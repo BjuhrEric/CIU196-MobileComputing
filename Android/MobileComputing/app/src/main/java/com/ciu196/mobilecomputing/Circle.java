@@ -7,6 +7,7 @@ package com.ciu196.mobilecomputing;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -58,8 +59,8 @@ public class Circle extends View {
             canvas.drawCircle(getHeight()/2, getWidth()/2,getWidth()/2,p );
         }
     }
-    public void setColor(int c){
-        p.setColor(c);
+    public void setColor(String colorString){
+        p.setColor(Color.parseColor(colorString));
        invalidate();
     }
 

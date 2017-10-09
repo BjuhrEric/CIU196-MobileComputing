@@ -49,10 +49,13 @@ public class ConnectActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //DO STUFF HERE!!!!
                 Toast.makeText(v.getContext(), "ActionClicked",Toast.LENGTH_LONG).show();
-                actionButton.setColor(999999);
+                actionButton.setColor("#d1172e");
                 Animation out = new AlphaAnimation(1.0f, 0.0f);
                 out.setDuration(2000);
                 pianoStatusTextView.startAnimation(out);
+
+
+
 
 
             }
