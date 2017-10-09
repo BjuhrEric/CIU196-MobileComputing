@@ -1,86 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.ciu196.mobilecomputing.ConnectActivity"
-    android:background="@color/backgroundNotConnected">
+    android:background="@color/backgroundNotConnected"
+    tools:context="com.ciu196.mobilecomputing.ConnectActivity">
 
     <TextView
         android:id="@+id/pianoStatusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="\'Piano Status'"
         android:layout_centerHorizontal="true"
-        android:textColor="@color/statusTextColor"
-        android:textSize="30sp"
         android:paddingTop="40dp"
-       />
+        android:text="\'Piano Status'"
+        android:textColor="@color/statusTextColor"
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/pianodetailedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="\'Detailed Inforamtion'"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/pianoStatusTextView"
-        android:textColor="@color/detaliedTextColor"
-        android:textSize="20sp"
-        android:paddingTop="10dp"
-        />
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-200dp">
+        android:paddingTop="10dp"
+        android:text="'Detailed Inforamtion'"
+        android:textColor="@color/detaliedTextColor"
+        android:textSize="20sp" />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="-230dp">
 
-        <com.ciu196.mobilecomputing.Circle
-            android:layout_width="420dp"
-            android:layout_height="420dp"
-            app:circleColor="#424242"
-            android:layout_gravity="center"
-            android:id="@+id/thirdRadius"
-            />
+            <com.ciu196.mobilecomputing.Circle
+                android:id="@+id/outerCircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:circleColor="#424242"
+                app:circleRadius="400" />
 
-        <com.ciu196.mobilecomputing.Circle
-            android:layout_width="360dp"
-            android:layout_height="360dp"
-            app:circleColor="#3b3b3b"
-            android:layout_gravity="center"
-            android:id="@+id/secondRadius"
-            />
+            <com.ciu196.mobilecomputing.Circle
+                android:id="@+id/innerCircle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:circleColor="#3b3b3b"
+                app:circleRadius="360" />
 
-        <com.ciu196.mobilecomputing.Circle
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            app:circleColor="#343434"
-            android:layout_gravity="center"
-            android:id="@+id/firstRadius"
-            />
+            <com.ciu196.mobilecomputing.Circle
+                android:id="@+id/innerCircle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:circleColor="#343434"
+                app:circleRadius="300" />
 
-        <com.ciu196.mobilecomputing.Circle
-            android:layout_width="210dp"
-            android:layout_height="210dp"
-            app:circleColor="#f46173"
-            android:layout_gravity="center"
-            android:id="@+id/actionButton"
-        />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="'TAKE ACTION'"
-            android:layout_gravity="center"
-            android:textColor="@color/statusTextColor"
-            android:paddingBottom="30dp"
-            android:textSize="25sp"/>
+            <com.ciu196.mobilecomputing.Circle
+                android:id="@+id/buttonCircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:circleColor="#f46173"
+                app:circleRadius="210" />
 
-         />
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="30dp"
+                android:text="'TAKE ACTION'"
+                android:textColor="@color/statusTextColor"
+                android:textSize="25sp" />
     </FrameLayout>
-
 
 
 </RelativeLayout>

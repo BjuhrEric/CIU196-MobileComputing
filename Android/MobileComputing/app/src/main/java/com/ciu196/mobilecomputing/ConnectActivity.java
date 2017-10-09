@@ -18,7 +18,7 @@ public class ConnectActivity extends AppCompatActivity {
         TextView pianoDetaildTextView = (TextView) findViewById(R.id.pianodetailedTextView);
 
 
-         final Circle actionButton =  (Circle) findViewById(R.id.actionButton);
+         final Circle actionButton =  (Circle) findViewById(R.id.thirdRadius);
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override

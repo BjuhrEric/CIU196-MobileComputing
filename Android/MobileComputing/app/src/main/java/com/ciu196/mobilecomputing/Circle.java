@@ -11,12 +11,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.TextView;
 
 
 public class Circle extends View {
 
     Paint p;
     int color ;
+    int radius;
+
     public Circle(Context context) {
         this(context, null);
     }
@@ -37,6 +40,7 @@ public class Circle extends View {
         try {
 
             color = a.getColor(R.styleable.Circle_circleColor, 0xff000000);
+            radius = a.getInt(R.styleable.Circle_circleRadius, 10);
         } finally {
             // release the TypedArray so that it can be reused.
             a.recycle();
@@ -44,8 +48,11 @@ public class Circle extends View {
         init();
     }
 
+    private TextView txtID;
+
     public void init()
     {
+        txtID = (TextView) findViewById(R.id.textID);
         p = new Paint();
         p.setColor(color);
     }
@@ -56,11 +63,29 @@ public class Circle extends View {
         super.onDraw(canvas);
         if(canvas!=null)
         {
-            canvas.drawCircle(getHeight()/2, getWidth()/2,getWidth()/2,p );
+
+            int w = getWidth();
+            int h = getHeight();
+//
+//            int pl = getPaddingLeft();
+//            int pr = getPaddingRight();
+//            int pt = getPaddingTop();
+//            int pb = getPaddingBottom();
+//
+//            int usableWidth = w - (pl + pr);
+//            int usableHeight = h - (pt + pb);
+//
+//            int radius = Math.min(usableWidth, usableHeight) / 2;
+//            int cx = pl + (usableWidth / 2);
+//            int cy = pt + (usableHeight / 2);
+
+//            canvas.drawCircle(cx, cy, radius, p);
+
+            canvas.drawCircle(getWidth()/2, getHeight()/2,radius,p );
         }
     }
     public void setColor(String colorString){
-        p.setColor(Color.parseColor(colorString));
+       p.setColor(Color.parseColor(colorString));
        invalidate();
     }
 
