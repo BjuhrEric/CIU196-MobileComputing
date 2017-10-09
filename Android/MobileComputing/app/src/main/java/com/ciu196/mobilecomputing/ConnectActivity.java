@@ -48,15 +48,36 @@ public class ConnectActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //DO STUFF HERE!!!!
-                Toast.makeText(v.getContext(), "ActionClicked",Toast.LENGTH_LONG).show();
                 actionButton.setColor("#d1172e");
-                Animation out = new AlphaAnimation(1.0f, 0.0f);
-                out.setDuration(2000);
+
+
+                final Animation out = new AlphaAnimation(1.0f, 0.0f);
+                out.setDuration(1000);
+                final Animation in = new AlphaAnimation(0.0f, 1.0f);
+                in.setDuration(1000);
+
                 pianoStatusTextView.startAnimation(out);
 
+                out.setAnimationListener(new Animation.AnimationListener() {
 
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
+                    }
 
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        pianoStatusTextView.setText("No-one is playing");
+                        pianoStatusTextView.startAnimation(in);
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                
 
             }
         });
