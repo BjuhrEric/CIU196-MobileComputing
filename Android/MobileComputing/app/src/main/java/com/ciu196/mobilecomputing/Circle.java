@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 public class Circle extends View {
 
-    Paint p;
+    Paint paint;
     int color ;
     int radius;
 
@@ -52,9 +52,8 @@ public class Circle extends View {
 
     public void init()
     {
-        txtID = (TextView) findViewById(R.id.textID);
-        p = new Paint();
-        p.setColor(color);
+        paint = new Paint();
+        paint.setColor(color);
     }
 
     @Override
@@ -66,27 +65,18 @@ public class Circle extends View {
 
             int w = getWidth();
             int h = getHeight();
-//
-//            int pl = getPaddingLeft();
-//            int pr = getPaddingRight();
-//            int pt = getPaddingTop();
-//            int pb = getPaddingBottom();
-//
-//            int usableWidth = w - (pl + pr);
-//            int usableHeight = h - (pt + pb);
-//
-//            int radius = Math.min(usableWidth, usableHeight) / 2;
-//            int cx = pl + (usableWidth / 2);
-//            int cy = pt + (usableHeight / 2);
 
-//            canvas.drawCircle(cx, cy, radius, p);
-
-            canvas.drawCircle(getWidth()/2, getHeight()/2,radius,p );
+            canvas.drawCircle(getWidth()/2, getHeight()/2,radius, paint);
         }
     }
     public void setColor(String colorString){
-       p.setColor(Color.parseColor(colorString));
+       paint.setColor(Color.parseColor(colorString));
        invalidate();
+    }
+
+    public void setRadius(int radius){
+        this.radius = radius;
+        invalidate();
     }
 
 

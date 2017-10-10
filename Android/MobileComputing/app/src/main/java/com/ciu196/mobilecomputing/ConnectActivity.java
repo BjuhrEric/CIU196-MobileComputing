@@ -42,15 +42,13 @@ public class ConnectActivity extends AppCompatActivity {
         }
 
 
-         final Circle actionButton =  (Circle) findViewById(R.id.thirdRadius);
+         final Circle circleButton =  (Circle) findViewById(R.id.buttonCircle);
+        ClickEffect.clickTintEffect(circleButton);
 
-        actionButton.setOnClickListener(new View.OnClickListener() {
+        circleButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 //DO STUFF HERE!!!!
-                actionButton.setColor("#d1172e");
-
-
                 final Animation out = new AlphaAnimation(1.0f, 0.0f);
                 out.setDuration(1000);
                 final Animation in = new AlphaAnimation(0.0f, 1.0f);
@@ -69,7 +67,7 @@ public class ConnectActivity extends AppCompatActivity {
                     public void onAnimationEnd(Animation animation) {
                         pianoStatusTextView.setText("No-one is playing");
                         pianoStatusTextView.startAnimation(in);
-
+//                        circleButton.setColor("#d1172e"); //set no one is playing color
                     }
 
                     @Override
