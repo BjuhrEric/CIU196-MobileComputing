@@ -1,21 +1,14 @@
 package com.ciu196.mobilecomputing;
 
-import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
-
-
 
 
 public class ConnectActivity extends AppCompatActivity {
@@ -26,7 +19,10 @@ public class ConnectActivity extends AppCompatActivity {
     TextView pianoDetailedTextView;
     TextView playerNameTextView;
     Button actionButton;
-    Circle innerCircle;
+    Circle circle1;
+    Circle circle2;
+    Circle circle3;
+    Circle circle4;
 
 
 
@@ -42,7 +38,10 @@ public class ConnectActivity extends AppCompatActivity {
         pianoDetailedTextView = (TextView) findViewById(R.id.pianodetailedTextView);
         playerNameTextView = (TextView) findViewById(R.id.playerNameTextView);
         actionButton = (Button) findViewById(R.id.actionButtion);
-        innerCircle = (Circle) findViewById(R.id.buttonCircle);
+        circle1 = (Circle) findViewById(R.id.circle1);
+        circle2 = (Circle) findViewById(R.id.circle2);
+        circle3 = (Circle) findViewById(R.id.circle3);
+        circle4 = (Circle) findViewById(R.id.circle4);
 
 
 
@@ -82,7 +81,7 @@ public class ConnectActivity extends AppCompatActivity {
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
-            innerCircle.setColor(R.color.listenBlueColor);
+            circle1.setColor(getResources().getColor(R.color.listenBlueColor));
             try {
 
                 pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));

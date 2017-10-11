@@ -57,46 +57,46 @@
         />
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="-230dp">
+        android:layout_marginBottom="-200dp">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/outerCircle"
+                android:id="@+id/circle4"
                 android:layout_width="400dp"
                 android:layout_height="400dp"
                 android:layout_centerInParent="true"
                 app:circleColor="#424242"
-                app:circleRadius="400" />
+               />
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/innerCircle2"
+                android:id="@+id/circle3"
                 android:layout_width="360dp"
                 android:layout_height="360dp"
                 android:layout_centerInParent="true"
                 app:circleColor="#3b3b3b"
-                app:circleRadius="360" />
+                 />
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/innerCircle1"
+                android:id="@+id/circle2"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 android:layout_centerInParent="true"
                 app:circleColor="#343434"
-                app:circleRadius="300" />
+                 />
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/buttonCircle"
+                android:id="@+id/circle1"
                 android:layout_width="210dp"
                 android:layout_height="210dp"
                 android:layout_centerInParent="true"
                 app:circleColor="#f46173"
-                app:circleRadius="210" />
+                 />
 
             <TextView
                 android:id="@+id/debugTxt"
