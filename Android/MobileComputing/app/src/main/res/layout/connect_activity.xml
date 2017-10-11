@@ -76,16 +76,16 @@
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/circle3"
-                android:layout_width="360dp"
-                android:layout_height="360dp"
+                android:layout_width="340dp"
+                android:layout_height="340dp"
                 android:layout_centerInParent="true"
                 app:circleColor="#3b3b3b"
                  />
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/circle2"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
                 android:layout_centerInParent="true"
                 app:circleColor="#343434"
                  />
