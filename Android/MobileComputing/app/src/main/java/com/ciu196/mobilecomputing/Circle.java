@@ -9,15 +9,22 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
 
 public class Circle extends View {
 
+    private Point centerPoint;
+    int centerX;
+    int centerY;
     Paint paint;
-    int color ;
+    boolean circleClicked;
+
+    int color;
     int radius;
 
     public Circle(Context context) {
@@ -40,7 +47,7 @@ public class Circle extends View {
         try {
 
             color = a.getColor(R.styleable.Circle_circleColor, 0xff000000);
-            radius = a.getInt(R.styleable.Circle_circleRadius, 10);
+//            radius = a.getInt(R.styleable.Circle_circleRadius, 10);
         } finally {
             // release the TypedArray so that it can be reused.
             a.recycle();
@@ -50,8 +57,7 @@ public class Circle extends View {
 
     private TextView txtID;
 
-    public void init()
-    {
+    public void init() {
         paint = new Paint();
         paint.setColor(color);
     }
@@ -60,23 +66,49 @@ public class Circle extends View {
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
-        if(canvas!=null)
-        {
-
-            int w = getWidth();
-            int h = getHeight();
-
-            canvas.drawCircle(getWidth()/2, getHeight()/2,radius, paint);
+        if (canvas != null) {
+            if(centerPoint == null)
+            {
+                centerPoint = new Point (getWidth() / 2, getHeight() / 2);
+                centerX = centerPoint.x;
+                centerY =centerPoint.y;
+                radius = getWidth() / 2;
+            }
+            canvas.drawCircle(centerX, centerY, radius, paint);
         }
     }
-    public void setColor(String colorString){
-       paint.setColor(Color.parseColor(colorString));
-       invalidate();
+
+    public boolean insideCircle(MotionEvent event) {
+        //CIRCLE :      (x-a)^2 + (y-b)^2 = r^2
+        float touchX, touchY;
+        touchX = event.getX();
+        touchY = event.getY();
+        System.out.println("centerX = "+this.centerX+", centerY = "+this.centerY);
+        System.out.println("touchX = "+touchX+", touchY = "+touchY);
+        System.out.println("radius = "+this.radius);
+        if (Math.pow(touchX - this.centerX, 2) + Math.pow(touchY - this.centerY, 2) < Math.pow(this.radius, 2)) {
+            System.out.println("Inside Circle");
+            circleClicked = true;
+            return true;
+        } else {
+            System.out.println("Outside Circle");
+            circleClicked = false;
+            return false;
+        }
     }
 
-    public void setRadius(int radius){
+    public void setColor(String colorString) {
+        paint.setColor(Color.parseColor(colorString));
+        invalidate();
+    }
+
+    public void setRadius(int radius) {
         this.radius = radius;
         invalidate();
+    }
+
+    public int getRadius() {
+        return this.radius;
     }
 
 

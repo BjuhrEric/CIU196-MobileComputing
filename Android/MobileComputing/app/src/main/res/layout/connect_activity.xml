@@ -34,31 +34,39 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="-230dp">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/outerCircle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:layout_centerInParent="true"
                 app:circleColor="#424242"
                 app:circleRadius="400" />
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/innerCircle2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="360dp"
+                android:layout_height="360dp"
+                android:layout_centerInParent="true"
                 app:circleColor="#3b3b3b"
                 app:circleRadius="360" />
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/innerCircle1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_centerInParent="true"
                 app:circleColor="#343434"
                 app:circleRadius="300" />
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/buttonCircle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="210dp"
+                android:layout_height="210dp"
+                android:layout_centerInParent="true"
                 app:circleColor="#f46173"
                 app:circleRadius="210" />
 
@@ -68,8 +76,22 @@
                 android:layout_gravity="center"
                 android:paddingBottom="30dp"
                 android:text="'TAKE ACTION'"
+                android:layout_centerInParent="true"
                 android:textColor="@color/statusTextColor"
                 android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/debugTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="100dp"
+                android:text="'debug'"
+                android:layout_centerInParent="true"
+                android:textColor="@color/statusTextColor"
+                android:textSize="25sp" />
+        </RelativeLayout>
+
     </FrameLayout>
 
 
