@@ -6,4 +6,8 @@
     <color name="backgroundNotConnected">#4a4a4a</color>
     <color name="statusTextColor">#FFFFFF</color>
     <color name="detaliedTextColor">#9b9b9b</color>
+    <color name="listenBlueColor">#4a90e2</color>
+
+
+
 </resources>

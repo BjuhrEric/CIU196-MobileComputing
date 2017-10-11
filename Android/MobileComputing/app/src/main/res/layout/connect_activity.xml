@@ -7,26 +7,54 @@
     android:background="@color/backgroundNotConnected"
     tools:context="com.ciu196.mobilecomputing.ConnectActivity">
 
-    <TextView
-        android:id="@+id/pianoStatusTextView"
+    <RelativeLayout
+        android:id="@+id/nameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:paddingTop="40dp"
-        android:text="\'Piano Status'"
-        android:textColor="@color/statusTextColor"
-        android:textSize="30sp" />
+        android:layout_centerHorizontal="true">
+
+    <TextView
+            android:id="@+id/playerNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\'Name'"
+            android:textColor="@color/listenBlueColor"
+            android:textSize="26sp" />
+        <TextView
+            android:id="@+id/pianoStatusTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\'Piano Status'"
+            android:textColor="@color/statusTextColor"
+            android:textSize="26sp"
+            android:layout_toRightOf="@+id/playerNameTextView"
+            android:paddingLeft="8dp"/>
+</RelativeLayout>
 
     <TextView
         android:id="@+id/pianodetailedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pianoStatusTextView"
+        android:layout_below="@+id/nameLayout"
         android:layout_centerHorizontal="true"
         android:paddingTop="10dp"
         android:text="'Detailed Inforamtion'"
         android:textColor="@color/detaliedTextColor"
         android:textSize="20sp" />
+
+    <Button
+        android:layout_marginTop="80dp"
+        android:id="@+id/actionButtion"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/pianodetailedTextView"
+        android:text="'Action'"
+        android:textColor="@color/statusTextColor"
+        android:background="@drawable/rounded_button"
+
+        />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -71,25 +99,16 @@
                 app:circleRadius="210" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingBottom="30dp"
-                android:text="'TAKE ACTION'"
-                android:layout_centerInParent="true"
-                android:textColor="@color/statusTextColor"
-                android:textSize="25sp" />
-
-            <TextView
                 android:id="@+id/debugTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:paddingBottom="100dp"
                 android:text="'debug'"
-                android:layout_centerInParent="true"
                 android:textColor="@color/statusTextColor"
-                android:textSize="25sp" />
+                android:textSize="25sp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
         </RelativeLayout>
 
     </FrameLayout>
