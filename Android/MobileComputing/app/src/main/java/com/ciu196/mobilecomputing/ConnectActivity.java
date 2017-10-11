@@ -1,5 +1,8 @@
 package com.ciu196.mobilecomputing;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +16,7 @@ import org.joda.time.Duration;
 
 public class ConnectActivity extends AppCompatActivity {
 
-    public enum guiMode{CONNECT, LISTEN, CANT_LISTEN, CANT_CONNECT,LISTENING, PLAYING };
+    public enum guiMode{CONNECT, LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING };
 
     TextView pianoStatusTextView;
     TextView pianoDetailedTextView;
@@ -24,6 +27,8 @@ public class ConnectActivity extends AppCompatActivity {
     Circle circle3;
     Circle circle4;
     View backgroundView;
+
+    int currentBackgroundColor;
 
 
 
@@ -44,6 +49,7 @@ public class ConnectActivity extends AppCompatActivity {
         circle3 = (Circle) findViewById(R.id.circle3);
         circle4 = (Circle) findViewById(R.id.circle4);
         backgroundView = (View) findViewById(R.id.backgroundLayout);
+        currentBackgroundColor = getResources().getColor(R.color.backgroundGrayColor);
 
 
 
@@ -87,7 +93,7 @@ public class ConnectActivity extends AppCompatActivity {
             circle2.setColor(getResources().getColor(R.color.circle2BlueColor));
             circle3.setColor(getResources().getColor(R.color.circle3BlueColor));
             circle4.setColor(getResources().getColor(R.color.circle4BlueColor));
-            backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
+            backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
 
             try {
 
@@ -109,6 +115,8 @@ public class ConnectActivity extends AppCompatActivity {
         }
         else {
             if (m == guiMode.LISTENING) {
+
+                changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
                 final Animation out = new AlphaAnimation(1.0f, 0.0f);
                 out.setDuration(500);
                 actionButton.startAnimation(out);
@@ -140,6 +148,24 @@ public class ConnectActivity extends AppCompatActivity {
 
             }
         }
+
+    }
+
+    private void changeBackgroundColor(int newColor){
+        int colorFrom = currentBackgroundColor;
+        int colorTo = newColor;
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        colorAnimation.setDuration(250); // milliseconds
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                backgroundView.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        colorAnimation.start();
+        currentBackgroundColor = newColor;
 
     }
 }
