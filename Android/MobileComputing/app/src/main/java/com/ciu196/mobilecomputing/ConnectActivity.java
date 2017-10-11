@@ -1,26 +1,30 @@
 package com.ciu196.mobilecomputing;
 
-import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class ConnectActivity extends AppCompatActivity {
+
+    public enum guiMode{CONNECT, LISTEN, CANT_LISTEN, CANT_CONNECT,LISTENING, PLAYING };
+
+    TextView pianoStatusTextView;
+    TextView pianoDetailedTextView;
+    TextView playerNameTextView;
+    Button actionButton;
+    Circle circle1;
+    Circle circle2;
+    Circle circle3;
+    Circle circle4;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,58 +34,35 @@ public class ConnectActivity extends AppCompatActivity {
         BroadcastService broadcastService = new BroadcastService();
 
         //Connect UI Elements
-        final TextView pianoStatusTextView = (TextView) findViewById(R.id.pianoStatusTextView);
-        final TextView pianoDetailedTextView = (TextView) findViewById(R.id.pianodetailedTextView);
+        pianoStatusTextView = (TextView) findViewById(R.id.pianoStatusTextView);
+        pianoDetailedTextView = (TextView) findViewById(R.id.pianodetailedTextView);
+        playerNameTextView = (TextView) findViewById(R.id.playerNameTextView);
+        actionButton = (Button) findViewById(R.id.actionButtion);
+        circle1 = (Circle) findViewById(R.id.circle1);
+        circle2 = (Circle) findViewById(R.id.circle2);
+        circle3 = (Circle) findViewById(R.id.circle3);
+        circle4 = (Circle) findViewById(R.id.circle4);
+
+
 
         if (BroadcastService.isLive()) {
-            pianoStatusTextView.setText(BroadcastService.getPlayerName() + " is playing");
-            try {
-
-                pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
-            } catch (NotLiveException e) {
-                e.printStackTrace();
+            if(BroadcastService.closeEnough()){
+                switchGui(guiMode.LISTEN);
             }
+            else {
+                switchGui(guiMode.CANT_LISTEN);
+            }
+        }else{
+            switchGui(guiMode.CONNECT);
         }
 
-        final Circle circleButton = (Circle) findViewById(R.id.buttonCircle);
-        circleButton.setOnTouchListener(new View.OnTouchListener() {
+        actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (((Circle) v).insideCircle(event) && event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-                    //DO STUFF HERE!!!!
-                    ClickEffect.setButtonClickedEffect(circleButton);
-
-                    final Animation out = new AlphaAnimation(1.0f, 0.0f);
-                    out.setDuration(1000);
-                    final Animation in = new AlphaAnimation(0.0f, 1.0f);
-                    in.setDuration(1000);
-
-                    pianoStatusTextView.startAnimation(out);
-                    out.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            pianoStatusTextView.setText("No-one is playing");
-                            pianoStatusTextView.startAnimation(in);
-//                        circleButton.setColor("#d1172e"); //set no one is playing color
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                }else if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
-                    ClickEffect.setButtonReleasedEffect(circleButton);
-                }
-
-                return true;
+            public void onClick(View v) {
+                switchGui(guiMode.LISTENING);
             }
         });
+
     }
 
     private String formatDuration(Duration d) {
@@ -92,5 +73,66 @@ public class ConnectActivity extends AppCompatActivity {
 
 
         return hours + ":" + minutes + ":" + seconds;
+    }
+    private void switchGui(guiMode m){
+
+        if(m == guiMode.LISTEN){
+
+            playerNameTextView.setText(BroadcastService.getPlayerName());
+            pianoStatusTextView.setText("is playing");
+            actionButton.setText("Start Listening");
+            circle1.setColor(getResources().getColor(R.color.listenBlueColor));
+            try {
+
+                pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
+            } catch (NotLiveException e) {
+                e.printStackTrace();
+            }
+        }
+        else if(m == guiMode.CANT_CONNECT){
+            playerNameTextView.setText(BroadcastService.getPlayerName());
+            actionButton.setEnabled(false);
+            actionButton.setText("Connect");
+
+        }
+        else if(m == guiMode.CONNECT){
+            playerNameTextView.setText(BroadcastService.getPlayerName() + " is playing");
+            actionButton.setText("Connect");
+
+        }
+        else {
+            if (m == guiMode.LISTENING) {
+                final Animation out = new AlphaAnimation(1.0f, 0.0f);
+                out.setDuration(500);
+                actionButton.startAnimation(out);
+                out.setAnimationListener(new Animation.AnimationListener() {
+                                             @Override
+                                             public void onAnimationStart(Animation animation) {
+
+                                             }
+
+                                             @Override
+                                             public void onAnimationEnd(Animation animation) {
+                                                    actionButton.setVisibility(View.INVISIBLE);
+                                             }
+
+                                             @Override
+                                             public void onAnimationRepeat(Animation animation) {
+
+                                             }
+                                         }
+                );
+
+                pianoStatusTextView.setText("Currently listening to");
+                playerNameTextView.setText(BroadcastService.getPlayerName());
+
+
+            } else if (m == guiMode.PLAYING) {
+                pianoStatusTextView.setText(BroadcastService.getPlayerName() + " is playing");
+                actionButton.setText("Connect");
+
+            }
+        }
+
     }
 }

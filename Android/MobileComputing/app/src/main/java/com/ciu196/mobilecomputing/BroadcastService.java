@@ -40,4 +40,8 @@ public class BroadcastService {
 
     }
 
+    public static boolean closeEnough() {
+        //Todo: not implemented yet, just dummy implementation so far
+        return true;
+    }
 }
