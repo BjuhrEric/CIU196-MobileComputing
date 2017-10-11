@@ -23,6 +23,7 @@ public class ConnectActivity extends AppCompatActivity {
     Circle circle2;
     Circle circle3;
     Circle circle4;
+    View backgroundView;
 
 
 
@@ -42,6 +43,7 @@ public class ConnectActivity extends AppCompatActivity {
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
         circle4 = (Circle) findViewById(R.id.circle4);
+        backgroundView = (View) findViewById(R.id.backgroundLayout);
 
 
 
@@ -81,7 +83,12 @@ public class ConnectActivity extends AppCompatActivity {
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
-            circle1.setColor(getResources().getColor(R.color.listenBlueColor));
+            circle1.setColor(getResources().getColor(R.color.circle1BlueColor));
+            circle2.setColor(getResources().getColor(R.color.circle2BlueColor));
+            circle3.setColor(getResources().getColor(R.color.circle3BlueColor));
+            circle4.setColor(getResources().getColor(R.color.circle4BlueColor));
+            backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
+
             try {
 
                 pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
