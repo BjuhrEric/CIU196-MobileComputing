@@ -43,40 +43,14 @@ public class ConnectActivity extends AppCompatActivity {
             }
         }
 
-        final TextView tvDebug = (TextView) findViewById(R.id.debugTxt);
-        final int outerRadius = ((Circle) findViewById(R.id.outerCircle)).getRadius();
-
-//        tvDebug.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(final View view) {
-//                final int dur = 5;
-//                new CountDownTimer(dur*1000, 100) {
-//                    int delta = 100;
-//                    int secondsLeft = dur;
-//
-//                    public void onTick(long millisUntilFinished) {
-//                        if(Math.round(millisUntilFinished/1000)<=secondsLeft) {
-////                        ((Circle) view).setRadius(outerRadius + delta);
-//                            tvDebug.setText(String.valueOf(secondsLeft));
-//                            secondsLeft--;
-//                        }
-//                    }
-//
-//                    public void onFinish() {
-////                        ((Circle) view).setRadius(outerRadius);
-//                    }
-//
-//                }.start();
-//            }
-//        });
-
-        Circle circleButton = (Circle) findViewById(R.id.buttonCircle);
-        ClickEffect.clickTintEffect(circleButton);
+        final Circle circleButton = (Circle) findViewById(R.id.buttonCircle);
         circleButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (((Circle) v).insideCircle(event)) {
+                if (((Circle) v).insideCircle(event) && event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
                     //DO STUFF HERE!!!!
+                    ClickEffect.setButtonClickedEffect(circleButton);
+
                     final Animation out = new AlphaAnimation(1.0f, 0.0f);
                     out.setDuration(1000);
                     final Animation in = new AlphaAnimation(0.0f, 1.0f);
@@ -101,8 +75,11 @@ public class ConnectActivity extends AppCompatActivity {
 
                         }
                     });
+                }else if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                    ClickEffect.setButtonReleasedEffect(circleButton);
                 }
-                return false;
+
+                return true;
             }
         });
     }

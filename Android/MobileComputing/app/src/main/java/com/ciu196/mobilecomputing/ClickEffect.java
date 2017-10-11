@@ -44,7 +44,7 @@ public class ClickEffect {
                                      });
 
     }
-    private static void setButtonClickedEffect(View v) {
+    public static void setButtonClickedEffect(View v) {
         //https://stackoverflow.com/questions/8034494/tint-dim-drawable-on-touch
 
 //        Drawable background = v.getBackground();
@@ -53,7 +53,7 @@ public class ClickEffect {
 //        v.setBackgroundDrawable(background);
         v.setAlpha(0.3f);
     }
-    private static void setButtonReleasedEffect(View v) {
+    public static void setButtonReleasedEffect(View v) {
 //        Drawable background = v.getBackground();
 //        background.setColorFilter(null);
 //        v.setBackgroundDrawable(background);
