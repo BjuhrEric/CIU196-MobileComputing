@@ -1,6 +1,10 @@
 package com.ciu196.mobilecomputing;
 
 
+import android.util.Log;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
@@ -23,7 +27,8 @@ public class BroadcastService {
     public static Duration getCurrentSessionDuration() throws NotLiveException {
         //Todo: not implemented yet, just dummy implementation so far
         if(isLive()){
-            return new Duration(Instant.now().minus(1265000), Instant.now());
+            return new Duration(new DateTime(2017,10,11,12,0,0, DateTimeZone.UTC).toInstant(), Instant.now());
+
         }
      throw new NotLiveException();
     }
@@ -38,6 +43,12 @@ public class BroadcastService {
     public void setPlayername(String name){
         playername = name;
 
+    }
+
+    //Returns how many is currently listening
+    public int getNumberOfListeners(){
+        //Todo: not implemented yet, just dummy implementation so far
+        return 15;
     }
 
     public static boolean closeEnough() {
