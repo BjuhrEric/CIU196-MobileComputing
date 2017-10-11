@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/backgroundLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundNotConnected"
@@ -58,45 +59,41 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="-230dp">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:layout_marginBottom="-200dp">
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/outerCircle"
+                android:id="@+id/circle4"
                 android:layout_width="400dp"
                 android:layout_height="400dp"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 app:circleColor="#424242"
-                app:circleRadius="400" />
+               />
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/innerCircle2"
-                android:layout_width="360dp"
-                android:layout_height="360dp"
-                android:layout_centerInParent="true"
+                android:id="@+id/circle3"
+                android:layout_width="340dp"
+                android:layout_height="340dp"
+                android:layout_gravity="center"
                 app:circleColor="#3b3b3b"
-                app:circleRadius="360" />
+                 />
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/innerCircle1"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:layout_centerInParent="true"
+                android:id="@+id/circle2"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center"
                 app:circleColor="#343434"
-                app:circleRadius="300" />
+                 />
 
             <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/buttonCircle"
+                android:id="@+id/circle1"
                 android:layout_width="210dp"
                 android:layout_height="210dp"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 app:circleColor="#f46173"
-                app:circleRadius="210" />
+                 />
 
             <TextView
                 android:id="@+id/debugTxt"
@@ -109,8 +106,6 @@
                 android:textSize="25sp"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
-        </RelativeLayout>
-
     </FrameLayout>
 
 

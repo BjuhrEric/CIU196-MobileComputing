@@ -8,6 +8,13 @@
     <color name="detaliedTextColor">#9b9b9b</color>
     <color name="listenBlueColor">#4a90e2</color>
 
+    <color name="circle1BlueColor">#3467a2</color>
+    <color name="circle2BlueColor">#3b73b5</color>
+    <color name="circle3BlueColor">#4281ca</color>
+    <color name="circle4BlueColor">#173357</color>
+    <color name="backgroundBlueColor">#00152e</color>
+
+    <color name="backgroundGrayColor">#323232</color>
 
 
 </resources>

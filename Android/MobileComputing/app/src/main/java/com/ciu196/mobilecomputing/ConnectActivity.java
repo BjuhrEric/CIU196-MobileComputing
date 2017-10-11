@@ -1,32 +1,34 @@
 package com.ciu196.mobilecomputing;
 
-import android.os.CountDownTimer;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.Duration;
-import org.joda.time.Instant;
-
-
 
 
 public class ConnectActivity extends AppCompatActivity {
 
-    public enum guiMode{CONNECT, LISTEN, CANT_LISTEN, CANT_CONNECT,LISTENING, PLAYING };
+    public enum guiMode{CONNECT, LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING };
 
     TextView pianoStatusTextView;
     TextView pianoDetailedTextView;
     TextView playerNameTextView;
     Button actionButton;
-    Circle innerCircle;
+    Circle circle1;
+    Circle circle2;
+    Circle circle3;
+    Circle circle4;
+    View backgroundView;
+
+    int currentBackgroundColor;
 
 
 
@@ -42,7 +44,12 @@ public class ConnectActivity extends AppCompatActivity {
         pianoDetailedTextView = (TextView) findViewById(R.id.pianodetailedTextView);
         playerNameTextView = (TextView) findViewById(R.id.playerNameTextView);
         actionButton = (Button) findViewById(R.id.actionButtion);
-        innerCircle = (Circle) findViewById(R.id.buttonCircle);
+        circle1 = (Circle) findViewById(R.id.circle1);
+        circle2 = (Circle) findViewById(R.id.circle2);
+        circle3 = (Circle) findViewById(R.id.circle3);
+        circle4 = (Circle) findViewById(R.id.circle4);
+        backgroundView = (View) findViewById(R.id.backgroundLayout);
+        currentBackgroundColor = getResources().getColor(R.color.backgroundGrayColor);
 
 
 
@@ -82,7 +89,12 @@ public class ConnectActivity extends AppCompatActivity {
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
-            innerCircle.setColor(R.color.listenBlueColor);
+            circle1.setColor(getResources().getColor(R.color.circle1BlueColor));
+            circle2.setColor(getResources().getColor(R.color.circle2BlueColor));
+            circle3.setColor(getResources().getColor(R.color.circle3BlueColor));
+            circle4.setColor(getResources().getColor(R.color.circle4BlueColor));
+            backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
+
             try {
 
                 pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
@@ -103,6 +115,8 @@ public class ConnectActivity extends AppCompatActivity {
         }
         else {
             if (m == guiMode.LISTENING) {
+
+                changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
                 final Animation out = new AlphaAnimation(1.0f, 0.0f);
                 out.setDuration(500);
                 actionButton.startAnimation(out);
@@ -134,6 +148,24 @@ public class ConnectActivity extends AppCompatActivity {
 
             }
         }
+
+    }
+
+    private void changeBackgroundColor(int newColor){
+        int colorFrom = currentBackgroundColor;
+        int colorTo = newColor;
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        colorAnimation.setDuration(250); // milliseconds
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                backgroundView.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        colorAnimation.start();
+        currentBackgroundColor = newColor;
 
     }
 }
