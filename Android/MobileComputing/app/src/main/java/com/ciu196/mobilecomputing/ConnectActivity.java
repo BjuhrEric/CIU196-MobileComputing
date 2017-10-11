@@ -57,7 +57,6 @@ public class ConnectActivity extends AppCompatActivity {
             switchGui(guiMode.CONNECT);
         }
 
-
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,42 +64,6 @@ public class ConnectActivity extends AppCompatActivity {
             }
         });
 
-
-        Circle circleButton = (Circle) findViewById(R.id.buttonCircle);
-        ClickEffect.clickTintEffect(circleButton);
-        circleButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (((Circle) v).insideCircle(event)) {
-                    //DO STUFF HERE!!!!
-                    final Animation out = new AlphaAnimation(1.0f, 0.0f);
-                    out.setDuration(1000);
-                    final Animation in = new AlphaAnimation(0.0f, 1.0f);
-                    in.setDuration(1000);
-
-                    pianoStatusTextView.startAnimation(out);
-                    out.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            pianoStatusTextView.setText("No-one is playing");
-                            pianoStatusTextView.startAnimation(in);
-//                        circleButton.setColor("#d1172e"); //set no one is playing color
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                }
-                return false;
-            }
-        });
     }
 
     private String formatDuration(Duration d) {

@@ -22,7 +22,6 @@ public class Circle extends View {
     int centerX;
     int centerY;
     Paint paint;
-    boolean circleClicked;
 
     int color;
     int radius;
@@ -75,6 +74,7 @@ public class Circle extends View {
                 radius = getWidth() / 2;
             }
             canvas.drawCircle(centerX, centerY, radius, paint);
+//            System.out.println("onDraw: " + radius);
         }
     }
 
@@ -83,16 +83,14 @@ public class Circle extends View {
         float touchX, touchY;
         touchX = event.getX();
         touchY = event.getY();
-        System.out.println("centerX = "+this.centerX+", centerY = "+this.centerY);
-        System.out.println("touchX = "+touchX+", touchY = "+touchY);
-        System.out.println("radius = "+this.radius);
+//        System.out.println("centerX = "+this.centerX+", centerY = "+this.centerY);
+//        System.out.println("touchX = "+touchX+", touchY = "+touchY);
+//        System.out.println("radius = "+this.radius);
         if (Math.pow(touchX - this.centerX, 2) + Math.pow(touchY - this.centerY, 2) < Math.pow(this.radius, 2)) {
             System.out.println("Inside Circle");
-            circleClicked = true;
             return true;
         } else {
             System.out.println("Outside Circle");
-            circleClicked = false;
             return false;
         }
     }
@@ -102,14 +100,25 @@ public class Circle extends View {
         invalidate();
     }
 
+    public void setColor(int colorInt) {
+        paint.setColor(colorInt);
+        invalidate();
+    }
+
     public void setRadius(int radius) {
         this.radius = radius;
         invalidate();
     }
 
+    public int getColor(){
+        return this.color;
+    }
+
     public int getRadius() {
         return this.radius;
     }
+
+
 
 
 }
