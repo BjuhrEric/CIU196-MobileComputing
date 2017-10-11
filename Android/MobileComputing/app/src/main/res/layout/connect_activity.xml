@@ -58,36 +58,32 @@
         />
 
     <FrameLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="-200dp">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/circle4"
                 android:layout_width="400dp"
                 android:layout_height="400dp"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 app:circleColor="#424242"
                />
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/circle3"
-                android:layout_width="360dp"
-                android:layout_height="360dp"
-                android:layout_centerInParent="true"
+                android:layout_width="340dp"
+                android:layout_height="340dp"
+                android:layout_gravity="center"
                 app:circleColor="#3b3b3b"
                  />
 
             <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/circle2"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:layout_centerInParent="true"
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center"
                 app:circleColor="#343434"
                  />
 
@@ -95,7 +91,7 @@
                 android:id="@+id/circle1"
                 android:layout_width="210dp"
                 android:layout_height="210dp"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 app:circleColor="#f46173"
                  />
 
@@ -110,8 +106,6 @@
                 android:textSize="25sp"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
-        </RelativeLayout>
-
     </FrameLayout>
 
 
