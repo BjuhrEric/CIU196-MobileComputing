@@ -8,6 +8,7 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -37,10 +38,11 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-
-
-        </activity>
+            android:label="@string/title_activity_maps"></activity>
+        <activity
+            android:name=".PitchAnimationActivity"
+            android:label="@string/title_activity_pitch_animation"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
