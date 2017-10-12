@@ -5,7 +5,9 @@ import android.animation.ValueAnimator;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -19,7 +21,9 @@ import org.joda.time.Duration;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeOutAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.translateAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.translateToCenterInParentViewAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.uniformScaleAnimation;
+import static java.lang.Thread.sleep;
 
 
 public class ConnectActivity extends AppCompatActivity {
@@ -141,17 +145,18 @@ public class ConnectActivity extends AppCompatActivity {
             changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
             setCircleColor(circleColor.BLUE);
 
-
-            translateAnimation(pianoStatusTextView, 500, Axis.X, -70);
-
-            translateAnimation(playerNameTextView, 500, Axis.Y, 120);
-            translateAnimation(playerNameTextView, 500, Axis.X, 370);
-            uniformScaleAnimation(playerNameTextView, 500, 1.3f);
-
-            translateAnimation(pianoDetailedTextView, 500, Axis.Y, 130);
-
             pianoStatusTextView.setText("Currently listening to");
             playerNameTextView.setText(BroadcastService.getPlayerName());
+
+
+            //TODO: The previous setText call dosn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
+            translateToCenterInParentViewAnimation(pianoStatusTextView, 500, Axis.X);
+            translateToCenterInParentViewAnimation(playerNameTextView, 500, Axis.X);
+
+            translateAnimation(playerNameTextView, 500, Axis.Y, 120);
+            translateAnimation(pianoDetailedTextView, 500, Axis.Y, 130);
+
+            uniformScaleAnimation(playerNameTextView, 500, 1.3f);
 
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
