@@ -33,6 +33,16 @@
             android:textColor="@color/detaliedTextColor"
             android:textSize="20sp" />
 
+        <TextView
+            android:id="@+id/db"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="10dp"
+            android:text="'db: '"
+            android:textColor="@color/detaliedTextColor"
+            android:textSize="20sp" />
+
     </LinearLayout>
 
     <Button
@@ -41,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/pianodetailedTextView"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="180dp"
         android:background="@drawable/rounded_button"
         android:text="'Action'"
         android:textColor="@color/statusTextColor"

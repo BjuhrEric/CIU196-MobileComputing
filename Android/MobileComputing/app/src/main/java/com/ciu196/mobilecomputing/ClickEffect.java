@@ -62,39 +62,4 @@ public class ClickEffect {
         v.setAlpha(1);
     }
 
-//    final TextView tvDebug = (TextView) findViewById(R.id.debugTxt);
-//    Circle outerCircle = (Circle) findViewById(R.id.outerCircle);
-//        outerCircle.setOnClickListener(new View.OnClickListener() {
-//        @Override
-//        public void onClick(final View view) {
-//            final int outerRadius = ((Circle) findViewById(R.id.outerCircle)).getRadius();
-//            final int outerColor = ((Circle) findViewById(R.id.outerCircle)).getColor();
-//            final int dur = 5 + 1;
-//            new CountDownTimer(dur * 1000, 100) {
-//                int delta = 1;
-//                int tick = 1;
-//                int ratio = 10;
-//                int secondsLeft = ratio * dur - 1;
-//
-//                public void onTick(long millisUntilFinished) {
-//                    if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
-//                        System.out.println("math: " + Math.round(millisUntilFinished / 500));
-//                        System.out.println("secondsleft: " + secondsLeft);
-//                        ((Circle) view).setRadius(outerRadius + delta * tick);
-//                        ((Circle) view).setColor("#d1172e");
-//                        tvDebug.setText(String.valueOf(secondsLeft));
-//                        tick++;
-//                        secondsLeft--;
-//                    }
-//                }
-//
-//                public void onFinish() {
-//                    ((Circle) view).setRadius(outerRadius);
-//                    ((Circle) view).setColor(outerColor);
-//                }
-//
-//            }.start();
-//        }
-//    });
-
 }
