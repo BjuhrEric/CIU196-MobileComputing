@@ -1,0 +1,38 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+jar {
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes("Implementation-Title": "Music Test Client",
+                "Implementation-Version": 0.01)
+    }
+}
+
+configurations {
+    extraLibs
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    extraLibs project(':common')
+    configurations.compile.extendsFrom(configurations.extraLibs)
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+}
+
+
+mainClassName = "com.ciu196.mobilecomputing.servertestclient.Application"
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
