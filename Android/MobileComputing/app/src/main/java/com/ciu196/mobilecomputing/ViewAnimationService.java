@@ -1,5 +1,6 @@
 package com.ciu196.mobilecomputing;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.util.Log;
 import android.view.View;
@@ -168,6 +169,23 @@ public class ViewAnimationService {
         animator.setDuration(duration);
         animator.start();
 
+
+    }
+    public static void colorTransitionAnimation(final View v, int duration, int colorFrom, int colorTo) {
+        ValueAnimator circle1ColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        circle1ColorAnimation.setDuration(duration);
+        circle1ColorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                if (v instanceof Circle)
+                    ((Circle) v).setColor((int) animator.getAnimatedValue());
+                else
+                    v.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        circle1ColorAnimation.start();
 
     }
 }
