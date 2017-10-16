@@ -41,12 +41,22 @@ public class Application {
 
     private Application() {
         try {
-            data_socket = new Socket(InetAddress.getLocalHost(), DATA_PORT);
             request_socket = new Socket(InetAddress.getLocalHost(), REQUEST_PORT);
             bufferedInputStream = new BufferedInputStream(request_socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
             objectInputStream = new ObjectInputStream(bufferedInputStream);
-        } catch (IOException e) {
+            while (bufferedInputStream.available() <= 0) {
+                System.out.println("Waiting");
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+            objectInputStream.readObject();
+
+            data_socket = new Socket(InetAddress.getLocalHost(), DATA_PORT);
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

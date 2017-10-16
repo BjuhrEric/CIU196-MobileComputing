@@ -30,7 +30,6 @@ public class ClientRequestHandlerTask extends ServerTask {
 
     @Override
     protected boolean loop() {
-        System.out.println("Handling requests");
         final ClientRequest first = client.getFirstRequest();
         if (first == null)
             return true;
