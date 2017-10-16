@@ -2,7 +2,6 @@ package com.ciu196.mobilecomputing;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,13 +50,6 @@ public class ConnectActivity extends AppCompatActivity {
         circle4 = (Circle) findViewById(R.id.circle4);
         backgroundView = (View) findViewById(R.id.backgroundLayout);
         currentBackgroundColor = getResources().getColor(R.color.backgroundGrayColor);
-        pianoStatusTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), PitchAnimationActivity.class);
-                startActivity(i);
-            }
-        });
 
 
 
@@ -104,6 +96,7 @@ public class ConnectActivity extends AppCompatActivity {
             backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
 
             try {
+
                 pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
             } catch (NotLiveException e) {
                 e.printStackTrace();
@@ -113,6 +106,7 @@ public class ConnectActivity extends AppCompatActivity {
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
             actionButton.setText("Connect");
+
         }
         else if(m == guiMode.CONNECT){
             playerNameTextView.setText(BroadcastService.getPlayerName() + " is playing");

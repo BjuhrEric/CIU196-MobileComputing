@@ -1,8 +1,15 @@
 package com.ciu196.mobilecomputing;
 
 
+import android.util.Log;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.*;
 
 /**
  * Created by Andreas Pegelow on 2017-10-09.
@@ -23,7 +30,8 @@ public class BroadcastService {
     public static Duration getCurrentSessionDuration() throws NotLiveException {
         //Todo: not implemented yet, just dummy implementation so far
         if(isLive()){
-            return new Duration(Instant.now().minus(1265000), Instant.now());
+            return new Duration(new DateTime(2017,10,11,12,0,0, DateTimeZone.UTC).toInstant(), Instant.now());
+
         }
      throw new NotLiveException();
     }
@@ -35,13 +43,30 @@ public class BroadcastService {
        return (isLive() ? playername : "No-one");
 
     }
+
     public void setPlayername(String name){
         playername = name;
 
     }
 
+    /*
+    * http://googlemaps.github.io/android-maps-utils/javadoc/
+    * */
+
+    //Returns how many is currently listening
+    public static int getNumberOfListeners(){
+        //Todo: not implemented yet, just dummy implementation so far
+        return 15;
+    }
+    
     public static boolean closeEnough() {
         //Todo: not implemented yet, just dummy implementation so far
-        return true;
+        int playZone = 0;
+        int circleRadius = 0;
+        LatLng libLatLng = null;
+        LatLng userLatLng = null;
+
+        double distance = SphericalUtil.computeDistanceBetween(null, null);
+        return distance < playZone*circleRadius;
     }
 }
