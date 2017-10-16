@@ -3,6 +3,7 @@ package com.ciu196.mobilecomputing.server.io;
 import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.TaskManager;
+import com.ciu196.mobilecomputing.server.tasks.ClientConnectionCheckerTask;
 import com.ciu196.mobilecomputing.server.tasks.ClientRequestFetcherTask;
 import com.ciu196.mobilecomputing.server.tasks.ClientRequestHandlerTask;
 import com.ciu196.mobilecomputing.server.util.Client;
@@ -22,10 +23,14 @@ import java.util.TreeSet;
 
 public class SocketServer implements Server {
 
+
+    private final static String NOONE = "No-one";
+
     private volatile boolean running = false;
     private volatile Client broadcaster = null;
+    private volatile String broadcasterName = NOONE;
     private ServerSocket requestSocket, dataSocket;
-    private final Map<InetAddress, SocketClient> clientMap;
+    private final Map<InetAddress, Client> clientMap;
     private final Set<Client> listeners;
 
     public SocketServer() {
@@ -43,7 +48,7 @@ public class SocketServer implements Server {
 
     public synchronized void connectRequestSocket() throws IOException {
         Socket clientSocket = requestSocket.accept();
-        SocketClient client = clientMap.get(clientSocket.getInetAddress());
+        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
         if (client == null) {
             client = new SocketClient();
             client.bindRequestSocket(clientSocket);
@@ -55,19 +60,22 @@ public class SocketServer implements Server {
 
             ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
             ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
+            ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
 
             client.addTask(fetcherTask);
             client.addTask(handlerTask);
+            client.addTask(connectionTask);
 
             new Thread(fetcherTask).start();
             new Thread(handlerTask).start();
+            new Thread(connectionTask).start();
         }
 
     }
 
     public synchronized void connectDataSocket() throws IOException {
         Socket clientSocket = dataSocket.accept();
-        SocketClient client = clientMap.get(clientSocket.getInetAddress());
+        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
         if (client == null) {
             client = new SocketClient();
             client.bindDataSocket(clientSocket);
@@ -79,16 +87,19 @@ public class SocketServer implements Server {
 
             ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
             ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
+            ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
 
             client.addTask(fetcherTask);
             client.addTask(handlerTask);
+            client.addTask(connectionTask);
 
             new Thread(fetcherTask).start();
             new Thread(handlerTask).start();
+            new Thread(connectionTask).start();
         }
     }
 
-    public void receiveData(Client c) throws IllegalStateException, IOException {
+    public void receiveData(final Client c) throws IllegalStateException, IOException {
         if (c == null || !c.equals(broadcaster))
             throw new IllegalStateException("Only the broadcaster is supposed to broadcast");
 
@@ -100,37 +111,43 @@ public class SocketServer implements Server {
     }
 
     @Override
-    public void sendStatus(Client client) throws IOException {
+    public void sendStatus(final Client client) throws IOException {
         ServerResponse.Status status = new ServerResponse.Status();
         ServerResponse response = new ServerResponse(ServerResponse.ResponseType.STATUS, status);
         status.putStatus("broadcasting", Boolean.toString(broadcaster != null));
+        status.putStatus("broadcaster", broadcasterName);
+        status.putStatus("nListeners", Integer.toString(listeners.size()));
 
         client.sendMessage(response);
     }
 
-    public void sendData(Client c) throws IOException {
+    public void sendData(final Client c) throws IOException {
         c.sendData();
     }
 
-    public void setBroadcaster(Client c) throws IOException {
+    public void setBroadcaster(final Client c, final String name) throws IOException {
         System.out.println("Setting broadcaster");
         if (broadcaster != null) {
             c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_DECLINED, new ServerResponse.NoValue()));
             return;
         }
+        broadcasterName = name;
         broadcaster = c;
         listeners.remove(c);
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
     }
 
-    public void detachClient(Client c) throws IOException {
+    public void detachClient(final Client c) throws IOException {
         if (c == null)
             throw new IllegalArgumentException("Client may not be null");
-        if (c.equals(broadcaster))
+        if (c.equals(broadcaster)) {
             broadcaster = null;
+            broadcasterName = NOONE;
+        }
 
         System.out.println("Client detached");
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+        clientMap.remove(c.getInetAddress());
         listeners.remove(c);
         c.close();
     }

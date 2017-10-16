@@ -1,5 +1,6 @@
 package com.ciu196.mobilecomputing;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.view.animation.DecelerateInterpolator;
  */
 
 public class ViewAnimationService {
+    public enum Axis {X, Y};
 
     public static void fadeOutAnimation(final View v, int duration) {
         final Animation out = new AlphaAnimation(1.0f, 0.0f);
@@ -79,7 +81,7 @@ public class ViewAnimationService {
 
     }
 
-    public static void translateAnimation(final View v, int duration, final ConnectActivity.Axis axis, float distance) {
+    public static void translateAnimation(final View v, int duration, final Axis axis, float distance) {
 
         ValueAnimator animator = ValueAnimator.ofFloat(0, distance);
 
@@ -88,9 +90,9 @@ public class ViewAnimationService {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
 
-                if (axis == ConnectActivity.Axis.X)
+                if (axis == Axis.X)
                     v.setTranslationX(value);
-                else if (axis == ConnectActivity.Axis.Y)
+                else if (axis == Axis.Y)
                     v.setTranslationY(value);
 
 
@@ -103,7 +105,7 @@ public class ViewAnimationService {
 
 
     }
-    public static void translateToCenterInParentViewAnimation(final View v, int duration, final ConnectActivity.Axis axis) {
+    public static void translateToCenterInParentViewAnimation(final View v, int duration, final Axis axis) {
 
        View parentView = v.getRootView();
 
@@ -115,7 +117,7 @@ public class ViewAnimationService {
         int goalPosition = 0 ;
         int distance = 0;
 
-        if(axis == ConnectActivity.Axis.X) {
+        if(axis == Axis.X) {
             goalPosition = (parentView.getWidth() / 2) + parentPosition[0] - (v.getWidth() / 2);
             distance = goalPosition - vPosition[0];
         }else{
@@ -132,9 +134,9 @@ public class ViewAnimationService {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
 
-                if (axis == ConnectActivity.Axis.X)
+                if (axis == Axis.X)
                     v.setTranslationX(value);
-                else if (axis == ConnectActivity.Axis.Y)
+                else if (axis == Axis.Y)
                     v.setTranslationY(value);
 
 
@@ -168,6 +170,23 @@ public class ViewAnimationService {
         animator.setDuration(duration);
         animator.start();
 
+
+    }
+    public static void colorTransitionAnimation(final View v, int duration, int colorFrom, int colorTo) {
+        ValueAnimator circle1ColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        circle1ColorAnimation.setDuration(duration);
+        circle1ColorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                if (v instanceof Circle)
+                    ((Circle) v).setColor((int) animator.getAnimatedValue());
+                else
+                    v.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        circle1ColorAnimation.start();
 
     }
 }

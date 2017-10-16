@@ -10,7 +10,7 @@ public interface Server {
     void quit();
     void connectRequestSocket() throws IOException;
     void connectDataSocket() throws IOException;
-    void setBroadcaster(Client client) throws IOException;
+    void setBroadcaster(Client client, String name) throws IOException;
     void detachClient(Client client) throws IOException;
     void sendData(Client client) throws IOException;
     void receiveData(Client client) throws IllegalStateException, IOException;

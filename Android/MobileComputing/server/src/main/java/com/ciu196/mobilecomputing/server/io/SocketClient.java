@@ -83,6 +83,12 @@ class SocketClient implements Client {
         return inetAddress;
     }
 
+    @Override
+    public boolean isConnected() {
+        return dataSocket != null && requestSocket != null && dataSocket.isConnected()
+                && requestSocket.isConnected();
+    }
+
     public synchronized byte[] readData() throws IOException {
         byte[] buffer = new byte[dataInputStream.available()];
         dataInputStream.read(buffer);

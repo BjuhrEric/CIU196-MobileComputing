@@ -11,6 +11,8 @@ import org.joda.time.Instant;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.*;
 
+import java.util.SimpleTimeZone;
+
 /**
  * Created by Andreas Pegelow on 2017-10-09.
  */
@@ -30,7 +32,7 @@ public class BroadcastService {
     public static Duration getCurrentSessionDuration() throws NotLiveException {
         //Todo: not implemented yet, just dummy implementation so far
         if(isLive()){
-            return new Duration(new DateTime(2017,10,11,12,0,0, DateTimeZone.UTC).toInstant(), Instant.now());
+            return new Duration(new DateTime(2017,10,16,11,0,0, DateTimeZone.forOffsetHours(2)).toInstant(), Instant.now());
 
         }
      throw new NotLiveException();
@@ -49,15 +51,18 @@ public class BroadcastService {
 
     }
 
-    /*
-    * http://googlemaps.github.io/android-maps-utils/javadoc/
-    * */
+
 
     //Returns how many is currently listening
-    public int getNumberOfListeners(){
+    public static int getNumberOfListeners(){
         //Todo: not implemented yet, just dummy implementation so far
         return 15;
     }
+
+
+    /*
+   * http://googlemaps.github.io/android-maps-utils/javadoc/
+   * */
 
     public static boolean closeEnough() {
         //Todo: not implemented yet, just dummy implementation so far
@@ -66,7 +71,8 @@ public class BroadcastService {
         LatLng libLatLng = null;
         LatLng userLatLng = null;
 
-        double distance = SphericalUtil.computeDistanceBetween(null, null);
+//        double distance = SphericalUtil.computeDistanceBetween(null, null);
+        double distance = -1;
         return distance < playZone*circleRadius;
     }
 }

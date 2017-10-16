@@ -3,21 +3,17 @@ package com.ciu196.mobilecomputing;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.Duration;
 
+import static com.ciu196.mobilecomputing.ViewAnimationService.colorTransitionAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeOutAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.translateAnimation;
@@ -32,24 +28,40 @@ public class ConnectActivity extends AppCompatActivity {
 
     public enum circleColor {BLUE, RED};
 
-    public enum Axis {X, Y};
 
     TextView pianoStatusTextView;
-    TextView pianoDetailedTextView;
+    TextView listenersTextView;
     TextView playerNameTextView;
+    TextView durationText;
     Button actionButton;
     Circle circle1;
     Circle circle2;
     Circle circle3;
     Circle circle4;
     View backgroundView;
+    View listenerLayout;
+    FloatingActionButton fab;
 
-    guiMode currentGuiMode = guiMode.START_TO_LISTEN;
+    guiMode previusGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
     int currentCircleColors[] = {0, 0, 0, 0};
     circleColor currentCircleColor = circleColor.BLUE;
 
     boolean testFlag = false;
+
+    View.OnClickListener fabListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (previusGuiMode == guiMode.START_TO_LISTEN){
+
+                Toast.makeText(getApplicationContext(),"Start map acitivty",Toast.LENGTH_LONG).show();
+            }else if (previusGuiMode == guiMode.LISTENING){
+
+                Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
+        }
+
+        }
+    };
 
 
     @Override
@@ -59,9 +71,13 @@ public class ConnectActivity extends AppCompatActivity {
 
         //Connect UI Elements
         pianoStatusTextView = (TextView) findViewById(R.id.pianoStatusTextView);
-        pianoDetailedTextView = (TextView) findViewById(R.id.pianodetailedTextView);
+        listenersTextView = (TextView) findViewById(R.id.listenersTextView);
         playerNameTextView = (TextView) findViewById(R.id.playerNameTextView);
+        durationText = (TextView) findViewById(R.id.durationText);
         actionButton = (Button) findViewById(R.id.actionButtion);
+        listenerLayout = (View) findViewById(R.id.listenersLayout);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(fabListener);
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
@@ -72,6 +88,8 @@ public class ConnectActivity extends AppCompatActivity {
         currentCircleColors[1] = circle2.getColor();
         currentCircleColors[2] = circle3.getColor();
         currentCircleColors[3] = circle4.getColor();
+
+
 
 
 
@@ -112,17 +130,21 @@ public class ConnectActivity extends AppCompatActivity {
         teardownCurrentGui();
 
         if (m == guiMode.START_TO_LISTEN) {
-            currentGuiMode = guiMode.START_TO_LISTEN;
+            previusGuiMode = guiMode.START_TO_LISTEN;
 
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
+            listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
             setCircleColor(circleColor.BLUE);
             backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
-            fadeInAnimation(pianoDetailedTextView, 600);
+            fadeInAnimation(listenerLayout, 600);
             fadeInAnimation(actionButton, 1000);
+
+            fab.setImageResource(R.drawable.ic_map_white_24dp);
+            fab.show();
 
             final Handler handler = new Handler();
 
@@ -130,7 +152,7 @@ public class ConnectActivity extends AppCompatActivity {
                 public void run(){
                     try {
 
-                        pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
+                        durationText.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
                     } catch (NotLiveException e) {
                         e.printStackTrace();
                     }
@@ -140,7 +162,7 @@ public class ConnectActivity extends AppCompatActivity {
             }, 0);
 
         } else if (m == guiMode.LISTENING) {
-            currentGuiMode = guiMode.LISTENING;
+            previusGuiMode = guiMode.LISTENING;
 
             changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
             setCircleColor(circleColor.BLUE);
@@ -148,37 +170,37 @@ public class ConnectActivity extends AppCompatActivity {
             pianoStatusTextView.setText("Currently listening to");
             playerNameTextView.setText(BroadcastService.getPlayerName());
 
+            fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
+            fab.show();
 
-            //TODO: The previous setText call dosn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
-            translateToCenterInParentViewAnimation(pianoStatusTextView, 500, Axis.X);
-            translateToCenterInParentViewAnimation(playerNameTextView, 500, Axis.X);
 
-            translateAnimation(playerNameTextView, 500, Axis.Y, 120);
-            translateAnimation(pianoDetailedTextView, 500, Axis.Y, 130);
+            //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
+            translateToCenterInParentViewAnimation(pianoStatusTextView, 500, ViewAnimationService.Axis.X);
+            translateToCenterInParentViewAnimation(playerNameTextView, 500, ViewAnimationService.Axis.X);
+
+            translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
+            translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
 
             uniformScaleAnimation(playerNameTextView, 500, 1.3f);
 
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
-            fadeInAnimation(pianoDetailedTextView, 600);
-
-
 
         } else if (m == guiMode.CANT_CONNECT) {
-            currentGuiMode = guiMode.CANT_CONNECT;
+            previusGuiMode = guiMode.CANT_CONNECT;
 
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
             actionButton.setText("Connect");
 
         } else if (m == guiMode.CONNECT) {
-            currentGuiMode = guiMode.CONNECT;
+            previusGuiMode = guiMode.CONNECT;
 
             playerNameTextView.setText(BroadcastService.getPlayerName() + " is playing");
             actionButton.setText("Connect");
 
         }  else if (m == guiMode.PLAYING) {
-            currentGuiMode = guiMode.PLAYING;
+            previusGuiMode = guiMode.PLAYING;
 
             pianoStatusTextView.setText(BroadcastService.getPlayerName() + " is playing");
             setCircleColor(circleColor.RED);
@@ -189,25 +211,25 @@ public class ConnectActivity extends AppCompatActivity {
 
 
     private void teardownCurrentGui() {
-        if(currentGuiMode == guiMode.START_TO_LISTEN){
+        if(previusGuiMode == guiMode.START_TO_LISTEN){
             fadeOutAnimation(playerNameTextView, 200);
             fadeOutAnimation(pianoStatusTextView, 350);
-            fadeOutAnimation(pianoDetailedTextView, 400);
             fadeOutAnimation(actionButton, 500);
+            fab.hide();
 
-        } else if(currentGuiMode == guiMode.LISTENING){
+        } else if(previusGuiMode == guiMode.LISTENING){
+            fab.hide();
+
+        }
+        else if(previusGuiMode == guiMode.CANT_CONNECT){
 
 
         }
-        else if(currentGuiMode == guiMode.CANT_CONNECT){
+        else if(previusGuiMode == guiMode.CONNECT){
 
 
         }
-        else if(currentGuiMode == guiMode.CONNECT){
-
-
-        }
-        else if(currentGuiMode == guiMode.PLAYING){
+        else if(previusGuiMode == guiMode.PLAYING){
 
 
         }
@@ -215,7 +237,7 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     private void changeBackgroundColor(int newColor) {
-        colorTransitionAnimation(backgroundView, 250, currentBackgroundColor, newColor);
+        colorTransitionAnimation(backgroundView, 750, currentBackgroundColor, newColor);
         currentBackgroundColor = newColor;
 
     }
@@ -256,21 +278,5 @@ public class ConnectActivity extends AppCompatActivity {
 
     }
 
-    private void colorTransitionAnimation(final View v, int duration, int colorFrom, int colorTo) {
-        ValueAnimator circle1ColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
-        circle1ColorAnimation.setDuration(duration);
-        circle1ColorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
-            @Override
-            public void onAnimationUpdate(ValueAnimator animator) {
-                if (v instanceof Circle)
-                    ((Circle) v).setColor((int) animator.getAnimatedValue());
-                else
-                    v.setBackgroundColor((int) animator.getAnimatedValue());
-            }
-
-        });
-        circle1ColorAnimation.start();
-
-    }
 }
