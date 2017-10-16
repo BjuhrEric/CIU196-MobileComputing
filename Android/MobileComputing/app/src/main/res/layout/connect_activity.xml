@@ -36,25 +36,35 @@
             android:layout_toRightOf="@+id/playerNameTextView"
             android:paddingLeft="8dp"/>
 </RelativeLayout>
-
-    <TextView
-        android:id="@+id/pianodetailedTextView"
+    <RelativeLayout
+        android:id="@+id/listenersLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nameLayout"
         android:layout_centerHorizontal="true"
-        android:paddingTop="10dp"
-        android:text="'Detailed Inforamtion'"
-        android:textColor="@color/detaliedTextColor"
-        android:textSize="20sp" />
+        android:paddingTop="20dp">
+        <TextView
+            android:id="@+id/listenersTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="'#listeners'"
+            android:textColor="@color/detaliedTextColor"
+            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/earImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/listenersTextView"
+            android:src="@drawable/ic_my_location_white_24dp"/>
 
+    </RelativeLayout>
     <Button
         android:layout_marginTop="80dp"
         android:id="@+id/actionButtion"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/pianodetailedTextView"
+        android:layout_below="@+id/listenersLayout"
         android:text="'Action'"
         android:textColor="@color/statusTextColor"
         android:background="@drawable/rounded_button"
@@ -98,18 +108,29 @@
                 android:layout_gravity="center"
                 app:circleColor="#f46173"
                  />
-
-            <TextView
-                android:id="@+id/debugTxt"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingBottom="100dp"
+                android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/pianoImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_my_location_black_24dp"
+                />
+            <TextView
+                android:layout_below="@+id/pianoImage"
+                android:id="@+id/durationText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="'debug'"
                 android:textColor="@color/statusTextColor"
-                android:textSize="25sp"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true" />
+                android:textSize="18sp"
+                android:paddingBottom="50dp"
+               />
+            </RelativeLayout>
     </FrameLayout>
 
 

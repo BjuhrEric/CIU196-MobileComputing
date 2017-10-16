@@ -5,14 +5,7 @@ import android.animation.ValueAnimator;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -35,16 +28,18 @@ public class ConnectActivity extends AppCompatActivity {
     public enum Axis {X, Y};
 
     TextView pianoStatusTextView;
-    TextView pianoDetailedTextView;
+    TextView listenersTextView;
     TextView playerNameTextView;
+    TextView durationText;
     Button actionButton;
     Circle circle1;
     Circle circle2;
     Circle circle3;
     Circle circle4;
     View backgroundView;
+    View listenerLayout;
 
-    guiMode currentGuiMode = guiMode.START_TO_LISTEN;
+    guiMode previusGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
     int currentCircleColors[] = {0, 0, 0, 0};
     circleColor currentCircleColor = circleColor.BLUE;
@@ -59,9 +54,11 @@ public class ConnectActivity extends AppCompatActivity {
 
         //Connect UI Elements
         pianoStatusTextView = (TextView) findViewById(R.id.pianoStatusTextView);
-        pianoDetailedTextView = (TextView) findViewById(R.id.pianodetailedTextView);
+        listenersTextView = (TextView) findViewById(R.id.listenersTextView);
         playerNameTextView = (TextView) findViewById(R.id.playerNameTextView);
+        durationText = (TextView) findViewById(R.id.durationText);
         actionButton = (Button) findViewById(R.id.actionButtion);
+        listenerLayout = (View) findViewById(R.id.listenersLayout);
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
@@ -112,16 +109,17 @@ public class ConnectActivity extends AppCompatActivity {
         teardownCurrentGui();
 
         if (m == guiMode.START_TO_LISTEN) {
-            currentGuiMode = guiMode.START_TO_LISTEN;
+            previusGuiMode = guiMode.START_TO_LISTEN;
 
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
+            listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
             setCircleColor(circleColor.BLUE);
             backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
-            fadeInAnimation(pianoDetailedTextView, 600);
+            fadeInAnimation(listenerLayout, 600);
             fadeInAnimation(actionButton, 1000);
 
             final Handler handler = new Handler();
@@ -130,7 +128,7 @@ public class ConnectActivity extends AppCompatActivity {
                 public void run(){
                     try {
 
-                        pianoDetailedTextView.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
+                        durationText.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
                     } catch (NotLiveException e) {
                         e.printStackTrace();
                     }
@@ -140,7 +138,7 @@ public class ConnectActivity extends AppCompatActivity {
             }, 0);
 
         } else if (m == guiMode.LISTENING) {
-            currentGuiMode = guiMode.LISTENING;
+            previusGuiMode = guiMode.LISTENING;
 
             changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
             setCircleColor(circleColor.BLUE);
@@ -149,36 +147,33 @@ public class ConnectActivity extends AppCompatActivity {
             playerNameTextView.setText(BroadcastService.getPlayerName());
 
 
-            //TODO: The previous setText call dosn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
+            //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
             translateToCenterInParentViewAnimation(pianoStatusTextView, 500, Axis.X);
             translateToCenterInParentViewAnimation(playerNameTextView, 500, Axis.X);
 
             translateAnimation(playerNameTextView, 500, Axis.Y, 120);
-            translateAnimation(pianoDetailedTextView, 500, Axis.Y, 130);
+            translateAnimation(listenerLayout, 500, Axis.Y, 130);
 
             uniformScaleAnimation(playerNameTextView, 500, 1.3f);
 
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
-            fadeInAnimation(pianoDetailedTextView, 600);
-
-
 
         } else if (m == guiMode.CANT_CONNECT) {
-            currentGuiMode = guiMode.CANT_CONNECT;
+            previusGuiMode = guiMode.CANT_CONNECT;
 
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
             actionButton.setText("Connect");
 
         } else if (m == guiMode.CONNECT) {
-            currentGuiMode = guiMode.CONNECT;
+            previusGuiMode = guiMode.CONNECT;
 
             playerNameTextView.setText(BroadcastService.getPlayerName() + " is playing");
             actionButton.setText("Connect");
 
         }  else if (m == guiMode.PLAYING) {
-            currentGuiMode = guiMode.PLAYING;
+            previusGuiMode = guiMode.PLAYING;
 
             pianoStatusTextView.setText(BroadcastService.getPlayerName() + " is playing");
             setCircleColor(circleColor.RED);
@@ -189,25 +184,24 @@ public class ConnectActivity extends AppCompatActivity {
 
 
     private void teardownCurrentGui() {
-        if(currentGuiMode == guiMode.START_TO_LISTEN){
+        if(previusGuiMode == guiMode.START_TO_LISTEN){
             fadeOutAnimation(playerNameTextView, 200);
             fadeOutAnimation(pianoStatusTextView, 350);
-            fadeOutAnimation(pianoDetailedTextView, 400);
             fadeOutAnimation(actionButton, 500);
 
-        } else if(currentGuiMode == guiMode.LISTENING){
+        } else if(previusGuiMode == guiMode.LISTENING){
 
 
         }
-        else if(currentGuiMode == guiMode.CANT_CONNECT){
+        else if(previusGuiMode == guiMode.CANT_CONNECT){
 
 
         }
-        else if(currentGuiMode == guiMode.CONNECT){
+        else if(previusGuiMode == guiMode.CONNECT){
 
 
         }
-        else if(currentGuiMode == guiMode.PLAYING){
+        else if(previusGuiMode == guiMode.PLAYING){
 
 
         }
@@ -215,7 +209,7 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     private void changeBackgroundColor(int newColor) {
-        colorTransitionAnimation(backgroundView, 250, currentBackgroundColor, newColor);
+        colorTransitionAnimation(backgroundView, 750, currentBackgroundColor, newColor);
         currentBackgroundColor = newColor;
 
     }
