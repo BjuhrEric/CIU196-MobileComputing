@@ -16,7 +16,7 @@ public class ServerStatusFetcherTask extends LoopableTask {
 
     private final Context context;
 
-    protected ServerStatusFetcherTask(Context context) {
+    public ServerStatusFetcherTask(Context context) {
         super(1000);
         this.context = context;
     }
