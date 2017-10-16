@@ -175,9 +175,9 @@ public class ViewAnimationService {
 
     }
     public static void colorTransitionAnimation(final View v, int duration, int colorFrom, int colorTo) {
-        ValueAnimator circle1ColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
-        circle1ColorAnimation.setDuration(duration);
-        circle1ColorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        ValueAnimator animation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        animation.setDuration(duration);
+        animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
@@ -188,7 +188,32 @@ public class ViewAnimationService {
             }
 
         });
-        circle1ColorAnimation.start();
+        animation.start();
+
+    }
+    public static void colorTransitionAndBackAnimation(final View v, final int duration, final int colorFrom, final int colorTo) {
+        ValueAnimator animation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        animation.setDuration(duration);
+        animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                if (v instanceof Circle)
+                    ((Circle) v).setColor((int) animator.getAnimatedValue());
+                else
+                    v.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        animation.addListener(new AnimatorListenerAdapter(){
+            @Override
+            public void onAnimationEnd(Animator animation)
+            {
+                colorTransitionAnimation(v, duration, colorTo, colorFrom);
+            }
+
+        });
+        animation.start();
 
     }
     public static void colorTransitionAnimationReset(final View v, int duration, int colorFrom, int colorTo) {

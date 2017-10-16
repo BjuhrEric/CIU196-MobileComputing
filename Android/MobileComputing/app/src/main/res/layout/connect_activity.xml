@@ -35,7 +35,7 @@
             android:textSize="26sp"
             android:layout_toRightOf="@+id/playerNameTextView"
             android:paddingLeft="8dp"/>
-</RelativeLayout>
+    </RelativeLayout>
     <RelativeLayout
         android:id="@+id/listenersLayout"
         android:layout_width="wrap_content"
@@ -62,6 +62,7 @@
             />
 
     </RelativeLayout>
+
     <Button
         android:layout_marginTop="80dp"
         android:id="@+id/actionButtion"
@@ -73,6 +74,17 @@
         android:textColor="@color/statusTextColor"
         android:background="@drawable/rounded_button"
 
+        />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:src="@drawable/ic_map_white_24dp"
+        app:backgroundTint="@color/fabColor"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10dp"
         />
 
     <FrameLayout
@@ -137,6 +149,7 @@
                />
             </RelativeLayout>
     </FrameLayout>
+
 
 
 </RelativeLayout>

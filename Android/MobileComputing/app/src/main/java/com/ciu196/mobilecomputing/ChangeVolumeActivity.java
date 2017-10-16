@@ -1,18 +1,28 @@
 package com.ciu196.mobilecomputing;
 
+import android.graphics.Color;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ChangeVolumeActivity extends FragmentActivity implements OnMapReadyCallback {
+public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private FloatingActionButton fabPlus;
+    private FloatingActionButton fabMinus;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +32,45 @@ public class ChangeVolumeActivity extends FragmentActivity implements OnMapReady
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        //Toolbar init
+        Toolbar toolbar = (Toolbar) findViewById(R.id.map_volume_toolbar);
+        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Change Broadcast Volume");
+        //getSupportActionBar().setSubtitle("This is a subtitle");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Fab init
+        fabMinus = (FloatingActionButton) findViewById(R.id.volume_minus_fab);
+        fabMinus.setOnClickListener(this);
+        fabPlus = (FloatingActionButton) findViewById(R.id.volume_plus_fab);
+        fabPlus.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.volume_minus_fab:
+                play_zone--;
+                if(play_zone < 1){
+                    play_zone = 1;
+                }
+                //broadcastService.setVolume(playZone) eller nått sånt
+                redrawMap();
+                centerMap(libLatLng);
+                break;
+            case R.id.volume_plus_fab:
+                play_zone++;
+                if(play_zone > NUMBER_OF_CIRCLES){
+                    play_zone = NUMBER_OF_CIRCLES;
+
+                }
+                //broadcastService.setVolume(playZone) eller nått sånt
+                redrawMap();
+                centerMap(libLatLng);
+            default:
+        }
     }
 
 
@@ -36,11 +85,23 @@ public class ChangeVolumeActivity extends FragmentActivity implements OnMapReady
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        super.onMapReady(googleMap);
     }
+
+    /*
+    @Override
+    public void centerMap(LatLngBounds b, GoogleMap.CancelableCallback callback){
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(libLatLng, 15);
+        mMap.animateCamera(cu, 300, new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+    }*/
 }

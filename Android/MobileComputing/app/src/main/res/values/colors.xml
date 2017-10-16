@@ -21,6 +21,9 @@
     <color name="backgroundRedColor">#670d18</color>
 
     <color name="backgroundGrayColor">#323232</color>
+    <color name="fabColor">#f7cf09</color>
+
+
 
 
 </resources>
