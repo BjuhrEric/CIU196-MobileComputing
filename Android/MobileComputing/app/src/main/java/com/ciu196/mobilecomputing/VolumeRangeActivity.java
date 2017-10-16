@@ -34,7 +34,7 @@ import com.google.maps.android.SphericalUtil;
 
 import java.text.DecimalFormat;
 
-public class MapsActivity extends AbstractMapActivity implements View.OnClickListener, GoogleMap.OnCameraMoveListener, LocationListener {
+public class VolumeRangeActivity extends AbstractMapActivity implements View.OnClickListener, GoogleMap.OnCameraMoveListener, LocationListener {
 
     FloatingActionButton fab;
     FloatingActionButton fabLib;
@@ -55,29 +55,22 @@ public class MapsActivity extends AbstractMapActivity implements View.OnClickLis
         Toolbar toolbar = (Toolbar) findViewById(R.id.map_toolbar);
         toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Map Activity");
+
         //getSupportActionBar().setSubtitle("This is a subtitle");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        updateTitle();
 
         //Fab init
         fab = (FloatingActionButton) findViewById(R.id.map_fab_center_my_location);
         fab.setOnClickListener(this);
         fabLib = (FloatingActionButton) findViewById(R.id.map_fab_center_library);
         fabLib.setOnClickListener(this);
-
-        /*
-        mapCallback = new GoogleMap.CancelableCallback() {
-            @Override
-            public void onFinish() {
-                fab.hide();
-            }
-
-            @Override
-            public void onCancel() {
-                //do nothing?
-            }
-        };
-        */
 
     }
 
@@ -123,6 +116,7 @@ public class MapsActivity extends AbstractMapActivity implements View.OnClickLis
 
         if(userLocation != null){
             userLatLng = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+            updateTitle();
         }
     }
 
@@ -177,7 +171,7 @@ public class MapsActivity extends AbstractMapActivity implements View.OnClickLis
             mMap.addMarker(new MarkerOptions()
                     .position(userLatLng)
                     .title("My Location")
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location_black_24dp)));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location_pin_red)));
         }
     }
 
@@ -189,11 +183,20 @@ public class MapsActivity extends AbstractMapActivity implements View.OnClickLis
             Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show();
             redrawMap();
             centerMap(userLatLng);
+            updateTitle();
+        }
+    }
+
+    public void updateTitle(){
+        getSupportActionBar().setTitle("Volume Range");
+
+        if(userLatLng != null){
             double distance = SphericalUtil.computeDistanceBetween(libLatLng, userLatLng);
             DecimalFormat numberFormat = new DecimalFormat("#.00");
             double distanceKM = distance / 1000;
-            getSupportActionBar().setTitle(numberFormat.format(distanceKM) + "km to the piano");
+            getSupportActionBar().setSubtitle(numberFormat.format(distanceKM) + "km to the piano");
         }
+
     }
 
     @Override
