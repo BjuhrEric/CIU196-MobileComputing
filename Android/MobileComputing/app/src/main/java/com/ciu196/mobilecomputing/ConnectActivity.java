@@ -2,6 +2,7 @@ package com.ciu196.mobilecomputing;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Handler;
@@ -98,23 +99,31 @@ public class ConnectActivity extends AppCompatActivity {
         view.setX(x);
         view.setY(y);
         view.setVisibility(VISIBLE);
+
+        int duration = 3000;
+        AnimatorSet animation = new AnimatorSet();
+        animation
+                .play(ViewAnimationService.getFadeAnimator(view, duration, 1, 0))
+                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -200))
+                .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 2.5f));
+
         
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha",  1f, 0f);
-        fadeOut.setDuration(2000);
+        //ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha",  1f, 0f);
+        //fadeOut.setDuration(2000);
 
         //final AnimatorSet mAnimationSet = new AnimatorSet();
 
         //mAnimationSet.play(fadeIn).after(fadeOut);
 
-        fadeOut.addListener(new AnimatorListenerAdapter() {
+        animation.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 rel.removeView(view);
             }
         });
-        fadeOut.start();
 
+        animation.start();
 
     }
 

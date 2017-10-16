@@ -77,8 +77,12 @@ public class ViewAnimationService {
     }
 
     public static Animator getTranslationAnimator(final View v, int duration, final Axis axis, float distance) {
-
-        ValueAnimator animator = ValueAnimator.ofFloat(0, distance);
+        ValueAnimator animator;
+        if(axis == Axis.X){
+            animator = ValueAnimator.ofFloat(v.getX(), v.getX() + distance);
+        } else {
+            animator = ValueAnimator.ofFloat(v.getY(), v.getY() + distance);
+        }
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -90,7 +94,6 @@ public class ViewAnimationService {
                 else if (axis == Axis.Y)
                     v.setTranslationY(value);
 
-
             }
         });
 
@@ -99,6 +102,8 @@ public class ViewAnimationService {
 
         return animator;
     }
+
+
 
     public static void startTranslationAnimator(final View v, int duration, final Axis axis, float distance) {
         getTranslationAnimator(v, duration, axis, distance).start();
