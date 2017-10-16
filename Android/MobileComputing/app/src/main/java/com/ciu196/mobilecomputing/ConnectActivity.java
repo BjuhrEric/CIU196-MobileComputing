@@ -102,7 +102,7 @@ public class ConnectActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (currentGuiMode == guiMode.START_TO_LISTEN){
 
-                    Intent i = new Intent(ConnectActivity.this, MapsActivity.class);
+                    Intent i = new Intent(ConnectActivity.this, VolumeRangeActivity.class);
                     startActivity(i);
                     Toast.makeText(getApplicationContext(),"Start map activity",Toast.LENGTH_LONG).show();
                 }else if (currentGuiMode == guiMode.LISTENING){

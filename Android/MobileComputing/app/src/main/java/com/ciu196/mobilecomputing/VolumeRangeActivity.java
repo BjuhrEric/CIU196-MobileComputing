@@ -34,7 +34,7 @@ import com.google.maps.android.SphericalUtil;
 
 import java.text.DecimalFormat;
 
-public class MapsActivity extends AbstractMapActivity implements View.OnClickListener, GoogleMap.OnCameraMoveListener, LocationListener {
+public class VolumeRangeActivity extends AbstractMapActivity implements View.OnClickListener, GoogleMap.OnCameraMoveListener, LocationListener {
 
     FloatingActionButton fab;
     FloatingActionButton fabLib;

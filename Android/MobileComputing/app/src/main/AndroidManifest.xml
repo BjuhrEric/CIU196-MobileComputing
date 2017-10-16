@@ -39,13 +39,13 @@
 
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".VolumeRangeActivity"
             android:label="@string/title_activity_maps">
 
 
         </activity>
         <activity
-            android:name=".ChangeVolumeActivity"
+            android:name=".ChangeVolumeRangeActivity"
             android:label="@string/title_activity_change_volume">
 
 

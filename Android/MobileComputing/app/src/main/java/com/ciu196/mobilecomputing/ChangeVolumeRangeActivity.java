@@ -17,7 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapReadyCallback {
+public class ChangeVolumeRangeActivity extends AbstractMapActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FloatingActionButton fabPlus;
