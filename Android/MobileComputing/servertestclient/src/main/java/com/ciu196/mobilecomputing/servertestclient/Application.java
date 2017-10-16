@@ -22,7 +22,20 @@ public class Application {
     private ObjectInputStream objectInputStream;
 
     public static void main(String[] args) {
-        new Application();
+        System.out.println("Starting application");
+        Application app = new Application();
+        try {
+            app.getStatus();
+            app.startBroadcast();
+            app.getStatus();
+            app.detach();
+
+            app.request_socket.close();
+            app.data_socket.close();
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Application finished");
     }
 
     private Application() {
@@ -32,15 +45,7 @@ public class Application {
             bufferedInputStream = new BufferedInputStream(request_socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
             objectInputStream = new ObjectInputStream(bufferedInputStream);
-            System.out.println("Starting application");
-            //startBroadcast();
-            getStatus();
-            detach();
-
-            request_socket.close();
-            data_socket.close();
-            System.out.println("Application finished");
-        } catch (InterruptedException | IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -52,7 +57,7 @@ public class Application {
         serverMessage = sendRequest(ClientRequest.BROADCAST);
 
         if (serverMessage != null) {
-            System.out.println("Response from server: "+ serverMessage.toString());
+            System.out.println("Response from server: " + ((ServerResponse) serverMessage).getType());
         }
     }
 
@@ -63,7 +68,7 @@ public class Application {
 
         serverMessage = sendRequest(ClientRequest.DETACH_CLIENT);
         if (serverMessage != null)
-            System.out.println("Response from server: " + serverMessage.toString());
+            System.out.println("Response from server: " + ((ServerResponse) serverMessage).getType());
     }
 
     private void getStatus()  throws IOException, InterruptedException, ClassNotFoundException {
@@ -78,6 +83,7 @@ public class Application {
             if (serverResponse.getType() == ServerResponse.ResponseType.STATUS) {
                 ServerResponse.Status status = (ServerResponse.Status) serverResponse.getValue();
                 System.out.println("Broadcasting: "+status.getStatus("broadcasting"));
+                System.out.println("Number of listeners: "+status.getStatus("nListeners"));
             }
         }
     }

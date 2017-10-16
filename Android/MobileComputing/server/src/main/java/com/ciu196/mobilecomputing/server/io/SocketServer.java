@@ -26,7 +26,7 @@ public class SocketServer implements Server {
     private volatile boolean running = false;
     private volatile Client broadcaster = null;
     private ServerSocket requestSocket, dataSocket;
-    private final Map<InetAddress, SocketClient> clientMap;
+    private final Map<InetAddress, Client> clientMap;
     private final Set<Client> listeners;
 
     public SocketServer() {
@@ -44,7 +44,7 @@ public class SocketServer implements Server {
 
     public synchronized void connectRequestSocket() throws IOException {
         Socket clientSocket = requestSocket.accept();
-        SocketClient client = clientMap.get(clientSocket.getInetAddress());
+        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
         if (client == null) {
             client = new SocketClient();
             client.bindRequestSocket(clientSocket);
@@ -71,7 +71,7 @@ public class SocketServer implements Server {
 
     public synchronized void connectDataSocket() throws IOException {
         Socket clientSocket = dataSocket.accept();
-        SocketClient client = clientMap.get(clientSocket.getInetAddress());
+        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
         if (client == null) {
             client = new SocketClient();
             client.bindDataSocket(clientSocket);
@@ -139,6 +139,7 @@ public class SocketServer implements Server {
 
         System.out.println("Client detached");
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+        clientMap.remove(c.getInetAddress());
         listeners.remove(c);
         c.close();
     }
