@@ -99,7 +99,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:src="@drawable/ic_tag_faces_white_24dp"
-        app:backgroundTint="@color/myLocationRed"
+        app:backgroundTint="@color/fabColor"
         android:layout_above="@+id/fab1"
         android:layout_alignStart="@+id/fab1"
         app:fabSize="mini"
@@ -115,7 +115,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:src="@drawable/ic_thumb_up_white_24dp"
-        app:backgroundTint="@color/myLocationRed"
+        app:backgroundTint="@color/actionBlueColor"
         app:fabSize="mini"
         />
 
