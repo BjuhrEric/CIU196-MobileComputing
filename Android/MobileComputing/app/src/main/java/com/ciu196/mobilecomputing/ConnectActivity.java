@@ -26,7 +26,6 @@ public class ConnectActivity extends AppCompatActivity {
 
     public enum circleColor {BLUE, RED};
 
-    public enum Axis {X, Y};
 
     TextView pianoStatusTextView;
     TextView listenersTextView;
@@ -149,11 +148,11 @@ public class ConnectActivity extends AppCompatActivity {
 
 
             //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
-            translateToCenterInParentViewAnimation(pianoStatusTextView, 500, Axis.X);
-            translateToCenterInParentViewAnimation(playerNameTextView, 500, Axis.X);
+            translateToCenterInParentViewAnimation(pianoStatusTextView, 500, ViewAnimationService.Axis.X);
+            translateToCenterInParentViewAnimation(playerNameTextView, 500, ViewAnimationService.Axis.X);
 
-            translateAnimation(playerNameTextView, 500, Axis.Y, 120);
-            translateAnimation(listenerLayout, 500, Axis.Y, 130);
+            translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
+            translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
 
             uniformScaleAnimation(playerNameTextView, 500, 1.3f);
 
