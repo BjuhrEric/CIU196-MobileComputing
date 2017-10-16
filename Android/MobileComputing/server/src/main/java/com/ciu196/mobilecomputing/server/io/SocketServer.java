@@ -3,6 +3,7 @@ package com.ciu196.mobilecomputing.server.io;
 import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.TaskManager;
+import com.ciu196.mobilecomputing.server.tasks.ClientConnectionCheckerTask;
 import com.ciu196.mobilecomputing.server.tasks.ClientRequestFetcherTask;
 import com.ciu196.mobilecomputing.server.tasks.ClientRequestHandlerTask;
 import com.ciu196.mobilecomputing.server.util.Client;
@@ -55,12 +56,15 @@ public class SocketServer implements Server {
 
             ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
             ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
+            ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
 
             client.addTask(fetcherTask);
             client.addTask(handlerTask);
+            client.addTask(connectionTask);
 
             new Thread(fetcherTask).start();
             new Thread(handlerTask).start();
+            new Thread(connectionTask).start();
         }
 
     }
@@ -79,12 +83,15 @@ public class SocketServer implements Server {
 
             ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
             ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
+            ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
 
             client.addTask(fetcherTask);
             client.addTask(handlerTask);
+            client.addTask(connectionTask);
 
             new Thread(fetcherTask).start();
             new Thread(handlerTask).start();
+            new Thread(connectionTask).start();
         }
     }
 
@@ -104,6 +111,7 @@ public class SocketServer implements Server {
         ServerResponse.Status status = new ServerResponse.Status();
         ServerResponse response = new ServerResponse(ServerResponse.ResponseType.STATUS, status);
         status.putStatus("broadcasting", Boolean.toString(broadcaster != null));
+        status.putStatus("nListeners", Integer.toString(listeners.size()));
 
         client.sendMessage(response);
     }

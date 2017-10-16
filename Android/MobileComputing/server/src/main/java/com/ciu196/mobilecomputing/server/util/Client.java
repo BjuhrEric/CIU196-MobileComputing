@@ -19,4 +19,5 @@ public interface Client extends Comparable<Client> {
     void close() throws IOException;
     void sendMessage(ServerMessage response) throws IOException;
     InetAddress getInetAddress();
+    boolean isConnected();
 }
