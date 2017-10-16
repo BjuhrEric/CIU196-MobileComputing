@@ -1,7 +1,5 @@
 package com.ciu196.mobilecomputing;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -43,7 +41,7 @@ public class ConnectActivity extends AppCompatActivity {
     View listenerLayout;
     FloatingActionButton fab;
 
-    guiMode previusGuiMode = guiMode.START_TO_LISTEN;
+    guiMode currentGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
     int currentCircleColors[] = {0, 0, 0, 0};
     circleColor currentCircleColor = circleColor.BLUE;
@@ -89,9 +87,9 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(previusGuiMode == guiMode.START_TO_LISTEN){
+                if(currentGuiMode == guiMode.START_TO_LISTEN){
                     switchGui(guiMode.LISTENING);
-                } else if (previusGuiMode == guiMode.LISTENING){
+                } else if (currentGuiMode == guiMode.LISTENING){
                     switchGui(guiMode.START_TO_LISTEN);
 
                 }
@@ -102,11 +100,12 @@ public class ConnectActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (previusGuiMode == guiMode.START_TO_LISTEN){
+                if (currentGuiMode == guiMode.START_TO_LISTEN){
 
                     Intent i = new Intent(ConnectActivity.this, MapsActivity.class);
                     startActivity(i);
-                }else if (previusGuiMode == guiMode.LISTENING){
+                    Toast.makeText(getApplicationContext(),"Start map activity",Toast.LENGTH_LONG).show();
+                }else if (currentGuiMode == guiMode.LISTENING){
 
                     Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
                 }
@@ -130,7 +129,7 @@ public class ConnectActivity extends AppCompatActivity {
         teardownCurrentGui();
 
         if (m == guiMode.START_TO_LISTEN) {
-            previusGuiMode = guiMode.START_TO_LISTEN;
+            currentGuiMode = guiMode.START_TO_LISTEN;
 
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
@@ -162,7 +161,7 @@ public class ConnectActivity extends AppCompatActivity {
             }, 0);
 
         } else if (m == guiMode.LISTENING) {
-            previusGuiMode = guiMode.LISTENING;
+            currentGuiMode = guiMode.LISTENING;
 
             changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
             setCircleColor(circleColor.BLUE);
@@ -189,20 +188,20 @@ public class ConnectActivity extends AppCompatActivity {
             fadeInAnimation(actionButton, 700);
 
         } else if (m == guiMode.CANT_CONNECT) {
-            previusGuiMode = guiMode.CANT_CONNECT;
+            currentGuiMode = guiMode.CANT_CONNECT;
 
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
             actionButton.setText("Connect");
 
         } else if (m == guiMode.CONNECT) {
-            previusGuiMode = guiMode.CONNECT;
+            currentGuiMode = guiMode.CONNECT;
 
             playerNameTextView.setText(BroadcastService.getPlayerName() + " is playing");
             actionButton.setText("Connect");
 
         }  else if (m == guiMode.PLAYING) {
-            previusGuiMode = guiMode.PLAYING;
+            currentGuiMode = guiMode.PLAYING;
 
             pianoStatusTextView.setText(BroadcastService.getPlayerName() + " is playing");
             setCircleColor(circleColor.RED);
@@ -213,25 +212,25 @@ public class ConnectActivity extends AppCompatActivity {
 
 
     private void teardownCurrentGui() {
-        if(previusGuiMode == guiMode.START_TO_LISTEN){
+        if(currentGuiMode == guiMode.START_TO_LISTEN){
             fadeOutAnimation(playerNameTextView, 200);
             fadeOutAnimation(pianoStatusTextView, 350);
             fadeOutAnimation(actionButton, 700);
             fab.hide();
 
-        } else if(previusGuiMode == guiMode.LISTENING){
+        } else if(currentGuiMode == guiMode.LISTENING){
             fab.hide();
 
         }
-        else if(previusGuiMode == guiMode.CANT_CONNECT){
+        else if(currentGuiMode == guiMode.CANT_CONNECT){
 
 
         }
-        else if(previusGuiMode == guiMode.CONNECT){
+        else if(currentGuiMode == guiMode.CONNECT){
 
 
         }
-        else if(previusGuiMode == guiMode.PLAYING){
+        else if(currentGuiMode == guiMode.PLAYING){
 
 
         }
