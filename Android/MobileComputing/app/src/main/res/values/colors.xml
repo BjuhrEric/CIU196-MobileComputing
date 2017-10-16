@@ -11,8 +11,8 @@
     <color name="circle1BlueColor">#3467a2</color>
     <color name="circle2BlueColor">#3b73b5</color>
     <color name="circle3BlueColor">#4281ca</color>
-    <color name="circle4BlueColor">#173357</color>
-    <color name="backgroundBlueColor">#0b1521</color>
+    <color name="circle4BlueColor">#1e3e68</color>
+    <color name="backgroundBlueColor">#1a314c</color>
 
     <color name="circle1RedColor">#b04652</color>
     <color name="circle2RedColor">#c44e5c</color>
@@ -20,7 +20,7 @@
     <color name="circle4RedColor">#7e323b</color>
     <color name="backgroundRedColor">#670d18</color>
 
-    <color name="backgroundGrayColor">#323232</color>
+    <color name="backgroundCreamColor">#f7f4ef</color>
     <color name="fabColor">#f7cf09</color>
 
 

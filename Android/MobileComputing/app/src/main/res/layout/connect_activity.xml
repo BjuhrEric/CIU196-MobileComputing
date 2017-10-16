@@ -5,7 +5,7 @@
     android:id="@+id/backgroundLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundNotConnected"
+    android:background="@color/backgroundCreamColor"
     tools:context="com.ciu196.mobilecomputing.ConnectActivity"
     android:clipChildren="false"
     android:clipToPadding="false">
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="\'Piano Status'"
-            android:textColor="@color/statusTextColor"
+            android:textColor="@color/detaliedTextColor"
             android:textSize="26sp"
             android:layout_toRightOf="@+id/playerNameTextView"
             android:paddingLeft="8dp"/>
@@ -49,16 +49,17 @@
             android:layout_height="wrap_content"
             android:text="'#listeners'"
             android:textColor="@color/detaliedTextColor"
-            android:textSize="40sp" />
+            android:textSize="40sp"
+            />
         <ImageView
             android:paddingLeft="6dp"
             android:id="@+id/earImage"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:layout_toRightOf="@+id/listenersTextView"
-            android:src="@drawable/ic_hearing_white_24dp"
-            android:alpha="0.6"
-
+            android:src="@drawable/ic_hearing_black_24dp"
+            android:alpha="0.5"
+            android:layout_marginTop="5dp"
             />
 
     </RelativeLayout>

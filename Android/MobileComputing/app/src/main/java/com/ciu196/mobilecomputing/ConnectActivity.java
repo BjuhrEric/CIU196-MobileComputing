@@ -5,8 +5,10 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +17,7 @@ import org.joda.time.Duration;
 import static com.ciu196.mobilecomputing.ViewAnimationService.colorTransitionAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeOutAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.translateAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.translateToCenterInParentViewAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.uniformScaleAnimation;
@@ -32,6 +35,7 @@ public class ConnectActivity extends AppCompatActivity {
     TextView listenersTextView;
     TextView playerNameTextView;
     TextView durationText;
+    ImageView earImage;
     Button actionButton;
     Circle circle1;
     Circle circle2;
@@ -61,13 +65,14 @@ public class ConnectActivity extends AppCompatActivity {
         durationText = (TextView) findViewById(R.id.durationText);
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
+        earImage = (ImageView) findViewById(R.id.earImage);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
         circle4 = (Circle) findViewById(R.id.circle4);
         backgroundView = (View) findViewById(R.id.backgroundLayout);
-        currentBackgroundColor = getResources().getColor(R.color.backgroundGrayColor);
+        currentBackgroundColor = getResources().getColor(R.color.backgroundCreamColor);
         currentCircleColors[0] = circle1.getColor();
         currentCircleColors[1] = circle2.getColor();
         currentCircleColors[2] = circle3.getColor();
@@ -135,12 +140,16 @@ public class ConnectActivity extends AppCompatActivity {
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
             listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
+            earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
             setCircleColor(circleColor.BLUE);
-            backgroundView.setBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
+            changeBackgroundColor(getResources().getColor(R.color.backgroundCreamColor));
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
+            fadeInAnimation(earImage, 400);
             fadeInAnimation(listenerLayout, 600);
             fadeInAnimation(actionButton, 1000);
+
+
 
             fab.setImageResource(R.drawable.ic_map_white_24dp);
             fab.show();
@@ -169,17 +178,18 @@ public class ConnectActivity extends AppCompatActivity {
             pianoStatusTextView.setText("Currently listening to");
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setText("Stop listening");
+            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
 
             fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
             fab.show();
 
-
+            fadeInAnimation(earImage, 400);
             //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
             translateToCenterInParentViewAnimation(pianoStatusTextView, 500, ViewAnimationService.Axis.X);
             translateToCenterInParentViewAnimation(playerNameTextView, 500, ViewAnimationService.Axis.X);
 
-            translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
-            translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
+            //translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
+            //translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
 
             uniformScaleAnimation(playerNameTextView, 500, 1.3f);
 
@@ -208,6 +218,7 @@ public class ConnectActivity extends AppCompatActivity {
             changeBackgroundColor(getResources().getColor(R.color.backgroundRedColor));
 
         }
+        startAllAnimation();
     }
 
 
@@ -216,9 +227,14 @@ public class ConnectActivity extends AppCompatActivity {
             fadeOutAnimation(playerNameTextView, 200);
             fadeOutAnimation(pianoStatusTextView, 350);
             fadeOutAnimation(actionButton, 700);
+            fadeOutAnimation(earImage, 400);
             fab.hide();
 
         } else if(currentGuiMode == guiMode.LISTENING){
+            fadeOutAnimation(playerNameTextView, 200);
+            fadeOutAnimation(pianoStatusTextView, 350);
+            fadeOutAnimation(actionButton, 700);
+            fadeOutAnimation(earImage, 400);
             fab.hide();
 
         }

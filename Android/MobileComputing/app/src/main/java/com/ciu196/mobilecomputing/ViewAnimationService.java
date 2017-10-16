@@ -10,58 +10,52 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Andreas Pegelow on 2017-10-11.
  */
 
 public class ViewAnimationService {
     public enum Axis {X, Y};
+    static Map<View,AnimationView> map = new HashMap<>();
+
+    public static void startAllAnimation(){
+
+        for(AnimationView a : map.values()){
+            a.startAnimation();
+
+        }
+    }
 
     public static void fadeOutAnimation(final View v, int duration) {
         final Animation out = new AlphaAnimation(1.0f, 0.0f);
         out.setDuration(duration);
-        v.startAnimation(out);
-        out.setAnimationListener(new Animation.AnimationListener() {
-                                     @Override
-                                     public void onAnimationStart(Animation animation) {
 
-                                     }
+        AnimationView animationView= map.get(v);
 
-                                     @Override
-                                     public void onAnimationEnd(Animation animation) {
-                                         v.setVisibility(View.INVISIBLE);
-                                     }
-
-                                     @Override
-                                     public void onAnimationRepeat(Animation animation) {
-
-                                     }
-                                 }
-        );
+       if(animationView == null){
+           animationView = new AnimationView(v);
+           map.put(v, animationView);
+       }
+        animationView.addAnimation(out);
+        //animationView.startAnimation();
 
     }
 
     public static void fadeInAnimation(final View v, int duration) {
         final Animation in = new AlphaAnimation(0.0f, 1.0f);
         in.setDuration(duration);
-        v.startAnimation(in);
-        in.setAnimationListener(new Animation.AnimationListener() {
-                                    @Override
-                                    public void onAnimationStart(Animation animation) {
 
-                                    }
+        AnimationView animationView= map.get(v);
 
-                                    @Override
-                                    public void onAnimationEnd(Animation animation) {
-                                        v.setVisibility(View.VISIBLE);
-                                    }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animation animation) {
-
-                                    }
-                                }
-        );
+        if(animationView == null){
+            animationView = new AnimationView(v);
+            map.put(v, animationView);
+        }
+        animationView.addAnimation(in);
+        //animationView.startAnimation();
 
     }
     public static void customFadeAnimation(final View v, int duration, float startAlpha, float endAlpha) {
