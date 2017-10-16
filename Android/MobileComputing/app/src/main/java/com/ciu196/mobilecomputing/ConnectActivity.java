@@ -1,17 +1,21 @@
 package com.ciu196.mobilecomputing;
 
+import android.animation.StateListAnimator;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.Duration;
 
+import static android.support.design.widget.FloatingActionButton.*;
 import static com.ciu196.mobilecomputing.ViewAnimationService.colorTransitionAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeOutAnimation;
@@ -47,24 +51,34 @@ public class ConnectActivity extends AppCompatActivity {
     circleColor currentCircleColor = circleColor.BLUE;
 
     boolean testFlag = false;
-    boolean isShowingReaction = false;
+    boolean isShowingReactions = false;
     View.OnClickListener reactionListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            Toast toast = new Toast(ConnectActivity.this);
+            ImageView imageView = new ImageView(ConnectActivity.this);
+
             int id = view.getId();
             switch (id){
                 case R.id.fab1:
-                    Toast.makeText(ConnectActivity.this, "Fab 1", Toast.LENGTH_LONG).show();
+                    imageView.setImageResource(R.drawable.ic_thumb_up_white_24dp);
+                    imageView.setBackgroundColor(getColor(R.color.listenBlueColor));
                     break;
                 case R.id.fab2:
-                    Toast.makeText(ConnectActivity.this, "Fab 2", Toast.LENGTH_LONG).show();
+                    imageView.setImageResource(R.drawable.ic_tag_faces_white_24dp);
+                    imageView.setBackgroundColor(getColor(R.color.fabColor));
                     break;
                 case R.id.fab3:
-                    Toast.makeText(ConnectActivity.this, "Fab 3", Toast.LENGTH_LONG).show();
+                    imageView.setImageResource(R.drawable.ic_favorite_white_24dp);
+                    imageView.setBackgroundColor(getColor(R.color.myLocationRed));
                     break;
                 default:
                     break;
             }
+            imageView.setPadding(10,10,10,10);
+            toast.setView(imageView);
+            toast.setDuration(Toast.LENGTH_SHORT);
+            toast.show();
         }
     };
 
@@ -134,10 +148,15 @@ public class ConnectActivity extends AppCompatActivity {
                     startActivity(i);
                     Toast.makeText(getApplicationContext(),"Start map activity",Toast.LENGTH_LONG).show();
                 }else if (currentGuiMode == guiMode.LISTENING){
-                    Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
-                    if(isShowingReaction){
+                    if(isShowingReactions){
                         //hide reaction alternatives
-                        //show reaction alternatives
+                        fab.hide();
+                        fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
+                        fab.setBackgroundColor(getColor(R.color.fabColor));
+                        fab.show();
+
+
+
                         fab1.setClickable(false);
                         fab2.setClickable(false);
                         fab3.setClickable(false);
@@ -145,9 +164,14 @@ public class ConnectActivity extends AppCompatActivity {
                         fab2.hide();
                         fab3.hide();
 
-                        isShowingReaction = false;
+                        isShowingReactions = false;
                     } else {
                         //show reaction alternatives
+                        fab.hide();
+                        fab.setImageResource(R.drawable.ic_close_black_24dp);
+                        fab.setBackgroundColor(getColor(R.color.disabledGrey));
+                        fab.show();
+
                         fab1.setClickable(true);
                         fab2.setClickable(true);
                         fab3.setClickable(true);
@@ -155,7 +179,8 @@ public class ConnectActivity extends AppCompatActivity {
                         fab2.show();
                         fab3.show();
 
-                        isShowingReaction = true;
+
+                        isShowingReactions = true;
                     }
 
 
