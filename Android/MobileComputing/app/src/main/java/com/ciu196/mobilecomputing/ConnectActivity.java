@@ -2,6 +2,7 @@ package com.ciu196.mobilecomputing;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -49,20 +50,6 @@ public class ConnectActivity extends AppCompatActivity {
 
     boolean testFlag = false;
 
-    View.OnClickListener fabListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (previusGuiMode == guiMode.START_TO_LISTEN){
-
-                Toast.makeText(getApplicationContext(),"Start map acitivty",Toast.LENGTH_LONG).show();
-            }else if (previusGuiMode == guiMode.LISTENING){
-
-                Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
-        }
-
-        }
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +64,6 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(fabListener);
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
@@ -88,10 +74,6 @@ public class ConnectActivity extends AppCompatActivity {
         currentCircleColors[1] = circle2.getColor();
         currentCircleColors[2] = circle3.getColor();
         currentCircleColors[3] = circle4.getColor();
-
-
-
-
 
 
         if (BroadcastService.isLive()) {
@@ -107,9 +89,27 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(previusGuiMode == guiMode.START_TO_LISTEN){
                     switchGui(guiMode.LISTENING);
+                } else if (previusGuiMode == guiMode.LISTENING){
+                    switchGui(guiMode.START_TO_LISTEN);
+
+                }
 
 
+            }
+        });
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (previusGuiMode == guiMode.START_TO_LISTEN){
+
+                    Intent i = new Intent(ConnectActivity.this, MapsActivity.class);
+                    startActivity(i);
+                }else if (previusGuiMode == guiMode.LISTENING){
+
+                    Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -169,6 +169,7 @@ public class ConnectActivity extends AppCompatActivity {
 
             pianoStatusTextView.setText("Currently listening to");
             playerNameTextView.setText(BroadcastService.getPlayerName());
+            actionButton.setText("Stop listening");
 
             fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
             fab.show();
@@ -185,6 +186,7 @@ public class ConnectActivity extends AppCompatActivity {
 
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
+            fadeInAnimation(actionButton, 700);
 
         } else if (m == guiMode.CANT_CONNECT) {
             previusGuiMode = guiMode.CANT_CONNECT;
@@ -214,7 +216,7 @@ public class ConnectActivity extends AppCompatActivity {
         if(previusGuiMode == guiMode.START_TO_LISTEN){
             fadeOutAnimation(playerNameTextView, 200);
             fadeOutAnimation(pianoStatusTextView, 350);
-            fadeOutAnimation(actionButton, 500);
+            fadeOutAnimation(actionButton, 700);
             fab.hide();
 
         } else if(previusGuiMode == guiMode.LISTENING){
