@@ -58,7 +58,7 @@ public class BroadcastService {
         //Todo: not implemented yet, just dummy implementation so far
         return 15;
     }
-    
+
     public static boolean closeEnough() {
         //Todo: not implemented yet, just dummy implementation so far
         int playZone = 0;
