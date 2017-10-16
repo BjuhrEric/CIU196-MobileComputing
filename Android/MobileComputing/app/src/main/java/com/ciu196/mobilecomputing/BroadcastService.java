@@ -73,5 +73,14 @@ public class BroadcastService {
 //        double distance = SphericalUtil.computeDistanceBetween(null, null);
         double distance = -1;
         return distance < playZone*circleRadius;
+
+    }
+    //Start new brodcast
+    public static boolean startNewBroadcast() {
+        //Todo: not implemented yet
+        if(!isLive())
+            return true;
+        else
+            return false;
     }
 }

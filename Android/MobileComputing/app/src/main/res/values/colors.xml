@@ -4,9 +4,10 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#FF4081</color>
     <color name="backgroundNotConnected">#4a4a4a</color>
-    <color name="statusTextColor">#FFFFFF</color>
-    <color name="detaliedTextColor">#9b9b9b</color>
-    <color name="listenBlueColor">#4a90e2</color>
+    <color name="whiteColor">#FFFFFF</color>
+    <color name="grayTextColor">#9b9b9b</color>
+    <color name="actionBlueColor">#4a90e2</color>
+    <color name="actionRedColor">#f46173</color>
 
     <color name="circle1BlueColor">#FF3467a2</color>
     <color name="circle2BlueColor">#FF3b73b5</color>
@@ -14,12 +15,17 @@
     <color name="circle4BlueColor">#FF173357</color>
     <color name="backgroundBlueColor">#FF0b1521</color>
 
-
     <color name="circle1RedColor">#b04652</color>
     <color name="circle2RedColor">#c44e5c</color>
     <color name="circle3RedColor">#db5767</color>
     <color name="circle4RedColor">#7e323b</color>
     <color name="backgroundRedColor">#670d18</color>
+
+    <color name="circle1GrayColor">#313131</color>
+    <color name="circle2GrayColor">#373737</color>
+    <color name="circle3GrayColor">#3e3e3e</color>
+    <color name="circle4GrayColor">#464646</color>
+    <color name="backgroundGrayColor">#323232</color>
 
     <color name="backgroundCreamColor">#f7f4ef</color>
     <color name="fabColor">#f7cf09</color>

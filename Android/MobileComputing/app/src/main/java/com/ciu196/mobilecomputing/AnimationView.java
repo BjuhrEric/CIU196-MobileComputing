@@ -28,11 +28,10 @@ public class AnimationView {
 
     }
     public void startAnimation(){
-        Log.d("queue","in start, queue size: "+(animationsQueue.size()));
+
         if(!animationsQueue.isEmpty() && !ongoingAnimation){
             Animation a = animationsQueue.poll();
             if (a instanceof AlphaAnimation) {
-                Log.d("queue", "duration: "+((AlphaAnimation) a).getDuration());
             }
 
             a.setAnimationListener(new Animation.AnimationListener() {

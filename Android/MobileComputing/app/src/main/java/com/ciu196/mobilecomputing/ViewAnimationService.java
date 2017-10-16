@@ -55,7 +55,7 @@ public class ViewAnimationService {
             map.put(v, animationView);
         }
         animationView.addAnimation(in);
-        //animationView.startAnimation();
+
 
     }
     public static void customFadeAnimation(final View v, int duration, float startAlpha, float endAlpha) {

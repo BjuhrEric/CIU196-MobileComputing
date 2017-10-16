@@ -24,14 +24,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="\'Name'"
-            android:textColor="@color/listenBlueColor"
+            android:textColor="@color/actionBlueColor"
             android:textSize="26sp" />
         <TextView
             android:id="@+id/pianoStatusTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="\'Piano Status'"
-            android:textColor="@color/detaliedTextColor"
+            android:textColor="@color/grayTextColor"
             android:textSize="26sp"
             android:layout_toRightOf="@+id/playerNameTextView"
             android:paddingLeft="8dp"/>
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="'#listeners'"
-            android:textColor="@color/detaliedTextColor"
+            android:textColor="@color/grayTextColor"
             android:textSize="40sp"
             />
         <ImageView
@@ -72,8 +72,8 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/listenersLayout"
         android:text="'Action'"
-        android:textColor="@color/statusTextColor"
-        android:background="@drawable/rounded_button"
+        android:textColor="@color/whiteColor"
+        android:background="@drawable/rounded_button_blue"
 
         />
 
@@ -187,7 +187,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="'debug'"
-                android:textColor="@color/statusTextColor"
+                android:textColor="@color/whiteColor"
                 android:textSize="18sp"
                 android:paddingBottom="50dp"
                 android:layout_centerHorizontal="true"

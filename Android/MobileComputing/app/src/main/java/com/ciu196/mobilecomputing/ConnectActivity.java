@@ -28,7 +28,7 @@ public class ConnectActivity extends AppCompatActivity {
 
     public enum guiMode {CONNECT, START_TO_LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING};
 
-    public enum circleColor {BLUE, RED};
+    public enum circleColor {BLUE, GRAY, RED};
 
 
     TextView pianoStatusTextView;
@@ -48,7 +48,7 @@ public class ConnectActivity extends AppCompatActivity {
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
     int currentCircleColors[] = {0, 0, 0, 0};
-    circleColor currentCircleColor = circleColor.BLUE;
+
 
     boolean testFlag = false;
     boolean isShowingReaction = false;
@@ -124,7 +124,12 @@ public class ConnectActivity extends AppCompatActivity {
                     switchGui(guiMode.LISTENING);
                 } else if (currentGuiMode == guiMode.LISTENING){
                     switchGui(guiMode.START_TO_LISTEN);
-
+                }else if (currentGuiMode == guiMode.CONNECT){
+                    if(BroadcastService.startNewBroadcast())
+                        switchGui(guiMode.PLAYING);
+                }else if (currentGuiMode == guiMode.PLAYING){
+                    if(BroadcastService.startNewBroadcast())
+                        switchGui(guiMode.CONNECT);
                 }
 
 
@@ -137,9 +142,7 @@ public class ConnectActivity extends AppCompatActivity {
 
                     Intent i = new Intent(ConnectActivity.this, VolumeRangeActivity.class);
                     startActivity(i);
-                    Toast.makeText(getApplicationContext(),"Start map activity",Toast.LENGTH_LONG).show();
                 }else if (currentGuiMode == guiMode.LISTENING){
-                    Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
                     if(isShowingReaction){
                         //hide reaction alternatives
                         //show reaction alternatives
@@ -162,12 +165,6 @@ public class ConnectActivity extends AppCompatActivity {
 
                         isShowingReaction = true;
                     }
-
-
-
-
-
-
 
 
                 }
@@ -193,12 +190,16 @@ public class ConnectActivity extends AppCompatActivity {
         if (m == guiMode.START_TO_LISTEN) {
             currentGuiMode = guiMode.START_TO_LISTEN;
 
+            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_blue));
+            setCircleColor(circleColor.GRAY);
+            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
+            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Start Listening");
             listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
             earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
-            setCircleColor(circleColor.BLUE);
+            setCircleColor(circleColor.GRAY);
             changeBackgroundColor(getResources().getColor(R.color.backgroundCreamColor));
             fadeInAnimation(playerNameTextView, 500);
             fadeInAnimation(pianoStatusTextView, 550);
@@ -237,8 +238,10 @@ public class ConnectActivity extends AppCompatActivity {
             currentGuiMode = guiMode.LISTENING;
 
             changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
+            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_blue));
             setCircleColor(circleColor.BLUE);
-
+            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
+            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
             pianoStatusTextView.setText("Currently listening to");
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setText("Stop listening");
@@ -252,8 +255,8 @@ public class ConnectActivity extends AppCompatActivity {
             translateToCenterInParentViewAnimation(pianoStatusTextView, 500, ViewAnimationService.Axis.X);
             translateToCenterInParentViewAnimation(playerNameTextView, 500, ViewAnimationService.Axis.X);
 
-            //translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
-            //translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
+            translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
+            translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
 
             uniformScaleAnimation(playerNameTextView, 500, 1.3f);
 
@@ -263,23 +266,37 @@ public class ConnectActivity extends AppCompatActivity {
 
         } else if (m == guiMode.CANT_CONNECT) {
             currentGuiMode = guiMode.CANT_CONNECT;
-
+            setCircleColor(circleColor.GRAY);
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
             actionButton.setText("Connect");
 
         } else if (m == guiMode.CONNECT) {
             currentGuiMode = guiMode.CONNECT;
-
-            playerNameTextView.setText(BroadcastService.getPlayerName() + " is playing");
-            actionButton.setText("Connect");
+            changeBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
+            setCircleColor(circleColor.GRAY);
+            playerNameTextView.setTextColor(getResources().getColor(R.color.actionRedColor));
+            playerNameTextView.setText(BroadcastService.getPlayerName());
+            pianoStatusTextView.setTextColor(getResources().getColor(R.color.whiteColor));
+            pianoStatusTextView.setText("is playing");
+            actionButton.setText("Connect to piano");
+            listenersTextView.setText("0");
+            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
+            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_red));
+            durationText.setVisibility(View.INVISIBLE);
 
         }  else if (m == guiMode.PLAYING) {
             currentGuiMode = guiMode.PLAYING;
-
-            pianoStatusTextView.setText(BroadcastService.getPlayerName() + " is playing");
-            setCircleColor(circleColor.RED);
             changeBackgroundColor(getResources().getColor(R.color.backgroundRedColor));
+            setCircleColor(circleColor.RED);
+            playerNameTextView.setTextColor(getResources().getColor(R.color.actionRedColor));
+            playerNameTextView.setText("You");
+            pianoStatusTextView.setTextColor(getResources().getColor(R.color.whiteColor));
+            pianoStatusTextView.setText("are playing");
+            actionButton.setText("Stop playing");
+            listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
+            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
+            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_red));
 
         }
         startAllAnimation();
@@ -343,6 +360,12 @@ public class ConnectActivity extends AppCompatActivity {
             colorTo2 = getResources().getColor(R.color.circle2RedColor);
             colorTo3 = getResources().getColor(R.color.circle3RedColor);
             colorTo4 = getResources().getColor(R.color.circle4RedColor);
+
+        }else if (c == circleColor.GRAY) {
+            colorTo1 = getResources().getColor(R.color.circle1GrayColor);
+            colorTo2 = getResources().getColor(R.color.circle2GrayColor);
+            colorTo3 = getResources().getColor(R.color.circle3GrayColor);
+            colorTo4 = getResources().getColor(R.color.circle4GrayColor);
 
         }
 
