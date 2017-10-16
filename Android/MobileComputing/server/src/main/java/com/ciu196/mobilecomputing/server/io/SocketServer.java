@@ -23,8 +23,12 @@ import java.util.TreeSet;
 
 public class SocketServer implements Server {
 
+
+    private final static String NOONE = "No-one";
+    private volatile long broadcastStartTime = -1;
     private volatile boolean running = false;
     private volatile Client broadcaster = null;
+    private volatile String broadcasterName = NOONE;
     private ServerSocket requestSocket, dataSocket;
     private final Map<InetAddress, Client> clientMap;
     private final Set<Client> listeners;
@@ -95,7 +99,7 @@ public class SocketServer implements Server {
         }
     }
 
-    public void receiveData(Client c) throws IllegalStateException, IOException {
+    public void receiveData(final Client c) throws IllegalStateException, IOException {
         if (c == null || !c.equals(broadcaster))
             throw new IllegalStateException("Only the broadcaster is supposed to broadcast");
 
@@ -107,35 +111,42 @@ public class SocketServer implements Server {
     }
 
     @Override
-    public void sendStatus(Client client) throws IOException {
+    public void sendStatus(final Client client) throws IOException {
         ServerResponse.Status status = new ServerResponse.Status();
         ServerResponse response = new ServerResponse(ServerResponse.ResponseType.STATUS, status);
         status.putStatus("broadcasting", Boolean.toString(broadcaster != null));
+        status.putStatus("broadcaster", broadcasterName);
         status.putStatus("nListeners", Integer.toString(listeners.size()));
+        status.putStatus("broadcastStartTime", Long.toString(broadcastStartTime));
 
         client.sendMessage(response);
     }
 
-    public void sendData(Client c) throws IOException {
+    public void sendData(final Client c) throws IOException {
         c.sendData();
     }
 
-    public void setBroadcaster(Client c) throws IOException {
+    public void setBroadcaster(final Client c, final String name) throws IOException {
         System.out.println("Setting broadcaster");
         if (broadcaster != null) {
             c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_DECLINED, new ServerResponse.NoValue()));
             return;
         }
+        broadcasterName = name;
         broadcaster = c;
+        broadcastStartTime = System.currentTimeMillis();
         listeners.remove(c);
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
     }
 
-    public void detachClient(Client c) throws IOException {
+    public void detachClient(final Client c) throws IOException {
         if (c == null)
             throw new IllegalArgumentException("Client may not be null");
-        if (c.equals(broadcaster))
+        if (c.equals(broadcaster)) {
             broadcaster = null;
+            broadcasterName = NOONE;
+            broadcastStartTime = -1;
+        }
 
         System.out.println("Client detached");
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));

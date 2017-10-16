@@ -1,6 +1,7 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
+import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
@@ -34,9 +35,9 @@ public class ClientRequestHandlerTask extends ServerTask {
         if (first == null)
             return true;
         try {
-            switch (first) {
+            switch (first.getType()) {
                 case BROADCAST:
-                    server.setBroadcaster(client);
+                    server.setBroadcaster(client, first.getValue());
                     break;
                 case DETACH_CLIENT:
                     server.detachClient(client);
