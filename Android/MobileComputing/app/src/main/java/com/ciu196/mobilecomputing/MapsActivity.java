@@ -92,7 +92,9 @@ public class MapsActivity extends AbstractMapActivity implements View.OnClickLis
     @Override
     protected void onPause() {
         super.onPause();
-        locationManager.removeUpdates(this);
+        if(locationManager != null){
+            locationManager.removeUpdates(this);
+        }
     }
 
     public void initLocationTracking(){

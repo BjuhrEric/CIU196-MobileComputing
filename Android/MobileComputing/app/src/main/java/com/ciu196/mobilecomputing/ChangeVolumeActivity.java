@@ -56,6 +56,7 @@ public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapRe
                 if(play_zone < 1){
                     play_zone = 1;
                 }
+                //broadcastService.setVolume(playZone) eller nått sånt
                 redrawMap();
                 centerMap(libLatLng);
                 break;
@@ -65,6 +66,7 @@ public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapRe
                     play_zone = NUMBER_OF_CIRCLES;
 
                 }
+                //broadcastService.setVolume(playZone) eller nått sånt
                 redrawMap();
                 centerMap(libLatLng);
             default:

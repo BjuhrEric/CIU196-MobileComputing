@@ -52,7 +52,6 @@ public class BroadcastService {
     }
 
 
-
     //Returns how many is currently listening
     public static int getNumberOfListeners(){
         //Todo: not implemented yet, just dummy implementation so far
