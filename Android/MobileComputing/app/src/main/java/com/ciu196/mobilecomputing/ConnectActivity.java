@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import org.joda.time.Duration;
 
+import static com.ciu196.mobilecomputing.ViewAnimationService.colorTransitionAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.fadeOutAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.translateAnimation;
@@ -250,21 +251,5 @@ public class ConnectActivity extends AppCompatActivity {
 
     }
 
-    private void colorTransitionAnimation(final View v, int duration, int colorFrom, int colorTo) {
-        ValueAnimator circle1ColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
-        circle1ColorAnimation.setDuration(duration);
-        circle1ColorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
-            @Override
-            public void onAnimationUpdate(ValueAnimator animator) {
-                if (v instanceof Circle)
-                    ((Circle) v).setColor((int) animator.getAnimatedValue());
-                else
-                    v.setBackgroundColor((int) animator.getAnimatedValue());
-            }
-
-        });
-        circle1ColorAnimation.start();
-
-    }
 }
