@@ -8,6 +8,9 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -46,6 +49,13 @@
         </activity>
         <activity
             android:name=".ChangeVolumeActivity"
+            android:label="@string/title_activity_change_volume">
+
+
+        </activity>
+
+        <activity
+            android:name=".PitchAnimationActivity"
             android:label="@string/title_activity_change_volume">
 
 
