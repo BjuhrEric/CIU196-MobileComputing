@@ -2,13 +2,14 @@ package com.ciu196.mobilecomputing.common.tasks;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 public final class TaskManager implements TaskStateListener {
     private static final TaskManager taskManager = new TaskManager();
     private static boolean created = false;
 
-    private final Set<LoopableTask> runningTasks;
+    private final SortedSet<LoopableTask> runningTasks;
 
     public static TaskManager getInstance() {
         return taskManager;
@@ -18,11 +19,13 @@ public final class TaskManager implements TaskStateListener {
         if (created)
             throw new UnsupportedOperationException("Singleton. Use getInstance instead.");
         created = true;
-        runningTasks = Collections.synchronizedSortedSet(new TreeSet<>());
+        runningTasks = Collections.synchronizedSortedSet(new TreeSet<LoopableTask>());
     }
 
     public void finishAllTasks() {
-        runningTasks.forEach(LoopableTask::stop);
+        for (LoopableTask task : runningTasks) {
+         task.stop();
+        }
     }
 
     @Override
