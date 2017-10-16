@@ -1,5 +1,28 @@
 package com.ciu196.mobilecomputing.common.requests;
 
-public enum ClientRequest {
-    BROADCAST, DETACH_CLIENT, SEND_DATA, REQUEST_DATA, REQUEST_STATUS
+import java.io.Serializable;
+
+public final class ClientRequest implements Serializable {
+
+    private final String val;
+    private final ClientRequestType type;
+
+    public ClientRequest(ClientRequestType type) {
+        this(type, null);
+    }
+
+    public ClientRequest(ClientRequestType type, String val) {
+        this.type = type;
+        this.val = val;
+    }
+
+    public String getValue() {
+        return val;
+    }
+
+    public ClientRequestType getType() {
+        return type;
+    }
+
+
 }
