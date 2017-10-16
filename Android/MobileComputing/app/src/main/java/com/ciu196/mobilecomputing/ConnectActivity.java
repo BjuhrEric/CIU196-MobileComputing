@@ -94,8 +94,8 @@ public class ConnectActivity extends AppCompatActivity {
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         Random random = new Random();
-        int x = 100 + random.nextInt(width-200);
-        int y = height - random.nextInt(height / 4);
+        int x = 150 + random.nextInt(width-300);
+        int y = height - random.nextInt(height / 4) - 100;
         view.setX(x);
         view.setY(y);
         view.setVisibility(VISIBLE);
@@ -122,7 +122,7 @@ public class ConnectActivity extends AppCompatActivity {
                 rel.removeView(view);
             }
         });
-
+        animation.setInterpolator(new PowerInterpolator(2.5f));
         animation.start();
 
     }
