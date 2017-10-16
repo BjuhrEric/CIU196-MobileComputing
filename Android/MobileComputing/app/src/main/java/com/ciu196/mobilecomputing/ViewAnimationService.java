@@ -4,10 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 
 import java.util.HashMap;
@@ -25,40 +22,28 @@ public class ViewAnimationService {
 
         for(AnimationView a : map.values()){
             a.startAnimation();
-
         }
     }
 
-    public static void fadeOutAnimation(final View v, int duration) {
-        final Animation out = new AlphaAnimation(1.0f, 0.0f);
-        out.setDuration(duration);
-
-        AnimationView animationView= map.get(v);
-
-       if(animationView == null){
-           animationView = new AnimationView(v);
-           map.put(v, animationView);
-       }
-        animationView.addAnimation(out);
-        //animationView.startAnimation();
-
-    }
-
-    public static void fadeInAnimation(final View v, int duration) {
-        final Animation in = new AlphaAnimation(0.0f, 1.0f);
-        in.setDuration(duration);
-
+    public static void addAnimator(final View v, final Animator a) {
         AnimationView animationView= map.get(v);
 
         if(animationView == null){
             animationView = new AnimationView(v);
             map.put(v, animationView);
         }
-        animationView.addAnimation(in);
-
-
+        animationView.addAnimation(new AnimatorOperation(a));
     }
-    public static void customFadeAnimation(final View v, int duration, float startAlpha, float endAlpha) {
+
+    public static void addFadeOutAnimation(final View v, int duration) {
+        addAnimator(v, getFadeAnimator(v, duration, 1, 0));
+    }
+
+    public static void addFadeInAnimation(final View v, int duration) {
+        addAnimator(v, getFadeAnimator(v, duration, 0, 1));
+    }
+
+    public static Animator getFadeAnimator(final View v, int duration, float startAlpha, float endAlpha) {
         ValueAnimator animator = ValueAnimator.ofFloat(startAlpha, endAlpha);
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -72,12 +57,15 @@ public class ViewAnimationService {
 
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(duration);
-        animator.start();
 
-
+        return animator;
     }
 
-    public static void translateAnimation(final View v, int duration, final Axis axis, float distance) {
+    public static void startFadeAnimator(final View v, int duration, float startAlpha, float endAlpha) {
+        getFadeAnimator(v, duration, startAlpha, endAlpha).start();
+    }
+
+    public static Animator getTranslationAnimator(final View v, int duration, final Axis axis, float distance) {
 
         ValueAnimator animator = ValueAnimator.ofFloat(0, distance);
 
@@ -97,11 +85,15 @@ public class ViewAnimationService {
 
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(duration);
-        animator.start();
 
-
+        return animator;
     }
-    public static void translateToCenterInParentViewAnimation(final View v, int duration, final Axis axis) {
+
+    public static void startTranslationAnimator(final View v, int duration, final Axis axis, float distance) {
+        getTranslationAnimator(v, duration, axis, distance).start();
+    }
+
+    public static Animator getTranslateToCenterInParentViewAnimator(final View v, int duration, final Axis axis) {
 
        View parentView = v.getRootView();
 
@@ -141,12 +133,16 @@ public class ViewAnimationService {
 
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(duration);
-        animator.start();
 
-
+        return animator;
     }
 
-    public static void uniformScaleAnimation(final View v, int duration, float scaleFactor) {
+    public static void startTranslateToCenterInParentViewAnimator(final View v, int duration, final Axis axis) {
+        getTranslateToCenterInParentViewAnimator(v, duration, axis).start();
+    }
+
+
+    public static Animator getUniformScaleAnimator(final View v, int duration, float scaleFactor) {
 
         ValueAnimator animator = ValueAnimator.ofFloat(1, scaleFactor);
 
@@ -164,11 +160,14 @@ public class ViewAnimationService {
 
         animator.setInterpolator(new DecelerateInterpolator());
         animator.setDuration(duration);
-        animator.start();
-
-
+        return animator;
     }
-    public static void colorTransitionAnimation(final View v, int duration, int colorFrom, int colorTo) {
+
+    public static void startUniformScaleAnimator(final View v, int duration, float scaleFactor) {
+        getUniformScaleAnimator(v, duration, scaleFactor).start();
+    }
+
+    public static Animator getColorTransitionAnimator(final View v, int duration, int colorFrom, int colorTo) {
         ValueAnimator animation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
         animation.setDuration(duration);
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -183,9 +182,14 @@ public class ViewAnimationService {
 
         });
         animation.start();
-
+        return animation;
     }
-    public static void colorTransitionAndBackAnimation(final View v, final int duration, final int colorFrom, final int colorTo) {
+
+    public static void startColorTransitionAnimator(final View v, int duration, int colorFrom, int colorTo) {
+        getColorTransitionAnimator(v, duration, colorFrom, colorTo).start();
+    }
+
+    public static Animator getColorTransitionAndBackAnimator(final View v, final int duration, final int colorFrom, final int colorTo) {
         ValueAnimator animation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
         animation.setDuration(duration);
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -203,11 +207,16 @@ public class ViewAnimationService {
             @Override
             public void onAnimationEnd(Animator animation)
             {
-                colorTransitionAnimation(v, duration, colorTo, colorFrom);
+                startColorTransitionAnimator(v, duration, colorTo, colorFrom);
             }
 
         });
         animation.start();
-
+        return animation;
     }
+
+    public static void startColorTransitionAndBackAnimator(final View v, final int duration, final int colorFrom, final int colorTo) {
+        getColorTransitionAndBackAnimator(v, duration, colorFrom, colorTo).start();
+    }
+
 }

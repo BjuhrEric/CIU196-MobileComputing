@@ -3,36 +3,30 @@ package com.ciu196.mobilecomputing;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.StateListAnimator;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.Duration;
 
 import java.util.Random;
 
 import static android.support.design.widget.FloatingActionButton.*;
-import static com.ciu196.mobilecomputing.ViewAnimationService.colorTransitionAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.fadeInAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.fadeOutAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.addAnimator;
+import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeInAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeOutAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.getColorTransitionAnimator;
+import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslateToCenterInParentViewAnimator;
+import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslationAnimator;
+import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.translateAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.translateToCenterInParentViewAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.uniformScaleAnimation;
-import static java.lang.Thread.sleep;
 
 
 public class ConnectActivity extends AppCompatActivity {
@@ -266,11 +260,11 @@ public class ConnectActivity extends AppCompatActivity {
             earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
             setCircleColor(circleColor.GRAY);
             changeBackgroundColor(getResources().getColor(R.color.backgroundCreamColor));
-            fadeInAnimation(playerNameTextView, 500);
-            fadeInAnimation(pianoStatusTextView, 550);
-            fadeInAnimation(earImage, 400);
-            fadeInAnimation(listenerLayout, 600);
-            fadeInAnimation(actionButton, 1000);
+            addFadeInAnimation(playerNameTextView, 500);
+            addFadeInAnimation(pianoStatusTextView, 550);
+            addFadeInAnimation(earImage, 400);
+            addFadeInAnimation(listenerLayout, 600);
+            addFadeInAnimation(actionButton, 1000);
 
 
 
@@ -315,19 +309,19 @@ public class ConnectActivity extends AppCompatActivity {
             fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
             fab.show();
 
-            fadeInAnimation(earImage, 400);
+            addFadeInAnimation(earImage, 400);
             //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
-            translateToCenterInParentViewAnimation(pianoStatusTextView, 500, ViewAnimationService.Axis.X);
-            translateToCenterInParentViewAnimation(playerNameTextView, 500, ViewAnimationService.Axis.X);
+            addAnimator(pianoStatusTextView, getTranslateToCenterInParentViewAnimator(pianoStatusTextView, 500, ViewAnimationService.Axis.X));
+            addAnimator(playerNameTextView, getTranslateToCenterInParentViewAnimator(playerNameTextView, 500, ViewAnimationService.Axis.X));
 
-            translateAnimation(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120);
-            translateAnimation(listenerLayout, 500, ViewAnimationService.Axis.Y, 130);
+            addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120));
+            addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, 130));
 
-            uniformScaleAnimation(playerNameTextView, 500, 1.3f);
+            addAnimator(playerNameTextView, getUniformScaleAnimator(playerNameTextView, 500, 1.3f));
 
-            fadeInAnimation(playerNameTextView, 500);
-            fadeInAnimation(pianoStatusTextView, 550);
-            fadeInAnimation(actionButton, 700);
+            addFadeInAnimation(playerNameTextView, 500);
+            addFadeInAnimation(pianoStatusTextView, 550);
+            addFadeInAnimation(actionButton, 700);
 
         } else if (m == guiMode.CANT_CONNECT) {
             currentGuiMode = guiMode.CANT_CONNECT;
@@ -370,17 +364,17 @@ public class ConnectActivity extends AppCompatActivity {
 
     private void teardownCurrentGui() {
         if(currentGuiMode == guiMode.START_TO_LISTEN){
-            fadeOutAnimation(playerNameTextView, 200);
-            fadeOutAnimation(pianoStatusTextView, 350);
-            fadeOutAnimation(actionButton, 700);
-            fadeOutAnimation(earImage, 400);
+            addFadeOutAnimation(playerNameTextView, 200);
+            addFadeOutAnimation(pianoStatusTextView, 350);
+            addFadeOutAnimation(actionButton, 700);
+            addFadeOutAnimation(earImage, 400);
             fab.hide();
 
         } else if(currentGuiMode == guiMode.LISTENING){
-            fadeOutAnimation(playerNameTextView, 200);
-            fadeOutAnimation(pianoStatusTextView, 350);
-            fadeOutAnimation(actionButton, 700);
-            fadeOutAnimation(earImage, 400);
+            addFadeOutAnimation(playerNameTextView, 200);
+            addFadeOutAnimation(pianoStatusTextView, 350);
+            addFadeOutAnimation(actionButton, 700);
+            addFadeOutAnimation(earImage, 400);
             fab.hide();
 
         }
@@ -400,7 +394,7 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     private void changeBackgroundColor(int newColor) {
-        colorTransitionAnimation(backgroundView, 750, currentBackgroundColor, newColor);
+        addAnimator(backgroundView, getColorTransitionAnimator(backgroundView, 750, currentBackgroundColor, newColor));
         currentBackgroundColor = newColor;
 
     }
@@ -434,10 +428,10 @@ public class ConnectActivity extends AppCompatActivity {
 
         }
 
-        colorTransitionAnimation(circle1, 250, colorFrom1, colorTo1);
-        colorTransitionAnimation(circle2, 450, colorFrom2, colorTo2);
-        colorTransitionAnimation(circle3, 600, colorFrom3, colorTo3);
-        colorTransitionAnimation(circle4, 700, colorFrom4, colorTo4);
+        addAnimator(circle1, getColorTransitionAnimator(circle1, 250, colorFrom1, colorTo1));
+        addAnimator(circle2, getColorTransitionAnimator(circle2, 450, colorFrom2, colorTo2));
+        addAnimator(circle3, getColorTransitionAnimator(circle3, 600, colorFrom3, colorTo3));
+        addAnimator(circle4, getColorTransitionAnimator(circle4, 700, colorFrom4, colorTo4));
 
         currentCircleColors[0] = colorTo1;
         currentCircleColors[1] = colorTo2;

@@ -14,44 +14,32 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Created by Andreas Pegelow on 2017-10-16.
  */
-public class AnimationView {
+public class AnimationView implements AnimationEndedListener {
 
     boolean ongoingAnimation = false;
-    Queue<Animation> animationsQueue;
+    Queue<ViewOperation> animationsQueue;
     View v;
+
     public AnimationView(View v) {
         this.v = v;
         animationsQueue = new ConcurrentLinkedQueue<>();
     }
-    public void addAnimation(Animation a){
+
+    public void addAnimation(ViewOperation a){
         animationsQueue.offer(a);
-
     }
+
     public void startAnimation(){
-
         if(!animationsQueue.isEmpty() && !ongoingAnimation){
-            Animation a = animationsQueue.poll();
-            if (a instanceof AlphaAnimation) {
-            }
-
-            a.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    ongoingAnimation = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    ongoingAnimation = false;
-                    startAnimation();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            v.startAnimation(a);
+            ViewOperation op = animationsQueue.poll();
+            op.addAnimationEndedListener(this);
+            op.perform(v);
         }
+    }
+
+    @Override
+    public void animationEnded() {
+        ongoingAnimation = false;
+        startAnimation();
     }
 }
