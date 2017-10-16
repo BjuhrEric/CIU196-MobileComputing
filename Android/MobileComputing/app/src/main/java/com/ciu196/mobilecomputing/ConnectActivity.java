@@ -39,7 +39,7 @@ public class ConnectActivity extends AppCompatActivity {
     Circle circle4;
     View backgroundView;
     View listenerLayout;
-    FloatingActionButton fab;
+    FloatingActionButton fab, fab1, fab2, fab3;
 
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
@@ -47,7 +47,26 @@ public class ConnectActivity extends AppCompatActivity {
     circleColor currentCircleColor = circleColor.BLUE;
 
     boolean testFlag = false;
-
+    boolean isShowingReaction = false;
+    View.OnClickListener reactionListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id = view.getId();
+            switch (id){
+                case R.id.fab1:
+                    Toast.makeText(ConnectActivity.this, "Fab 1", Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.fab2:
+                    Toast.makeText(ConnectActivity.this, "Fab 2", Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.fab3:
+                    Toast.makeText(ConnectActivity.this, "Fab 3", Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +81,15 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
         fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        fab1 = (FloatingActionButton) findViewById(R.id.fab1);
+        fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab3 = (FloatingActionButton) findViewById(R.id.fab3);
+
+        fab1.setOnClickListener(reactionListener);
+        fab2.setOnClickListener(reactionListener);
+        fab3.setOnClickListener(reactionListener);
+
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
@@ -106,8 +134,37 @@ public class ConnectActivity extends AppCompatActivity {
                     startActivity(i);
                     Toast.makeText(getApplicationContext(),"Start map activity",Toast.LENGTH_LONG).show();
                 }else if (currentGuiMode == guiMode.LISTENING){
-
                     Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
+                    if(isShowingReaction){
+                        //hide reaction alternatives
+                        //show reaction alternatives
+                        fab1.setClickable(false);
+                        fab2.setClickable(false);
+                        fab3.setClickable(false);
+                        fab1.hide();
+                        fab2.hide();
+                        fab3.hide();
+
+                        isShowingReaction = false;
+                    } else {
+                        //show reaction alternatives
+                        fab1.setClickable(true);
+                        fab2.setClickable(true);
+                        fab3.setClickable(true);
+                        fab1.show();
+                        fab2.show();
+                        fab3.show();
+
+                        isShowingReaction = true;
+                    }
+
+
+
+
+
+
+
+
                 }
             }
         });
@@ -144,6 +201,13 @@ public class ConnectActivity extends AppCompatActivity {
 
             fab.setImageResource(R.drawable.ic_map_white_24dp);
             fab.show();
+
+            fab1.setClickable(false);
+            fab2.setClickable(false);
+            fab3.setClickable(false);
+            fab1.hide();
+            fab2.hide();
+            fab3.hide();
 
             final Handler handler = new Handler();
 

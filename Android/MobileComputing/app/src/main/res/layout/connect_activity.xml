@@ -75,6 +75,49 @@
         android:background="@drawable/rounded_button"
 
         />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fab2"
+        android:layout_alignStart="@+id/fab2"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_favorite_white_24dp"
+        app:backgroundTint="@color/myLocationRed"
+        app:fabSize="mini"
+
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_tag_faces_white_24dp"
+        app:backgroundTint="@color/myLocationRed"
+        android:layout_above="@+id/fab1"
+        android:layout_alignStart="@+id/fab1"
+        app:fabSize="mini"
+
+        />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fab"
+        android:layout_alignStart="@+id/fab"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_thumb_up_white_24dp"
+        app:backgroundTint="@color/myLocationRed"
+        app:fabSize="mini"
+        />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -85,6 +128,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="10dp"
+        app:fabSize="mini"
         />
 
     <FrameLayout
