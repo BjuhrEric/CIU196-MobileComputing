@@ -23,12 +23,12 @@ public class ServerStatusFetcherTask extends LoopableTask {
 
     @Override
     protected boolean init() {
-        return false;
+        return true;
     }
 
     @Override
     protected boolean finish() {
-        return false;
+        return true;
     }
 
     @Override
