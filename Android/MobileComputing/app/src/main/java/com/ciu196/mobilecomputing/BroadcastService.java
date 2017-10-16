@@ -8,6 +8,9 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.*;
+
 /**
  * Created by Andreas Pegelow on 2017-10-09.
  */
@@ -40,19 +43,30 @@ public class BroadcastService {
        return (isLive() ? playername : "No-one");
 
     }
+
     public void setPlayername(String name){
         playername = name;
 
     }
+
+    /*
+    * http://googlemaps.github.io/android-maps-utils/javadoc/
+    * */
 
     //Returns how many is currently listening
     public static int getNumberOfListeners(){
         //Todo: not implemented yet, just dummy implementation so far
         return 15;
     }
-
+    
     public static boolean closeEnough() {
         //Todo: not implemented yet, just dummy implementation so far
-        return true;
+        int playZone = 0;
+        int circleRadius = 0;
+        LatLng libLatLng = null;
+        LatLng userLatLng = null;
+
+        double distance = SphericalUtil.computeDistanceBetween(null, null);
+        return distance < playZone*circleRadius;
     }
 }
