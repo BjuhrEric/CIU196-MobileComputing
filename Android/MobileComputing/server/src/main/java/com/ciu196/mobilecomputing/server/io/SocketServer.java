@@ -25,7 +25,7 @@ public class SocketServer implements Server {
 
 
     private final static String NOONE = "No-one";
-
+    private volatile long broadcastStartTime = -1;
     private volatile boolean running = false;
     private volatile Client broadcaster = null;
     private volatile String broadcasterName = NOONE;
@@ -117,6 +117,7 @@ public class SocketServer implements Server {
         status.putStatus("broadcasting", Boolean.toString(broadcaster != null));
         status.putStatus("broadcaster", broadcasterName);
         status.putStatus("nListeners", Integer.toString(listeners.size()));
+        status.putStatus("broadcastStartTime", Long.toString(broadcastStartTime));
 
         client.sendMessage(response);
     }
@@ -133,6 +134,7 @@ public class SocketServer implements Server {
         }
         broadcasterName = name;
         broadcaster = c;
+        broadcastStartTime = System.currentTimeMillis();
         listeners.remove(c);
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
     }
@@ -143,6 +145,7 @@ public class SocketServer implements Server {
         if (c.equals(broadcaster)) {
             broadcaster = null;
             broadcasterName = NOONE;
+            broadcastStartTime = -1;
         }
 
         System.out.println("Client detached");

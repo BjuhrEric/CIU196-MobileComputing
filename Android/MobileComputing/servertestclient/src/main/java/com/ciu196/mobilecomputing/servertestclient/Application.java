@@ -85,6 +85,7 @@ public class Application {
                 ServerResponse.Status status = (ServerResponse.Status) serverResponse.getValue();
                 System.out.println("Broadcasting: "+status.getStatus("broadcasting"));
                 System.out.println("Broadcaster: "+status.getStatus("broadcaster"));
+                System.out.println("Broadcast start time: "+status.getStatus("broadcastStartTime"));
                 System.out.println("Number of listeners: "+status.getStatus("nListeners"));
             }
         }
