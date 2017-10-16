@@ -25,7 +25,9 @@ public class InstantViewOperation extends ViewOperation {
         for (ViewAction action : actions) {
             action.perform();
         }
-        animationEndedListeners.forEach(AnimationEndedListener::animationEnded);
+        for (AnimationEndedListener listener : animationEndedListeners) {
+            listener.animationEnded();
+        }
     }
 
 }

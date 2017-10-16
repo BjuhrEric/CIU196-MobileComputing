@@ -25,10 +25,21 @@ public class ViewAnimationService {
         }
     }
 
-    public static void addAnimator(final View v, final Animator a) {
-        AnimationView animationView= map.get(v);
+    public static void addInstantOperation(final View v, ViewAction... actions) {
+        AnimationView animationView = map.get(v);
 
-        if(animationView == null){
+        if (animationView == null) {
+            animationView = new AnimationView(v);
+            map.put(v, animationView);
+        }
+
+        animationView.addAnimation(new InstantViewOperation(actions));
+    }
+
+    public static void addAnimator(final View v, final Animator a) {
+        AnimationView animationView = map.get(v);
+
+        if (animationView == null) {
             animationView = new AnimationView(v);
             map.put(v, animationView);
         }

@@ -22,6 +22,7 @@ import static android.support.design.widget.FloatingActionButton.*;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeOutAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.addInstantOperation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getColorTransitionAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslateToCenterInParentViewAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslationAnimator;
@@ -249,12 +250,12 @@ public class ConnectActivity extends AppCompatActivity {
         if (m == guiMode.START_TO_LISTEN) {
             currentGuiMode = guiMode.START_TO_LISTEN;
 
-            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_blue));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
             setCircleColor(circleColor.GRAY);
             pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
             playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
             playerNameTextView.setText(BroadcastService.getPlayerName());
-            pianoStatusTextView.setText("is playing");
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             actionButton.setText("Start Listening");
             listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
             earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
@@ -301,7 +302,7 @@ public class ConnectActivity extends AppCompatActivity {
             setCircleColor(circleColor.BLUE);
             pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
             playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
-            pianoStatusTextView.setText("Currently listening to");
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setText("Stop listening");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
