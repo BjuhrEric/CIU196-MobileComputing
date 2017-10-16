@@ -1,5 +1,8 @@
 package com.ciu196.mobilecomputing;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.animation.StateListAnimator;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,14 +10,19 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.Duration;
+
+import java.util.Random;
 
 import static android.support.design.widget.FloatingActionButton.*;
 import static com.ciu196.mobilecomputing.ViewAnimationService.colorTransitionAnimation;
@@ -33,7 +41,7 @@ public class ConnectActivity extends AppCompatActivity {
 
     public enum circleColor {BLUE, RED};
 
-
+    RelativeLayout rel;
     TextView pianoStatusTextView;
     TextView listenersTextView;
     TextView playerNameTextView;
@@ -58,7 +66,7 @@ public class ConnectActivity extends AppCompatActivity {
     View.OnClickListener reactionListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Toast toast = new Toast(ConnectActivity.this);
+            //Toast toast = new Toast(ConnectActivity.this);
             ImageView imageView = new ImageView(ConnectActivity.this);
 
             int id = view.getId();
@@ -78,12 +86,42 @@ public class ConnectActivity extends AppCompatActivity {
                 default:
                     break;
             }
+            imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT));
             imageView.setPadding(10,10,10,10);
-            toast.setView(imageView);
-            toast.setDuration(Toast.LENGTH_SHORT);
-            toast.show();
+            rel.addView(imageView);
+            animateReaction(imageView);
         }
     };
+
+    public void animateReaction(final ImageView view){
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int height = getResources().getDisplayMetrics().heightPixels;
+        Random random = new Random();
+        int x = 100 + random.nextInt(width-200);
+        int y = height - random.nextInt(height / 4);
+        view.setX(x);
+        view.setY(y);
+        view.setVisibility(VISIBLE);
+        
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha",  1f, 0f);
+        fadeOut.setDuration(2000);
+
+        //final AnimatorSet mAnimationSet = new AnimatorSet();
+
+        //mAnimationSet.play(fadeIn).after(fadeOut);
+
+        fadeOut.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                rel.removeView(view);
+            }
+        });
+        fadeOut.start();
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +129,7 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.connect_activity);
 
         //Connect UI Elements
+        rel = (RelativeLayout) (RelativeLayout) findViewById(R.id.backgroundLayout);
         pianoStatusTextView = (TextView) findViewById(R.id.pianoStatusTextView);
         listenersTextView = (TextView) findViewById(R.id.listenersTextView);
         playerNameTextView = (TextView) findViewById(R.id.playerNameTextView);
