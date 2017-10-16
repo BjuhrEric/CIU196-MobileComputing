@@ -22,6 +22,7 @@ public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapRe
     private GoogleMap mMap;
     private FloatingActionButton fabPlus;
     private FloatingActionButton fabMinus;
+    int disabledColor;
 
 
     @Override
@@ -40,12 +41,21 @@ public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapRe
         getSupportActionBar().setTitle("Change Broadcast Volume");
         //getSupportActionBar().setSubtitle("This is a subtitle");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // Fab init
         fabMinus = (FloatingActionButton) findViewById(R.id.volume_minus_fab);
         fabMinus.setOnClickListener(this);
         fabPlus = (FloatingActionButton) findViewById(R.id.volume_plus_fab);
         fabPlus.setOnClickListener(this);
+
+        //colors
+        disabledColor = getColor(R.color.disabledGrey);
     }
 
     @Override
@@ -57,6 +67,7 @@ public class ChangeVolumeActivity extends AbstractMapActivity implements OnMapRe
                     play_zone = 1;
                 }
                 //broadcastService.setVolume(playZone) eller nått sånt
+
                 redrawMap();
                 centerMap(libLatLng);
                 break;

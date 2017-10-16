@@ -31,8 +31,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_remove_white_24dp"
-        app:backgroundTint="@color/listenBlueColor"
+        android:src="@drawable/ic_remove_black_24dp"
+        app:backgroundTint="#FFFFFFFF"
         app:fabSize="normal" />
 
 
@@ -40,8 +40,8 @@
         android:id="@+id/volume_plus_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_add_white_24dp"
-        app:backgroundTint="@color/listenBlueColor"
+        android:src="@drawable/ic_add_black_24dp"
+        app:backgroundTint="#FFFFFFFF"
         app:fabSize="normal"
         android:layout_marginRight="16dp"
         android:layout_above="@+id/volume_minus_fab"
