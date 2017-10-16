@@ -3,11 +3,13 @@ package com.ciu196.mobilecomputing;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.Duration;
 
@@ -38,6 +40,7 @@ public class ConnectActivity extends AppCompatActivity {
     Circle circle4;
     View backgroundView;
     View listenerLayout;
+    FloatingActionButton fab;
 
     guiMode previusGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
@@ -45,6 +48,20 @@ public class ConnectActivity extends AppCompatActivity {
     circleColor currentCircleColor = circleColor.BLUE;
 
     boolean testFlag = false;
+
+    View.OnClickListener fabListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (previusGuiMode == guiMode.START_TO_LISTEN){
+
+                Toast.makeText(getApplicationContext(),"Start map acitivty",Toast.LENGTH_LONG).show();
+            }else if (previusGuiMode == guiMode.LISTENING){
+
+                Toast.makeText(getApplicationContext(),"Handle Reaction",Toast.LENGTH_LONG).show();
+        }
+
+        }
+    };
 
 
     @Override
@@ -59,6 +76,8 @@ public class ConnectActivity extends AppCompatActivity {
         durationText = (TextView) findViewById(R.id.durationText);
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(fabListener);
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
         circle3 = (Circle) findViewById(R.id.circle3);
@@ -69,6 +88,8 @@ public class ConnectActivity extends AppCompatActivity {
         currentCircleColors[1] = circle2.getColor();
         currentCircleColors[2] = circle3.getColor();
         currentCircleColors[3] = circle4.getColor();
+
+
 
 
 
@@ -122,6 +143,9 @@ public class ConnectActivity extends AppCompatActivity {
             fadeInAnimation(listenerLayout, 600);
             fadeInAnimation(actionButton, 1000);
 
+            fab.setImageResource(R.drawable.ic_map_white_24dp);
+            fab.show();
+
             final Handler handler = new Handler();
 
             handler.postDelayed(new Runnable(){
@@ -145,6 +169,9 @@ public class ConnectActivity extends AppCompatActivity {
 
             pianoStatusTextView.setText("Currently listening to");
             playerNameTextView.setText(BroadcastService.getPlayerName());
+
+            fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
+            fab.show();
 
 
             //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
@@ -188,9 +215,10 @@ public class ConnectActivity extends AppCompatActivity {
             fadeOutAnimation(playerNameTextView, 200);
             fadeOutAnimation(pianoStatusTextView, 350);
             fadeOutAnimation(actionButton, 500);
+            fab.hide();
 
         } else if(previusGuiMode == guiMode.LISTENING){
-
+            fab.hide();
 
         }
         else if(previusGuiMode == guiMode.CANT_CONNECT){
