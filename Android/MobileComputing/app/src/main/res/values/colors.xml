@@ -14,13 +14,14 @@
     <color name="circle4BlueColor">#FF173357</color>
     <color name="backgroundBlueColor">#FF0b1521</color>
 
+
     <color name="circle1RedColor">#b04652</color>
     <color name="circle2RedColor">#c44e5c</color>
     <color name="circle3RedColor">#db5767</color>
     <color name="circle4RedColor">#7e323b</color>
     <color name="backgroundRedColor">#670d18</color>
 
-    <color name="backgroundGrayColor">#323232</color>
+    <color name="backgroundCreamColor">#f7f4ef</color>
     <color name="fabColor">#f7cf09</color>
     <color name="myLocationRed">#E55050</color>
     <color name="disabledGrey"> #FFCECECE</color>
