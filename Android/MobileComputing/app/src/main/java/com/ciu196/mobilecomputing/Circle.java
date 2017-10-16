@@ -96,6 +96,7 @@ public class Circle extends View {
 
     public void setColor(int colorInt) {
         paint.setColor(colorInt);
+        this.color = colorInt;
         invalidate();
     }
 
