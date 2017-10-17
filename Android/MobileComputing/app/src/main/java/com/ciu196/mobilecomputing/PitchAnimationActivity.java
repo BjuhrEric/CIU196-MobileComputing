@@ -24,13 +24,19 @@ import java.util.concurrent.Executors;
 
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.beatroot.Event;
 import be.tarsos.dsp.io.android.AndroidAudioPlayer;
 import be.tarsos.dsp.io.android.AndroidFFMPEGLocator;
 import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.onsets.BeatRootSpectralFluxOnsetDetector;
+import be.tarsos.dsp.onsets.OnsetHandler;
+import be.tarsos.dsp.onsets.PercussionOnsetDetector;
 import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 import be.tarsos.dsp.util.fft.FFT;
+
+import static junit.framework.Assert.assertEquals;
 
 public class PitchAnimationActivity extends AppCompatActivity {
 
@@ -184,6 +190,7 @@ public class PitchAnimationActivity extends AppCompatActivity {
     }
 
     private CountDownTimer circleTimer;
+    private int base=1;
 
     public void processPitch(float pitchInHz) {
         if (circle2Radius == 0) {
@@ -194,6 +201,7 @@ public class PitchAnimationActivity extends AppCompatActivity {
         }
 
         pitchText.setText("" + pitchInHz);
+        noteText.setText("...");
 //        if (pitchInHz == -1)
 //            circle2.resetRadius();
 //        else
@@ -209,33 +217,60 @@ public class PitchAnimationActivity extends AppCompatActivity {
 //            circle4.setRadius(circle4Radius + (int) Math.round(pitchInHz) / 10);
         }
 
+        if((int) Math.floor(pitchInHz/110)<=1) {
+            base = 1;
+        }else if ((int) Math.floor(pitchInHz/220)<=1){
+            base = 2;
+        }else if ((int) Math.floor(pitchInHz/440)<=1){
+            base = 3;
+        }else if ((int) Math.floor(pitchInHz/880)<=1){
+            base = 4;
+        }else if ((int) Math.floor(pitchInHz/1760)<=1){
+            base = 5;
+        }else if ((int) Math.floor(pitchInHz/3520)<=1){
+            base = 6;
+        }else if ((int) Math.floor(pitchInHz/7040)<=1){
+            base = 7;
+        }
 
-        if (pitchInHz >= 110 && pitchInHz < 123.47) {
+        System.out.println("base "+ base+ " pithz: "+ pitchInHz + " pitchAndBase: " + 110*powerN(base-1));
+
+        if (pitchInHz >= 110*powerN(base-1) && pitchInHz < 123.47*powerN(base-1)) {
             //A
             noteText.setText("A");
-        } else if (pitchInHz >= 123.47 && pitchInHz < 130.81) {
+        } else if (pitchInHz >= 123.47*powerN(base-1) && pitchInHz < 130.81*powerN(base-1)) {
             //B
             noteText.setText("B");
-        } else if (pitchInHz >= 130.81 && pitchInHz < 146.83) {
+        } else if (pitchInHz >= 130.81*powerN(base-1) && pitchInHz < 146.83*powerN(base-1)) {
             //C
             noteText.setText("C");
-        } else if (pitchInHz >= 146.83 && pitchInHz < 164.81) {
+        } else if (pitchInHz >= 146.83*powerN(base-1) && pitchInHz < 164.81*powerN(base-1)) {
             //D
             noteText.setText("D");
-        } else if (pitchInHz >= 164.81 && pitchInHz <= 174.61) {
+        } else if (pitchInHz >= 164.81*powerN(base-1) && pitchInHz <= 174.61*powerN(base-1)) {
             //E
             noteText.setText("E");
-        } else if (pitchInHz >= 174.61 && pitchInHz < 185) {
+        } else if (pitchInHz >= 174.61*powerN(base-1) && pitchInHz < 185*powerN(base-1)) {
             //F
             noteText.setText("F");
-        } else if (pitchInHz >= 185 && pitchInHz < 196) {
+        } else if (pitchInHz >= 185*powerN(base-1) && pitchInHz < 196*powerN(base-1)) {
             //G
             noteText.setText("G");
         }
-
-
     }
 
+    public static double powerN(int n) {
+        int base=2;
+        if (n < 0) {
+            System.out.println("this is the n: " + n);
+            throw new IllegalArgumentException("Illegal Power Argument");
+        }
+        if (n == 0) {
+            return 1;
+        } else {
+            return base * powerN(n - 1);
+        }
+    }
     private int deltaTime;
     private int oldTime;
     private double ampInDbOld;
@@ -247,158 +282,160 @@ public class PitchAnimationActivity extends AppCompatActivity {
         double deltaAmp = ampInDb - ampInDbOld;
         //(deltaAmp > 10 || deltaAmp < -10)
 
-        if (deltaTime > 500 && ampInDb > -70) {
-            oldTime = (int) System.currentTimeMillis();
-            ampInDbOld = ampInDb;
-            final int dur = 400 + 100;
-            new CountDownTimer(dur, 100) {
-                int tick = 0;
-                int ratio = 1;
-                int secondsLeft = ratio * dur - 100;
+        if (deltaTime > 500) {
+            if (ampInDb > -70) {
+                oldTime = (int) System.currentTimeMillis();
+                ampInDbOld = ampInDb;
+                final int dur = 400 + 100;
+                new CountDownTimer(dur, 100) {
+                    int tick = 0;
+                    int ratio = 1;
+                    int secondsLeft = ratio * dur - 100;
 
-                public void onTick(long millisUntilFinished) {
-                    if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
+                    public void onTick(long millisUntilFinished) {
+                        if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
 
-                        switch (tick) {
-                            case 1:
-                                String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
-                                int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
+                            switch (tick) {
+                                case 1:
+                                    String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
+                                    int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
 //                                    circle1.setAlpha(0.8f);
-                                break;
-                            case 2:
-                                String hexColor2 = String.format("#%06X", (0xFFFFFF & circle2.getColor()));
-                                int toColor2 = Color.parseColor("#59" + hexColor2.substring(1, hexColor2.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle2, 200, circle2.getColor(), toColor2);
+                                    break;
+                                case 2:
+                                    String hexColor2 = String.format("#%06X", (0xFFFFFF & circle2.getColor()));
+                                    int toColor2 = Color.parseColor("#59" + hexColor2.substring(1, hexColor2.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle2, 200, circle2.getColor(), toColor2);
 //                                    circle1.setAlpha(0.8f);
-                                break;
-                            case 3:
-                                String hexColor3 = String.format("#%06X", (0xFFFFFF & circle3.getColor()));
-                                int toColor3 = Color.parseColor("#59" + hexColor3.substring(1, hexColor3.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle3, 200, circle3.getColor(), toColor3);
+                                    break;
+                                case 3:
+                                    String hexColor3 = String.format("#%06X", (0xFFFFFF & circle3.getColor()));
+                                    int toColor3 = Color.parseColor("#59" + hexColor3.substring(1, hexColor3.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle3, 200, circle3.getColor(), toColor3);
 //
-                                break;
-                            case 4:
-                                String hexColor4 = String.format("#%06X", (0xFFFFFF & circle4.getColor()));
-                                int toColor4 = Color.parseColor("#80" + hexColor4.substring(1, hexColor4.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle4, 200, circle4.getColor(), toColor4);
+                                    break;
+                                case 4:
+                                    String hexColor4 = String.format("#%06X", (0xFFFFFF & circle4.getColor()));
+                                    int toColor4 = Color.parseColor("#80" + hexColor4.substring(1, hexColor4.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle4, 200, circle4.getColor(), toColor4);
 //                                    circle4.setAlpha(0.8f);
-                                break;
+                                    break;
+                            }
+                            tick++;
+                            secondsLeft--;
                         }
-                        tick++;
-                        secondsLeft--;
                     }
-                }
 
-                public void onFinish(){
-                }
+                    public void onFinish() {
+                    }
 
-            }.start();
-        } else if (deltaTime > 500 && ampInDb > -75) {
-            oldTime = (int) System.currentTimeMillis();
-            ampInDbOld = ampInDb;
-            final int dur = 400 + 100;
-            new CountDownTimer(dur, 100) {
-                int tick = 0;
-                int ratio = 1;
-                int secondsLeft = ratio * dur - 100;
+                }.start();
+            } else if (ampInDb > -75) {
+                oldTime = (int) System.currentTimeMillis();
+                ampInDbOld = ampInDb;
+                final int dur = 400 + 100;
+                new CountDownTimer(dur, 100) {
+                    int tick = 0;
+                    int ratio = 1;
+                    int secondsLeft = ratio * dur - 100;
 
-                public void onTick(long millisUntilFinished) {
-                    if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
+                    public void onTick(long millisUntilFinished) {
+                        if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
 
-                        switch (tick) {
-                            case 1:
-                                String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
-                                int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
+                            switch (tick) {
+                                case 1:
+                                    String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
+                                    int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
 //                                    circle1.setAlpha(0.8f);
-                                break;
-                            case 2:
-                                String hexColor2 = String.format("#%06X", (0xFFFFFF & circle2.getColor()));
-                                int toColor2 = Color.parseColor("#59" + hexColor2.substring(1, hexColor2.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle2, 200, circle2.getColor(), toColor2);
+                                    break;
+                                case 2:
+                                    String hexColor2 = String.format("#%06X", (0xFFFFFF & circle2.getColor()));
+                                    int toColor2 = Color.parseColor("#59" + hexColor2.substring(1, hexColor2.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle2, 200, circle2.getColor(), toColor2);
 //                                    circle1.setAlpha(0.8f);
-                                break;
-                            case 3:
-                                String hexColor3 = String.format("#%06X", (0xFFFFFF & circle3.getColor()));
-                                int toColor3 = Color.parseColor("#59" + hexColor3.substring(1, hexColor3.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle3, 200, circle3.getColor(), toColor3);
+                                    break;
+                                case 3:
+                                    String hexColor3 = String.format("#%06X", (0xFFFFFF & circle3.getColor()));
+                                    int toColor3 = Color.parseColor("#59" + hexColor3.substring(1, hexColor3.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle3, 200, circle3.getColor(), toColor3);
 //
-                                break;
+                                    break;
+                            }
+                            tick++;
+                            secondsLeft--;
                         }
-                        tick++;
-                        secondsLeft--;
                     }
-                }
 
-                public void onFinish() {
-                }
+                    public void onFinish() {
+                    }
 
-            }.start();
-        } else if (deltaTime > 500 && ampInDb > -80) {
-            oldTime = (int) System.currentTimeMillis();
-            ampInDbOld = ampInDb;
-            final int dur = 400 + 100;
-            new CountDownTimer(dur, 100) {
-                int tick = 0;
-                int ratio = 1;
-                int secondsLeft = ratio * dur - 100;
+                }.start();
+            } else if (ampInDb > -80) {
+                oldTime = (int) System.currentTimeMillis();
+                ampInDbOld = ampInDb;
+                final int dur = 400 + 100;
+                new CountDownTimer(dur, 100) {
+                    int tick = 0;
+                    int ratio = 1;
+                    int secondsLeft = ratio * dur - 100;
 
-                public void onTick(long millisUntilFinished) {
-                    if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
+                    public void onTick(long millisUntilFinished) {
+                        if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
 
-                        switch (tick) {
-                            case 1:
-                                String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
-                                int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
+                            switch (tick) {
+                                case 1:
+                                    String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
+                                    int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
 //                                    circle1.setAlpha(0.8f);
-                                break;
-                            case 2:
-                                String hexColor2 = String.format("#%06X", (0xFFFFFF & circle2.getColor()));
-                                int toColor2 = Color.parseColor("#59" + hexColor2.substring(1, hexColor2.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle2, 200, circle2.getColor(), toColor2);
+                                    break;
+                                case 2:
+                                    String hexColor2 = String.format("#%06X", (0xFFFFFF & circle2.getColor()));
+                                    int toColor2 = Color.parseColor("#59" + hexColor2.substring(1, hexColor2.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle2, 200, circle2.getColor(), toColor2);
 //                                    circle1.setAlpha(0.8f);
-                                break;
+                                    break;
+                            }
+                            tick++;
+                            secondsLeft--;
                         }
-                        tick++;
-                        secondsLeft--;
                     }
-                }
 
-                public void onFinish() {
-                }
+                    public void onFinish() {
+                    }
 
-            }.start();
-        } else if (deltaTime > 500 && ampInDb > -90) {
-            oldTime = (int) System.currentTimeMillis();
-            ampInDbOld = ampInDb;
-            final int dur = 400 + 100;
-            new CountDownTimer(dur, 100) {
-                int tick = 0;
-                int ratio = 1;
-                int secondsLeft = ratio * dur - 100;
+                }.start();
+            } else if (ampInDb > -90) {
+                oldTime = (int) System.currentTimeMillis();
+                ampInDbOld = ampInDb;
+                final int dur = 400 + 100;
+                new CountDownTimer(dur, 100) {
+                    int tick = 0;
+                    int ratio = 1;
+                    int secondsLeft = ratio * dur - 100;
 
-                public void onTick(long millisUntilFinished) {
-                    if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
+                    public void onTick(long millisUntilFinished) {
+                        if (Math.round(millisUntilFinished / (1000 / ratio)) <= secondsLeft) {
 
-                        switch (tick) {
-                            case 1:
-                                String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
-                                int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
-                                ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
+                            switch (tick) {
+                                case 1:
+                                    String hexColor = String.format("#%06X", (0xFFFFFF & circle1.getColor()));
+                                    int toColor = Color.parseColor("#59" + hexColor.substring(1, hexColor.length()));
+                                    ViewAnimationService.colorTransitionAndBackAnimation(circle1, 200, circle1.getColor(), toColor);
 //                                    circle1.setAlpha(0.8f);
-                                break;
+                                    break;
+                            }
+                            tick++;
+                            secondsLeft--;
                         }
-                        tick++;
-                        secondsLeft--;
                     }
-                }
 
-                public void onFinish() {
-                }
+                    public void onFinish() {
+                    }
 
-            }.start();
+                }.start();
+            }
         }
     }
 
@@ -449,6 +486,19 @@ public class PitchAnimationActivity extends AppCompatActivity {
 
             ampDetector = new AMP(adh);
             dispatcher.addAudioProcessor(ampDetector);
+
+            double threshold = 8;
+            double sensitivity = 20;
+
+            PercussionOnsetDetector mPercussionDetector = new PercussionOnsetDetector(22050, 1024,
+                    new OnsetHandler() {
+                        @Override
+                        public void handleOnset(double v, double v1) {
+                            System.out.println("Clap Detected");
+                        }
+                    }, sensitivity, threshold);
+
+            dispatcher.addAudioProcessor(mPercussionDetector);
 
             audioThread = new Thread(dispatcher, "Audio Thread");
             audioThread.start();
