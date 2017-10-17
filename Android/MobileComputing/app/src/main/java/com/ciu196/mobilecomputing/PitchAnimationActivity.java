@@ -250,10 +250,10 @@ public class PitchAnimationActivity extends AppCompatActivity {
             base = 7;
         }
 
-        if(changeColor>2)
-            changeColor=0;
+        if (changeColor > 2)
+            changeColor = 0;
 
-        if(changeColor>0)
+        if (changeColor > 0)
             ChangeColor(changeColor);
 
         //System.out.println("base " + base + " pithz: " + pitchInHz + " pitchAndBase: " + 110 * powerN(base - 1));
@@ -289,15 +289,15 @@ public class PitchAnimationActivity extends AppCompatActivity {
         }
     }
 
-    private void ChangeColor(int colorSwitch){
-        switch (colorSwitch){
-            case 1 :
+    private void ChangeColor(int colorSwitch) {
+        switch (colorSwitch) {
+            case 1:
                 circle1.setColor(getResources().getColor(R.color.circle1RedColor));
                 circle2.setColor(getResources().getColor(R.color.circle2RedColor));
                 circle3.setColor(getResources().getColor(R.color.circle3RedColor));
                 circle4.setColor(getResources().getColor(R.color.circle4RedColor));
                 break;
-            case 2 :
+            case 2:
                 circle1.setColor(getResources().getColor(R.color.circle1BlueColor));
                 circle2.setColor(getResources().getColor(R.color.circle2BlueColor));
                 circle3.setColor(getResources().getColor(R.color.circle3BlueColor));
@@ -344,18 +344,6 @@ public class PitchAnimationActivity extends AppCompatActivity {
         if (deltaTime > 500) {
             oldTime = (int) System.currentTimeMillis();
             ampInDbOld = ampInDb;
-
-            if (ampInDb > -77) {
-            } else if (ampInDb > -81) {
-            } else if (ampInDb > -86) {
-            } else if (ampInDb > -90) {
-            } else if (ampInDb > -190) {
-//                circle4.setRadius(circle4Radius + -(int) Math.round(ampInDb) + 2);
-//                circle3.setRadius(circle3Radius + -(int) Math.round(ampInDb) + 8);
-//                circle2.setRadius(circle2Radius + -(int) Math.round(ampInDb) + 5);
-//                circle1.setRadius(circle1Radius + -(int) Math.round(ampInDb) + 10);
-
-            }
         } else if (deltaTime2 > 500 && (deltaAmp > 3 || deltaAmp < -3)) {
             oldTime2 = (int) System.currentTimeMillis();
             ampInDbOld = ampInDb;
@@ -412,10 +400,11 @@ public class PitchAnimationActivity extends AppCompatActivity {
             if (ampInDb > -190) {
 
                 final int delta = 150;
-                final int dur = 4*delta + delta;
+                final int dur = 4 * delta + delta;
                 new CountDownTimer(dur, delta) {
                     int tick = 0;
                     int msLeft = dur - delta;
+
                     public void onTick(long millisUntilFinished) {
                         if (Math.round(millisUntilFinished / delta) <= msLeft) {
                             switch (tick) {
@@ -436,7 +425,7 @@ public class PitchAnimationActivity extends AppCompatActivity {
                                     break;
                             }
                             tick++;
-                            msLeft = msLeft-delta;
+                            msLeft = msLeft - delta;
                         }
                     }
 
@@ -446,6 +435,42 @@ public class PitchAnimationActivity extends AppCompatActivity {
 
                 }.start();
             }
+        } else {
+//            final int delta = 150;
+//            final int dur = 4 * delta + delta;
+//            new CountDownTimer(dur, delta) {
+//                int tick = 0;
+//                int msLeft = dur - delta;
+//
+//                public void onTick(long millisUntilFinished) {
+//                    if (Math.round(millisUntilFinished / delta) <= msLeft) {
+//                        switch (tick) {
+//                            case 1:
+//                                circle1.setRadius2(circle1Radius + 20);
+//                                break;
+//                            case 2:
+//                                circle1.setRadius(circle1Radius);
+//                                circle2.setRadius2(circle2Radius + 20);
+//                                break;
+//                            case 3:
+//                                circle2.setRadius(circle2Radius);
+//                                circle3.setRadius2(circle3Radius + 20);
+//                                break;
+//                            case 4:
+//                                circle3.setRadius(circle3Radius);
+//                                circle4.setRadius2(circle4Radius + 20);
+//                                break;
+//                        }
+//                        tick++;
+//                        msLeft = msLeft - delta;
+//                    }
+//                }
+//
+//                public void onFinish() {
+//                    circle4.setRadius2(circle4Radius);
+//                }
+//
+//            }.start();
         }
 
         /*
