@@ -6,14 +6,18 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.Duration;
 
@@ -23,6 +27,7 @@ import static android.support.design.widget.FloatingActionButton.*;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeInAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeOutAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeWithScaleAnimation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addInstantOperation;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getColorTransitionAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslateToCenterInParentViewAnimator;
@@ -59,6 +64,9 @@ public class ConnectActivity extends AppCompatActivity {
 
     boolean testFlag = false;
     boolean isShowingReactions = false;
+    float density;
+    LinearLayout.LayoutParams miniFabLp, normalFabLp;
+
     View.OnClickListener reactionListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -99,12 +107,14 @@ public class ConnectActivity extends AppCompatActivity {
         view.setX(x);
         view.setY(y);
         view.setVisibility(VISIBLE);
+        view.setElevation(4);
 
         int duration = 3000;
         AnimatorSet animation = new AnimatorSet();
         animation
                 .play(ViewAnimationService.getFadeAnimator(view, duration, 1, 0))
                 .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -200))
+                .with(ViewAnimationService.getElevationTransitionAnimator(view, duration, 32f))
                 .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 2.5f));
 
         
@@ -141,6 +151,19 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
         earImage = (ImageView) findViewById(R.id.earImage);
+
+        density = getResources().getDisplayMetrics().density;
+        int miniFabWidth = (int) (36 * getResources().getSystem().getDisplayMetrics().density);
+        int normalFabWidth = (int) (56 * getResources().getSystem().getDisplayMetrics().density);
+        int layout_padding16 = (int) (16 * getResources().getSystem().getDisplayMetrics().density);
+        int layout_padding36 = (int) (36 * getResources().getSystem().getDisplayMetrics().density);
+        int layout_padding8 = (int) (8 * getResources().getSystem().getDisplayMetrics().density);
+        miniFabLp = new LinearLayout.LayoutParams(miniFabWidth, miniFabWidth, Gravity.CENTER_HORIZONTAL);
+        miniFabLp.gravity = Gravity.CENTER_HORIZONTAL;
+        miniFabLp.setMargins(layout_padding16,layout_padding16,layout_padding16,layout_padding8); //todo
+        normalFabLp = new LinearLayout.LayoutParams(normalFabWidth, normalFabWidth, Gravity.CENTER_HORIZONTAL);
+        normalFabLp.gravity = Gravity.CENTER_HORIZONTAL;
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
         fab1 = (FloatingActionButton) findViewById(R.id.fab1);
@@ -150,6 +173,7 @@ public class ConnectActivity extends AppCompatActivity {
         fab1.setOnClickListener(reactionListener);
         fab2.setOnClickListener(reactionListener);
         fab3.setOnClickListener(reactionListener);
+
 
         circle1 = (Circle) findViewById(R.id.circle1);
         circle2 = (Circle) findViewById(R.id.circle2);
@@ -203,11 +227,11 @@ public class ConnectActivity extends AppCompatActivity {
                     if(isShowingReactions){
                         //hide reaction alternatives
                         fab.hide();
+                        fab.setSize(SIZE_NORMAL);
+                        fab.setLayoutParams(normalFabLp);
                         fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
                         fab.setBackgroundColor(getColor(R.color.fabColor));
                         fab.show();
-
-
 
                         fab1.setClickable(false);
                         fab2.setClickable(false);
@@ -220,6 +244,8 @@ public class ConnectActivity extends AppCompatActivity {
                     } else {
                         //show reaction alternatives
                         fab.hide();
+                        fab.setSize(SIZE_MINI);
+                        fab.setLayoutParams(miniFabLp);
                         fab.setImageResource(R.drawable.ic_close_black_24dp);
                         fab.setBackgroundColor(getColor(R.color.disabledGrey));
                         fab.show();
@@ -230,6 +256,11 @@ public class ConnectActivity extends AppCompatActivity {
                         fab1.show();
                         fab2.show();
                         fab3.show();
+
+                        fab1.setSize(SIZE_NORMAL);
+                        fab2.setSize(SIZE_NORMAL);
+                        fab3.setSize(SIZE_NORMAL);
+
 
 
                         isShowingReactions = true;
@@ -277,9 +308,11 @@ public class ConnectActivity extends AppCompatActivity {
             addFadeInAnimation(actionButton, 1000);
 
 
+            addInstantOperation(fab,
+                    () -> fab.setImageResource(R.drawable.ic_map_white_24dp)
+            );
+            addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
 
-            fab.setImageResource(R.drawable.ic_map_white_24dp);
-            fab.show();
 
             fab1.setClickable(false);
             fab2.setClickable(false);
@@ -311,13 +344,20 @@ public class ConnectActivity extends AppCompatActivity {
             setCircleColor(circleColor.BLUE);
             pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
             playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
-            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
+            //addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setText("Stop listening");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
 
-            fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
-            fab.show();
+            fab.setSize(SIZE_NORMAL);
+            fab.setLayoutParams(normalFabLp);
+
+            addInstantOperation(fab,
+                    () -> fab.setImageResource(R.drawable.ic_tag_faces_white_24dp)
+            );
+            addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
+
+
 
             addFadeInAnimation(earImage, 400);
             //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
@@ -341,26 +381,31 @@ public class ConnectActivity extends AppCompatActivity {
             actionButton.setText("Connect");
 
         } else if (m == guiMode.CONNECT) {
+            Toast.makeText(this, "SWITCHING TO CONNECT", Toast.LENGTH_SHORT).show();
             currentGuiMode = guiMode.CONNECT;
-            changeBackgroundColor(getResources().getColor(R.color.backgroundGrayColor));
+            changeBackgroundColor(getColor(R.color.backgroundGrayColor));
             setCircleColor(circleColor.GRAY);
-            playerNameTextView.setTextColor(getResources().getColor(R.color.actionRedColor));
+            playerNameTextView.setTextColor(getColor(R.color.actionRedColor));
             playerNameTextView.setText(BroadcastService.getPlayerName());
-            pianoStatusTextView.setTextColor(getResources().getColor(R.color.whiteColor));
+            pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
             pianoStatusTextView.setText("is playing");
             actionButton.setText("Connect to piano");
             listenersTextView.setText("0");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
-            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_red));
+            actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
             durationText.setVisibility(View.INVISIBLE);
+            addFadeInAnimation(playerNameTextView, 500);
+            addFadeInAnimation(pianoStatusTextView, 550);
+            addFadeInAnimation(actionButton, 700);
+
 
         }  else if (m == guiMode.PLAYING) {
             currentGuiMode = guiMode.PLAYING;
-            changeBackgroundColor(getResources().getColor(R.color.backgroundRedColor));
+            changeBackgroundColor(getColor(R.color.backgroundRedColor));
             setCircleColor(circleColor.RED);
-            playerNameTextView.setTextColor(getResources().getColor(R.color.actionRedColor));
+            playerNameTextView.setTextColor(getColor(R.color.actionRedColor));
             playerNameTextView.setText("You");
-            pianoStatusTextView.setTextColor(getResources().getColor(R.color.whiteColor));
+            pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
             pianoStatusTextView.setText("are playing");
             actionButton.setText("Stop playing");
             listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
@@ -373,20 +418,23 @@ public class ConnectActivity extends AppCompatActivity {
 
 
     private void teardownCurrentGui() {
+
         if(currentGuiMode == guiMode.START_TO_LISTEN){
+
             addFadeOutAnimation(playerNameTextView, 200);
             addFadeOutAnimation(pianoStatusTextView, 350);
             addFadeOutAnimation(actionButton, 700);
             addFadeOutAnimation(earImage, 400);
-            fab.hide();
-
+            addFadeWithScaleAnimation(fab, 400, 0, 1, 0);
         } else if(currentGuiMode == guiMode.LISTENING){
             addFadeOutAnimation(playerNameTextView, 200);
             addFadeOutAnimation(pianoStatusTextView, 350);
             addFadeOutAnimation(actionButton, 700);
             addFadeOutAnimation(earImage, 400);
-            fab.hide();
-
+            addFadeWithScaleAnimation(fab, 400, 0, 1, 0);
+            isShowingReactions = false;
+            addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, -120));
+            addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, -130));
         }
         else if(currentGuiMode == guiMode.CANT_CONNECT){
 
@@ -402,6 +450,7 @@ public class ConnectActivity extends AppCompatActivity {
         }
 
     }
+
 
     private void changeBackgroundColor(int newColor) {
         addAnimator(backgroundView, getColorTransitionAnimator(backgroundView, 750, currentBackgroundColor, newColor));

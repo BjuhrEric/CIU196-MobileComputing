@@ -10,6 +10,7 @@
     android:clipChildren="false"
     android:clipToPadding="false">
 
+
     <RelativeLayout
         android:id="@+id/nameLayout"
         android:layout_width="wrap_content"
@@ -77,60 +78,6 @@
 
         />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/fab2"
-        android:layout_alignStart="@+id/fab2"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/ic_favorite_white_24dp"
-        app:backgroundTint="@color/myLocationRed"
-        app:fabSize="mini"
-
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/ic_tag_faces_white_24dp"
-        app:backgroundTint="@color/fabColor"
-        android:layout_above="@+id/fab1"
-        android:layout_alignStart="@+id/fab1"
-        app:fabSize="mini"
-
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/fab"
-        android:layout_alignStart="@+id/fab"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/ic_thumb_up_white_24dp"
-        app:backgroundTint="@color/actionBlueColor"
-        app:fabSize="mini"
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:src="@drawable/ic_map_white_24dp"
-        app:backgroundTint="@color/fabColor"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="10dp"
-        app:fabSize="mini"
-        />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -138,7 +85,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="-180dp">
 
-            <com.ciu196.mobilecomputing.Circle
+
+        <com.ciu196.mobilecomputing.Circle
                 android:id="@+id/circle4"
                 android:layout_width="400dp"
                 android:layout_height="400dp"
@@ -195,6 +143,61 @@
             </RelativeLayout>
     </FrameLayout>
 
+    <LinearLayout
+        android:id="@+id/fab_linear_layout"
+        android:layout_width="56dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab3"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+            app:fabSize="normal"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_favorite_white_24dp"
+            app:backgroundTint="@color/myLocationRed" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab2"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:fabSize="normal"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:src="@drawable/ic_tag_faces_white_24dp"
+            app:backgroundTint="@color/fabColor"
+
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab1"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:fabSize="normal"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_thumb_up_white_24dp"
+            app:backgroundTint="@color/actionBlueColor" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:fabSize="normal"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_map_white_24dp"
+            app:backgroundTint="@color/fabColor"
+            />
+
+    </LinearLayout>
 
 
 </RelativeLayout>

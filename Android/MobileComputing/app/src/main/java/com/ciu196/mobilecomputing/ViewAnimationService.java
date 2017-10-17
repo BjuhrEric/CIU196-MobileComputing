@@ -2,11 +2,15 @@ package com.ciu196.mobilecomputing;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +22,7 @@ import java.util.Map;
 public class ViewAnimationService {
     public enum Axis {X, Y};
     static Map<View,AnimationView> map = new HashMap<>();
+    public static final String TAG = "ViewAnimationService";
 
     public static void startAllAnimation(){
 
@@ -78,12 +83,8 @@ public class ViewAnimationService {
     }
 
     public static Animator getTranslationAnimator(final View v, int duration, final Axis axis, float distance) {
-        ValueAnimator animator;
-        if(axis == Axis.X){
-            animator = ValueAnimator.ofFloat(v.getX(), v.getX() + distance);
-        } else {
-            animator = ValueAnimator.ofFloat(v.getY(), v.getY() + distance);
-        }
+        ValueAnimator animator = ValueAnimator.ofFloat(0, distance);
+        final float startX = v.getX(), startY = v.getY();
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -91,9 +92,12 @@ public class ViewAnimationService {
                 float value = (float) animation.getAnimatedValue();
 
                 if (axis == Axis.X)
-                    v.setTranslationX(value);
+                    //v.setTranslationX(value);
+                    v.setX(startX + value);
+
                 else if (axis == Axis.Y)
-                    v.setTranslationY(value);
+                    //v.setTranslationY(value);
+                    v.setY(startY + value);
 
             }
         });
@@ -103,8 +107,6 @@ public class ViewAnimationService {
 
         return animator;
     }
-
-
 
     public static void startTranslationAnimator(final View v, int duration, final Axis axis, float distance) {
         getTranslationAnimator(v, duration, axis, distance).start();
@@ -235,5 +237,31 @@ public class ViewAnimationService {
     public static void startColorTransitionAndBackAnimator(final View v, final int duration, final int colorFrom, final int colorTo) {
         getColorTransitionAndBackAnimator(v, duration, colorFrom, colorTo).start();
     }
+
+    public static Animator getElevationTransitionAnimator(final View view, int duration, float elevation){
+        ValueAnimator animation = ValueAnimator.ofFloat(0, elevation);
+        animation.setDuration(duration);
+        animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float value = (float ) valueAnimator.getAnimatedValue();
+            }
+        });
+        return animation;
+    }
+
+    private static Animator getFadeWithScaleAnimator(View view, int duration, float scale, int fadeFrom, int fadeTo){
+        AnimatorSet animation = new AnimatorSet();
+        animation
+                .play(ViewAnimationService.getFadeAnimator(view, duration, fadeFrom, fadeTo))
+                .with(ViewAnimationService.getUniformScaleAnimator(view, duration, scale));
+        return animation;
+    }
+
+
+    public static void addFadeWithScaleAnimation(View view, int duration, float scale, int fadeFrom, int fadeTo) {
+        addAnimator(view, getFadeWithScaleAnimator(view, duration, scale, fadeFrom, fadeTo));
+    }
+
 
 }
