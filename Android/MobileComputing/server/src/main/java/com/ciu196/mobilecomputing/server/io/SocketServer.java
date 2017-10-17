@@ -46,56 +46,43 @@ public class SocketServer implements Server {
         running = true;
     }
 
-    public synchronized void connectRequestSocket() throws IOException {
+    public void connectRequestSocket() throws IOException {
         Socket clientSocket = requestSocket.accept();
-        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
-        if (client == null) {
-            client = new SocketClient();
-            client.bindRequestSocket(clientSocket);
-            clientMap.put(clientSocket.getInetAddress(), client);
-            listeners.add(client);
+        SocketClient client;
+
+        if (clientMap.containsKey(clientSocket.getInetAddress())) {
+            client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
+            detachClient(client);
         } else {
-            System.out.println("Client connected: "+clientSocket.getInetAddress().getHostAddress());
-            client.bindRequestSocket(clientSocket);
-
-            ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
-            ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
-            ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
-
-            client.addTask(fetcherTask);
-            client.addTask(handlerTask);
-            client.addTask(connectionTask);
-
-            new Thread(fetcherTask).start();
-            new Thread(handlerTask).start();
-            new Thread(connectionTask).start();
+            client = new SocketClient();
         }
 
+        System.out.println("Client connected: "+clientSocket.getInetAddress().getHostAddress());
+        client.bindRequestSocket(clientSocket);
+        client.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+
+        clientMap.put(clientSocket.getInetAddress(), client);
+        listeners.add(client);
+
+        ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
+        ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
+        ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
+
+        client.addTask(fetcherTask);
+        client.addTask(handlerTask);
+        client.addTask(connectionTask);
+
+        new Thread(fetcherTask).start();
+        new Thread(handlerTask).start();
+        new Thread(connectionTask).start();
     }
 
-    public synchronized void connectDataSocket() throws IOException {
+    public void connectDataSocket() throws IOException {
         Socket clientSocket = dataSocket.accept();
         SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
-        if (client == null) {
-            client = new SocketClient();
+        if (client != null) {
+            System.out.println("Data socket opened for client: "+clientSocket.getInetAddress().getHostAddress());
             client.bindDataSocket(clientSocket);
-            clientMap.put(clientSocket.getInetAddress(), client);
-            listeners.add(client);
-        } else {
-            System.out.println("Client connected: "+clientSocket.getInetAddress().getHostAddress());
-            client.bindDataSocket(clientSocket);
-
-            ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
-            ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
-            ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
-
-            client.addTask(fetcherTask);
-            client.addTask(handlerTask);
-            client.addTask(connectionTask);
-
-            new Thread(fetcherTask).start();
-            new Thread(handlerTask).start();
-            new Thread(connectionTask).start();
         }
     }
 
@@ -112,6 +99,7 @@ public class SocketServer implements Server {
 
     @Override
     public void sendStatus(final Client client) throws IOException {
+        System.out.println("Sending status to client");
         ServerResponse.Status status = new ServerResponse.Status();
         ServerResponse response = new ServerResponse(ServerResponse.ResponseType.STATUS, status);
         status.putStatus("broadcasting", Boolean.toString(broadcaster != null));

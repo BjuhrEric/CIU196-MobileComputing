@@ -30,6 +30,7 @@ class SocketClient implements Client {
     private BufferedInputStream bufferedInputStream;
     private OutputStream dataOutputStream;
     private ObjectOutputStream requestOutputStream;
+    private long lastRequestTimestamp = -1;
 
     SocketClient(){
         this.requests = new ConcurrentLinkedQueue<>();
@@ -69,6 +70,7 @@ class SocketClient implements Client {
             if (o != null) {
                 request = (ClientRequest) o;
                 requests.offer(request);
+                lastRequestTimestamp = System.currentTimeMillis();
             }
         }
     }
@@ -85,8 +87,8 @@ class SocketClient implements Client {
 
     @Override
     public boolean isConnected() {
-        return dataSocket != null && requestSocket != null && dataSocket.isConnected()
-                && requestSocket.isConnected();
+        return true;
+        //Expecting status request ~1 second. If we have not gotten one for an entire minute, we have lost connection.
     }
 
     public synchronized byte[] readData() throws IOException {

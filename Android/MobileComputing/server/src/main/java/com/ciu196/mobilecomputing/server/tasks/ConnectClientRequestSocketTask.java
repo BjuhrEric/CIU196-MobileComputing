@@ -26,7 +26,7 @@ public class ConnectClientRequestSocketTask extends ServerTask {
             System.out.println("Waiting for clients to connects to port 1337");
             server.connectRequestSocket();
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }

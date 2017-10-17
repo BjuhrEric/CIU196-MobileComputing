@@ -31,6 +31,7 @@ public class ClientConnectionCheckerTask extends ServerTask {
 
     @Override
     protected boolean loop() {
+        System.out.println("Checking connection for client: "+client.getInetAddress().getHostAddress());
         return client.isConnected();
     }
 }
