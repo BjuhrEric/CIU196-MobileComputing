@@ -64,6 +64,13 @@
         android:layout_marginBottom="-200dp">
 
         <com.ciu196.mobilecomputing.Circle
+            android:id="@+id/circle5"
+            android:layout_width="430dp"
+            android:layout_height="430dp"
+            android:layout_gravity="center"
+            app:circleColor="#3b3b3b" />
+
+        <com.ciu196.mobilecomputing.Circle
             android:id="@+id/circle4"
             android:layout_width="400dp"
             android:layout_height="400dp"
@@ -99,7 +106,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:paddingBottom="100dp"
-            android:text="'debug'"
+            android:text=""
             android:textColor="@color/statusTextColor"
             android:textSize="25sp" />
     </FrameLayout>

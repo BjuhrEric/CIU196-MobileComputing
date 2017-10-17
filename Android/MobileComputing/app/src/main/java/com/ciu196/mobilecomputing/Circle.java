@@ -4,6 +4,10 @@ package com.ciu196.mobilecomputing;
  * Created by Andreas Pegelow on 2017-10-09.
  */
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -14,6 +18,11 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -107,6 +116,40 @@ public class Circle extends View {
         this.requestLayout();
         w=params.width;
         h=params.height;
+
+        centerX = radius;
+        centerY = radius;
+        this.radius = radius;
+//        updateCenterPoint(); //radius updated
+
+        invalidate();
+    }
+
+    void setRadius2(int radius) {
+        ViewGroup.LayoutParams params = this.getLayoutParams();
+        params.height = radius * 2;
+        params.width = radius * 2;
+        this.requestLayout();
+        w=params.width;
+        h=params.height;
+
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(this, "alpha",  1f, .3f);
+        fadeOut.setDuration(300);
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(this, "alpha", .3f, 1f);
+        fadeIn.setDuration(300);
+
+        final AnimatorSet mAnimationSet = new AnimatorSet();
+
+        mAnimationSet.play(fadeIn).after(fadeOut);
+
+        mAnimationSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+//                        mAnimationSet.start();
+            }
+        });
+        mAnimationSet.start();
 
         centerX = radius;
         centerY = radius;
