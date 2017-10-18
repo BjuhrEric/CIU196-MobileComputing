@@ -29,6 +29,10 @@ public class Application {
             app.getStatus();
             app.startBroadcast();
             app.getStatus();
+            app.stopBroadcast();
+            app.startListen();
+            app.getStatus();
+            app.stopListen();
             app.detach();
 
             app.request_socket.close();
@@ -41,21 +45,32 @@ public class Application {
 
     private Application() {
         try {
-            request_socket = new Socket(InetAddress.getLocalHost(), REQUEST_PORT);
+            request_socket = new Socket(InetAddress.getByName("46.239.104.32"), REQUEST_PORT);
             bufferedInputStream = new BufferedInputStream(request_socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
             objectInputStream = new ObjectInputStream(bufferedInputStream);
             while (bufferedInputStream.available() <= 0) {
-                System.out.println("Waiting");
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     break;
                 }
             }
-            objectInputStream.readObject();
 
-            data_socket = new Socket(InetAddress.getLocalHost(), DATA_PORT);
+            ServerResponse response = (ServerResponse) objectInputStream.readObject(); //Confirmation of connection.
+            if (response.getType() == ServerResponse.ResponseType.DETACHED) {
+                // Detached from previous session, wait for confirmation for the new session.
+                while (bufferedInputStream.available() <= 0) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+                objectInputStream.readObject();
+            }
+
+            data_socket = new Socket(InetAddress.getByName("46.239.104.32"), DATA_PORT);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -66,6 +81,39 @@ public class Application {
 
         System.out.println("Starting broadcast");
         serverMessage = sendRequest(ClientRequestType.BROADCAST, "Ray Charles");
+
+        if (serverMessage != null) {
+            System.out.println("Response from server: " + ((ServerResponse) serverMessage).getType());
+        }
+    }
+
+    private void stopBroadcast() throws IOException, InterruptedException, ClassNotFoundException {
+        ServerMessage serverMessage;
+
+        System.out.println("Stopping broadcast");
+        serverMessage = sendRequest(ClientRequestType.STOP_BROADCAST, "Ray Charles");
+
+        if (serverMessage != null) {
+            System.out.println("Response from server: " + ((ServerResponse) serverMessage).getType());
+        }
+    }
+
+    private void startListen() throws IOException, InterruptedException, ClassNotFoundException {
+        ServerMessage serverMessage;
+
+        System.out.println("Starting to listen");
+        serverMessage = sendRequest(ClientRequestType.LISTEN, "Ray Charles");
+
+        if (serverMessage != null) {
+            System.out.println("Response from server: " + ((ServerResponse) serverMessage).getType());
+        }
+    }
+
+    private void stopListen() throws IOException, InterruptedException, ClassNotFoundException {
+        ServerMessage serverMessage;
+
+        System.out.println("Stopping listening");
+        serverMessage = sendRequest(ClientRequestType.STOP_LISTEN, "Ray Charles");
 
         if (serverMessage != null) {
             System.out.println("Response from server: " + ((ServerResponse) serverMessage).getType());

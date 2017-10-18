@@ -30,12 +30,33 @@ public class ServerConnection {
         singletonInstantiated = true;
 
         try {
-            data_socket = new Socket(InetAddress.getLocalHost(), DATA_PORT);
-            request_socket = new Socket(InetAddress.getLocalHost(), REQUEST_PORT);
+            request_socket = new Socket(InetAddress.getByName("46.239.104.32"), REQUEST_PORT);
             bufferedInputStream = new BufferedInputStream(request_socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
             objectInputStream = new ObjectInputStream(bufferedInputStream);
-        } catch (IOException e) {
+            while (bufferedInputStream.available() <= 0) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+
+            ServerResponse response = (ServerResponse) objectInputStream.readObject(); //Confirmation of connection.
+            if (response.getType() == ServerResponse.ResponseType.DETACHED) {
+                // Detached from previous session, wait for confirmation for the new session.
+                while (bufferedInputStream.available() <= 0) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+                objectInputStream.readObject();
+            }
+
+            data_socket = new Socket(InetAddress.getByName("46.239.104.32"), DATA_PORT);
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -44,14 +65,53 @@ public class ServerConnection {
         return instance;
     }
 
-    public boolean startBroadcast() throws IOException, InterruptedException, ClassNotFoundException {
-        ServerResponse serverMessage = sendRequest(ClientRequestType.BROADCAST, "Ray Charles");
+    public boolean startBroadcast() {
+        ServerResponse serverMessage = null;
+        try {
+            serverMessage = sendRequest(ClientRequestType.BROADCAST, "Ray Charles");
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
+    }
+
+    public boolean stopBroadcast() {
+        ServerResponse serverMessage = null;
+        try {
+            serverMessage = sendRequest(ClientRequestType.STOP_BROADCAST);
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
+    }
+
+    public boolean startListen() {
+        ServerResponse serverMessage = null;
+        try {
+            serverMessage = sendRequest(ClientRequestType.LISTEN, "Ray Charles");
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
+    }
+
+    public boolean stopListen() {
+        ServerResponse serverMessage = null;
+        try {
+            serverMessage = sendRequest(ClientRequestType.STOP_LISTEN, "Ray Charles");
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
         return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
     }
 
     public boolean detach() throws IOException, InterruptedException, ClassNotFoundException {
         ServerResponse serverMessage = sendRequest(ClientRequestType.DETACH_CLIENT);
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
+        return serverMessage.getType().equals(ServerResponse.ResponseType.DETACHED);
     }
 
     public ServerResponse.Status getStatus()  throws IOException, InterruptedException, ClassNotFoundException {
@@ -83,6 +143,7 @@ public class ServerConnection {
 
         if (request_socket.isConnected())
             o = objectInputStream.readObject();
+
 
         return (ServerResponse) o;
     }
