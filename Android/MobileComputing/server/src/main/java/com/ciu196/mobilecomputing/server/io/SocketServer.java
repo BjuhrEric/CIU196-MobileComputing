@@ -126,32 +126,54 @@ public class SocketServer implements Server {
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
     }
 
-    public void stopBroadcast(final Client c) {
+    public void stopBroadcast(final Client c) throws IOException {
+        stopBroadcast(c, true);
+    }
+
+    private void stopBroadcast(final Client c, boolean respond) throws IOException {
         if (c.equals(broadcaster)) {
             broadcaster = null;
             broadcasterName = NOONE;
             broadcastStartTime = -1;
+            if (respond)
+                c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+        } else if (respond) {
+            c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_DECLINED, new ServerResponse.NoValue()));
         }
     }
 
     public void detachClient(final Client c) throws IOException {
         if (c == null)
             throw new IllegalArgumentException("Client may not be null");
-        stopBroadcast(c);
-        removeListener(c);
+        stopBroadcast(c, false);
+        removeListener(c, false);
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.DETACHED, new ServerResponse.NoValue()));
+
         clientMap.remove(c.getInetAddress());
         c.close();
 
         System.out.println("Client detached");
     }
 
-    public void addListener(Client c) {
-        listeners.add(c);
+    public void addListener(Client c) throws IOException {
+        if (!c.equals(broadcaster) && broadcaster != null) {
+            listeners.add(c);
+            c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+        } else {
+            c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_DECLINED, new ServerResponse.NoValue()));
+        }
+
     }
 
-    public void removeListener(Client c) {
+    public void removeListener(Client c) throws IOException {
+        removeListener(c, true);
+    }
+
+    public void removeListener(Client c, boolean respond) throws IOException {
         listeners.remove(c);
+        if (respond)
+            c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+
     }
 
     public void quit() {

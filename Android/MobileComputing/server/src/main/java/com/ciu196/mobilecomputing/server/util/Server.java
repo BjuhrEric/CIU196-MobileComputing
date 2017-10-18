@@ -11,9 +11,9 @@ public interface Server {
     void connectRequestSocket() throws IOException;
     void connectDataSocket() throws IOException;
     void setBroadcaster(Client client, String name) throws IOException;
-    void stopBroadcast(Client c);
-    void addListener(Client c);
-    void removeListener(Client c);
+    void stopBroadcast(Client c) throws IOException;
+    void addListener(Client c) throws IOException;
+    void removeListener(Client c) throws IOException;
     void detachClient(Client client) throws IOException;
     void sendData(Client client) throws IOException;
     void receiveData(Client client) throws IllegalStateException, IOException;
