@@ -160,7 +160,8 @@
             android:layout_gravity="center"
             android:layout_margin="8dp"
             android:src="@drawable/ic_favorite_white_24dp"
-            app:backgroundTint="@color/myLocationRed" />
+            app:backgroundTint="@color/myLocationRed"
+            android:visibility="invisible"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab2"
@@ -172,6 +173,7 @@
             android:clickable="true"
             android:src="@drawable/ic_tag_faces_white_24dp"
             app:backgroundTint="@color/fabColor"
+            android:visibility="invisible"/>
 
             />
 
@@ -183,7 +185,8 @@
             android:layout_gravity="center"
             android:layout_margin="8dp"
             android:src="@drawable/ic_thumb_up_white_24dp"
-            app:backgroundTint="@color/actionBlueColor" />
+            app:backgroundTint="@color/actionBlueColor"
+            android:visibility="invisible"/>/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
