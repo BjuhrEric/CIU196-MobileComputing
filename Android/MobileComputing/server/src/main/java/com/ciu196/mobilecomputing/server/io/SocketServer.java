@@ -1,6 +1,9 @@
 package com.ciu196.mobilecomputing.server.io;
 
+import com.ciu196.mobilecomputing.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ResponseValue;
+import com.ciu196.mobilecomputing.common.requests.ServerRequest;
+import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 import com.ciu196.mobilecomputing.common.tasks.TaskManager;
@@ -48,6 +51,11 @@ public class SocketServer implements Server {
         serverRequestSocket = new ServerSocket(SERVER_REQUEST_PORT);
         dataSocket = new ServerSocket(DATA_PORT);
         running = true;
+    }
+
+    @Override
+    public void shareReaction(final Reaction reaction) {
+        listeners.forEach((client) -> client.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name())));
     }
 
     public void connectRequestSocket() throws IOException {

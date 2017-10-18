@@ -118,7 +118,7 @@ public class ServerConnection {
     }
 
     public void sendReaction(Reaction reaction){
-        addRequest(ClientRequestType.SEND_REACTION, reaction.toString());
+        addRequest(ClientRequestType.SEND_REACTION, reaction.name());
     }
 
     public void fetchStatus(RequestDoneListener... listeners) {

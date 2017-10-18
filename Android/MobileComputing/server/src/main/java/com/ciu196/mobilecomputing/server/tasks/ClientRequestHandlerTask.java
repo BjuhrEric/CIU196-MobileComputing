@@ -1,5 +1,6 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
+import com.ciu196.mobilecomputing.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.server.util.Client;
@@ -60,7 +61,7 @@ public class ClientRequestHandlerTask extends ServerTask {
                     server.sendStatus(client);
                     break;
                 case SEND_REACTION:
-                    //TODO
+                    server.shareReaction(Reaction.valueOf(first.getValue()));
                     break;
             }
         } catch (IOException e) {
