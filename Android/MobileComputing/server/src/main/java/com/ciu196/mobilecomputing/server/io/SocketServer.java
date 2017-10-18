@@ -139,7 +139,7 @@ public class SocketServer implements Server {
             throw new IllegalArgumentException("Client may not be null");
         stopBroadcast(c);
         removeListener(c);
-        //c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+        c.sendMessage(new ServerResponse(ServerResponse.ResponseType.DETACHED, new ServerResponse.NoValue()));
         clientMap.remove(c.getInetAddress());
         c.close();
 
