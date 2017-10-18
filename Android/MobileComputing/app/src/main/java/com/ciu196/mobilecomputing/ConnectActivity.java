@@ -4,15 +4,21 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -60,6 +66,8 @@ public class ConnectActivity extends AppCompatActivity {
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
     int currentCircleColors[] = {0, 0, 0, 0};
+
+    String resultName;
 
 
     boolean testFlag = false;
@@ -208,10 +216,38 @@ public class ConnectActivity extends AppCompatActivity {
                 } else if (currentGuiMode == guiMode.LISTENING){
                     switchGui(guiMode.START_TO_LISTEN);
                 }else if (currentGuiMode == guiMode.CONNECT){
-                    if(BroadcastService.startNewBroadcast())
-                        switchGui(guiMode.PLAYING);
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle("Enter desired name");
+
+                    LayoutInflater inflater = getLayoutInflater();
+                    View dialogView = inflater.inflate(R.layout.name_dialog, null);
+                    builder.setView(dialogView);
+
+
+                    builder.setPositiveButton("CONNECT", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            resultName = ((EditText)dialogView.findViewById(R.id.name)).getText().toString();
+                            if(BroadcastService.startNewBroadcast(resultName))
+                                switchGui(guiMode.PLAYING);
+                            else
+                                Toast.makeText(v.getContext(),"Cannot connect", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+
+
+
                 }else if (currentGuiMode == guiMode.PLAYING){
-                    if(BroadcastService.startNewBroadcast())
                         switchGui(guiMode.CONNECT);
                 }
 
@@ -306,9 +342,8 @@ public class ConnectActivity extends AppCompatActivity {
             currentGuiMode = guiMode.START_TO_LISTEN;
 
             addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
-            setCircleColor(circleColor.GRAY);
-            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
-            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
+            pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor));
+            playerNameTextView.setTextColor(getColor(R.color.actionBlueColor));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             actionButton.setText("Start Listening");
@@ -411,6 +446,7 @@ public class ConnectActivity extends AppCompatActivity {
             durationText.setVisibility(View.INVISIBLE);
             addFadeInAnimation(playerNameTextView, 500);
             addFadeInAnimation(pianoStatusTextView, 550);
+            addFadeInAnimation(earImage, 550);
             addFadeInAnimation(actionButton, 700);
 
 
@@ -425,7 +461,7 @@ public class ConnectActivity extends AppCompatActivity {
             actionButton.setText("Stop playing");
             listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
-            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_red));
+            actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
 
         }
         startAllAnimation();

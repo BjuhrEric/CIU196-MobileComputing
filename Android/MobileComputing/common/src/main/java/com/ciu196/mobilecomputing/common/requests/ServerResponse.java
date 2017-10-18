@@ -24,23 +24,27 @@ public class ServerResponse implements ServerMessage {
     }
 
     public enum ResponseType {
-        REQUEST_ACCEPTED, REQUEST_DECLINED, STATUS
+        REQUEST_ACCEPTED, REQUEST_DECLINED, STATUS, DETACHED
     }
 
-    public static class ResponseValue implements Serializable {
-
+    public interface ResponseValue<T extends Serializable> extends Serializable {
+        T getValue();
     }
 
-    public static class NoValue extends ResponseValue {
+    public static class NoValue implements ResponseValue {
 
         private static final long serialVersionUID = -1582436423522968513L;
+
+        @Override
+        public Serializable getValue() {
+            return null;
+        }
     }
 
-    public static class Status extends  ResponseValue {
-
+    public static class Status implements ResponseValue<HashMap<String, String>> {
 
         private static final long serialVersionUID = -1520252080975424543L;
-        private final Map<String, String> statusMap;
+        private final HashMap<String, String> statusMap;
         public Status() {
             statusMap = new HashMap<>();
         }
@@ -53,5 +57,23 @@ public class ServerResponse implements ServerMessage {
             statusMap.put(key, value);
         }
 
+        @Override
+        public HashMap<String, String> getValue() {
+            return statusMap;
+        }
+    }
+
+    public static class SingleObjectValue<T extends Serializable> implements ResponseValue<T> {
+
+        private final T value;
+
+        public SingleObjectValue(T value) {
+            this.value = value;
+        }
+
+        @Override
+        public T getValue() {
+            return value;
+        }
     }
 }

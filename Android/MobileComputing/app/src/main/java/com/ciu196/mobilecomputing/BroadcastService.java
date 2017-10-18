@@ -123,7 +123,7 @@ public class BroadcastService {
 
     }
 
-    public void setPlayername(String name){
+    public static void setPlayername(String name){
         playername = name;
 
     }
@@ -153,8 +153,14 @@ public class BroadcastService {
 
     }
     //Start new brodcast
-    public static boolean startNewBroadcast() {
+    public static boolean startNewBroadcast(String nameOfBroadcaster) {
         //Todo: not implemented yet
+
+        if(nameOfBroadcaster.length()>0)
+            setPlayername(nameOfBroadcaster);
+        else
+            setPlayername("Anonymous");
+
         if(!isLive())
             return true;
         else
