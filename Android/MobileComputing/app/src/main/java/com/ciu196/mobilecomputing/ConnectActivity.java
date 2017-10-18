@@ -93,15 +93,15 @@ public class ConnectActivity extends AppCompatActivity {
             switch (id) {
                 case R.id.fab1:
                     imageView.setImageResource(R.drawable.ic_thumb_up_white_24dp);
-                    imageView.setBackgroundColor(getResources().getColor(R.color.actionBlueColor));
+                    imageView.setBackgroundColor(getColor(R.color.actionBlueColor));
                     break;
                 case R.id.fab2:
                     imageView.setImageResource(R.drawable.ic_tag_faces_white_24dp);
-                    imageView.setBackgroundColor(getResources().getColor(R.color.fabColor));
+                    imageView.setBackgroundColor(getColor(R.color.fabColor));
                     break;
                 case R.id.fab3:
                     imageView.setImageResource(R.drawable.ic_favorite_white_24dp);
-                    imageView.setBackgroundColor(getResources().getColor(R.color.myLocationRed));
+                    imageView.setBackgroundColor(getColor(R.color.myLocationRed));
                     break;
                 default:
                     break;
@@ -131,6 +131,7 @@ public class ConnectActivity extends AppCompatActivity {
                 .play(ViewAnimationService.getFadeAnimator(view, duration, 1, 0))
                 .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -200))
                 .with(ViewAnimationService.getElevationTransitionAnimator(view, duration, 32f))
+                .with(ViewAnimationService.getWiggleAnimator(view, 1000, -15f, 15f))
                 .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 2.5f));
 
 
@@ -157,6 +158,8 @@ public class ConnectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connect_activity);
+        //TESTING todo REMOVE
+        BroadcastService.getInstance(this);
 
         //Connect UI Elements
         rel = (RelativeLayout) (RelativeLayout) findViewById(R.id.backgroundLayout);
@@ -269,12 +272,18 @@ public class ConnectActivity extends AppCompatActivity {
 
                     if (isShowingReactions) {
                         //hide reaction alternatives
-                        fab.hide();
+                        addFadeWithScaleAnimation(fab, 400, 0, 1, 0); //hide
                         fab.setSize(SIZE_NORMAL);
                         fab.setLayoutParams(normalFabLp);
-                        fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
-                        fab.setBackgroundColor(getColor(R.color.fabColor));
-                        fab.show();
+
+                                fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
+                        AnimatorSet animation = new AnimatorSet();
+                        animation
+                                .play(ViewAnimationService.getColorTransitionAnimator(fab, 100, R.color.disabledGrey, R.color.fabColor))
+                                .with(ViewAnimationService.getFadeWithScaleAnimator(fab, 400, 1, 0, 1));
+                        animation.start(); //show
+
+                        //fab.show();
 
                         fab1.setClickable(false);
                         fab2.setClickable(false);
@@ -286,12 +295,18 @@ public class ConnectActivity extends AppCompatActivity {
                         isShowingReactions = false;
                     } else {
                         //show reaction alternatives
-                        fab.hide();
+                        addFadeWithScaleAnimation(fab, 400, 0, 1, 0); //hide
                         fab.setSize(SIZE_MINI);
                         fab.setLayoutParams(miniFabLp);
                         fab.setImageResource(R.drawable.ic_close_black_24dp);
-                        fab.setBackgroundColor(getColor(R.color.disabledGrey));
-                        fab.show();
+                        ViewAnimationService.getColorTransitionAnimator(fab, 100, R.color.fabColor, R.color.disabledGrey).start();
+
+                        AnimatorSet animation = new AnimatorSet();
+                        animation
+                                .play(ViewAnimationService.getColorTransitionAnimator(fab, 100, R.color.fabColor, R.color.disabledGrey))
+                                .with(ViewAnimationService.getFadeWithScaleAnimator(fab, 400, 1, 0, 1));
+                        animation.start(); //show
+
 
                         fab1.setClickable(true);
                         fab2.setClickable(true);
@@ -336,9 +351,8 @@ public class ConnectActivity extends AppCompatActivity {
             currentGuiMode = guiMode.START_TO_LISTEN;
 
             addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
-            setCircleColor(circleColor.GRAY);
-            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
-            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
+            pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor));
+            playerNameTextView.setTextColor(getColor(R.color.actionBlueColor));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             actionButton.setText("Start Listening");

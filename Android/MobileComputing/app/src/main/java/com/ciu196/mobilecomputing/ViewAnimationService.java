@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -250,7 +251,7 @@ public class ViewAnimationService {
         return animation;
     }
 
-    private static Animator getFadeWithScaleAnimator(View view, int duration, float scale, int fadeFrom, int fadeTo){
+    public static Animator getFadeWithScaleAnimator(View view, int duration, float scale, int fadeFrom, int fadeTo){
         AnimatorSet animation = new AnimatorSet();
         animation
                 .play(ViewAnimationService.getFadeAnimator(view, duration, fadeFrom, fadeTo))
@@ -261,6 +262,17 @@ public class ViewAnimationService {
 
     public static void addFadeWithScaleAnimation(View view, int duration, float scale, int fadeFrom, int fadeTo) {
         addAnimator(view, getFadeWithScaleAnimator(view, duration, scale, fadeFrom, fadeTo));
+    }
+
+    public static Animator getWiggleAnimator(View v, int duration, float fromDeg, float toDeg){
+        ObjectAnimator imageViewObjectAnimator = ObjectAnimator.ofFloat(v,
+                "rotation", fromDeg, toDeg);
+        imageViewObjectAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        imageViewObjectAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        imageViewObjectAnimator.setInterpolator(new DecelerateInterpolator());
+        imageViewObjectAnimator.setDuration(duration);
+        return imageViewObjectAnimator;
+
     }
 
 
