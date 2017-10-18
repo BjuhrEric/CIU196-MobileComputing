@@ -192,13 +192,12 @@
             android:id="@+id/fab"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            app:fabSize="normal"
             android:layout_gravity="center"
-            android:clickable="true"
             android:layout_marginTop="8dp"
+            android:clickable="true"
             android:src="@drawable/ic_map_white_24dp"
-            app:backgroundTint="@color/fabColor"
-            />
+            app:backgroundTint="@color/actionBlueColor"
+            app:fabSize="normal" />
 
     </LinearLayout>
 

@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -265,18 +266,12 @@ public class ConnectActivity extends AppCompatActivity {
 
                     if(isShowingReactions){
                         //hide reaction alternatives
-                        addFadeWithScaleAnimation(fab, 400, 0, 1, 0); //hide
+                        fab.hide();
                         fab.setSize(SIZE_NORMAL);
                         fab.setLayoutParams(normalFabLp);
-
-                                fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
-                        AnimatorSet animation = new AnimatorSet();
-                        animation
-                                .play(ViewAnimationService.getColorTransitionAnimator(fab, 100, R.color.disabledGrey, R.color.fabColor))
-                                .with(ViewAnimationService.getFadeWithScaleAnimator(fab, 400, 1, 0, 1));
-                        animation.start(); //show
-
-                        //fab.show();
+                        fab.setImageResource(R.drawable.ic_tag_faces_white_24dp);
+                        fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.fabColor)));
+                        fab.show();
 
                         fab1.setClickable(false);
                         fab2.setClickable(false);
@@ -288,17 +283,12 @@ public class ConnectActivity extends AppCompatActivity {
                         isShowingReactions = false;
                     } else {
                         //show reaction alternatives
-                        addFadeWithScaleAnimation(fab, 400, 0, 1, 0); //hide
+                        fab.hide();
                         fab.setSize(SIZE_MINI);
                         fab.setLayoutParams(miniFabLp);
                         fab.setImageResource(R.drawable.ic_close_black_24dp);
-                        ViewAnimationService.getColorTransitionAnimator(fab, 100, R.color.fabColor, R.color.disabledGrey).start();
-
-                        AnimatorSet animation = new AnimatorSet();
-                        animation
-                                .play(ViewAnimationService.getColorTransitionAnimator(fab, 100, R.color.fabColor, R.color.disabledGrey))
-                                .with(ViewAnimationService.getFadeWithScaleAnimator(fab, 400, 1, 0, 1));
-                        animation.start(); //show
+                        fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.disabledGrey)));
+                        fab.show();
 
 
                         fab1.setClickable(true);
@@ -358,11 +348,13 @@ public class ConnectActivity extends AppCompatActivity {
             addFadeInAnimation(actionButton, 1000);
 
 
+            fab.setSize(SIZE_NORMAL);
+            fab.setLayoutParams(normalFabLp);
             addInstantOperation(fab,
+                    () -> fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.actionBlueColor))),
                     () -> fab.setImageResource(R.drawable.ic_map_white_24dp)
             );
             addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
-
 
             fab1.setClickable(false);
             fab2.setClickable(false);
@@ -399,10 +391,12 @@ public class ConnectActivity extends AppCompatActivity {
             actionButton.setText("Stop listening");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
 
+
             fab.setSize(SIZE_NORMAL);
             fab.setLayoutParams(normalFabLp);
 
             addInstantOperation(fab,
+                    () -> fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.fabColor))),
                     () -> fab.setImageResource(R.drawable.ic_tag_faces_white_24dp)
             );
             addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
