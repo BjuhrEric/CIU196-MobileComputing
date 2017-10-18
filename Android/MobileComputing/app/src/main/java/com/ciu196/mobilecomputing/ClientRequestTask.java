@@ -27,7 +27,7 @@ public final class ClientRequestTask extends LoopableTask {
 
     private ClientRequestTask() {
         super(50);
-        requests = new ConcurrentLinkedQueue<>();
+        requests = new LinkedList<>();
     }
 
     public static ClientRequestTask getInstance() {

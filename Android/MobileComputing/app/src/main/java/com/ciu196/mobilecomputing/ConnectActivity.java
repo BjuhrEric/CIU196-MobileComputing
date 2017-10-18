@@ -16,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -274,6 +275,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                             //TODO create RequestDoneListener
                             resultName = ((EditText) dialogView.findViewById(R.id.name)).getText().toString();
                             ServerConnection.getInstance().startBroadcast(resultName);
+                            Log.d("Broadcast", "Starting broadcast");
                             switchGui(guiMode.PLAYING);
                         }
                     });

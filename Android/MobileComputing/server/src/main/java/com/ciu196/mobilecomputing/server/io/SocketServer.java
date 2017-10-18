@@ -55,13 +55,13 @@ public class SocketServer implements Server {
             detachClient(client);
         } else {
             client = new SocketClient();
+            clientMap.put(clientSocket.getInetAddress(), client);
         }
 
-        System.out.println("Client connected: "+clientSocket.getInetAddress().getHostAddress());
         client.bindRequestSocket(clientSocket);
-        client.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
 
-        clientMap.put(clientSocket.getInetAddress(), client);
+        System.out.println("Client connected: "+clientSocket.getInetAddress().getHostAddress());
+        client.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
 
         ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
         ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
@@ -145,10 +145,14 @@ public class SocketServer implements Server {
     public void detachClient(final Client c) throws IOException {
         if (c == null)
             throw new IllegalArgumentException("Client may not be null");
+        System.out.println("Detaching client: "+c.getInetAddress().getHostAddress());
         stopBroadcast(c, false);
         removeListener(c, false);
-        c.sendMessage(new ServerResponse(ServerResponse.ResponseType.DETACHED, new ServerResponse.NoValue()));
-
+        try {
+            c.sendMessage(new ServerResponse(ServerResponse.ResponseType.DETACHED, new ServerResponse.NoValue()));
+        } catch (IOException e) {
+            System.out.println("The socket was already closed");
+        }
         clientMap.remove(c.getInetAddress());
         c.close();
 
