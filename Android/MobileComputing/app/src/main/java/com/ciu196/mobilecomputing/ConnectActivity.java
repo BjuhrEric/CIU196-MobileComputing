@@ -457,7 +457,39 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
             audioDispatcher();
 
-        } else if (m == guiMode.CANT_CONNECT) {
+        } else if(m == guiMode.CANT_LISTEN){
+            currentGuiMode = guiMode.CANT_LISTEN;
+
+            setCircleColor(circleColor.GRAY);
+            changeBackgroundColor(getColor(R.color.backgroundCreamColor));
+
+            addInstantOperation(durationText, () -> durationText.setVisibility(INVISIBLE));
+
+            addInstantOperation(errorText, () -> errorText.setText("You are too far away to listen to the piano."));
+            addInstantOperation(errorView, () -> errorView.setVisibility(VISIBLE));
+            addFadeInAnimation(errorView, ERROR_FADE_DURATION);
+
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionBlueColor)));
+            addInstantOperation(playerNameTextView, () ->   playerNameTextView.setText(BroadcastService.getPlayerName()));
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+
+            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor)));
+            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+
+            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+            addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
+
+            addInstantOperation(earImage, () ->   earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+            addFadeInAnimation(earImage, EAR_FADE_DURATION);
+
+            addInstantOperation(actionButton, () ->   actionButton.setEnabled(false));
+            addInstantOperation(actionButton, () ->   actionButton.setText("Start to listen"));
+            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+
+
+        }else if (m == guiMode.CANT_CONNECT) {
             currentGuiMode = guiMode.CANT_CONNECT;
             setCircleColor(circleColor.GRAY);
             changeBackgroundColor(getColor(R.color.backgroundGrayColor));
@@ -524,6 +556,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             setCircleColor(circleColor.RED);
 
             final Handler handler = new Handler();
+
             handler.postDelayed(new Runnable() {
                 public void run() {
                     try {
@@ -582,7 +615,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, -120));
             addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, -130));
         } else if (currentGuiMode == guiMode.CONNECT) {
-
+            durationText.setVisibility(View.VISIBLE);
 
         } else if (currentGuiMode == guiMode.PLAYING) {
             addFadeOutAnimation(durationText, DURATION_TEXT_FADE_DURATION / 2);
