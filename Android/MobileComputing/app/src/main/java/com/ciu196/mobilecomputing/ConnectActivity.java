@@ -48,6 +48,11 @@ public class ConnectActivity extends AppCompatActivity {
 
     public enum circleColor {BLUE, GRAY, RED};
 
+    final int STATUS_FADE_DURATION = 475;
+    final int NAME_FADE_DURATION = 400;
+    final int ACTION_BUTTON_FADE_DURATION = 550;
+    final int DURATION_TEXT_FADE_DURATION = 600;
+
     RelativeLayout rel;
     TextView pianoStatusTextView;
     TextView listenersTextView;
@@ -61,6 +66,8 @@ public class ConnectActivity extends AppCompatActivity {
     Circle circle4;
     View backgroundView;
     View listenerLayout;
+    View errorView;
+    TextView errorText;
     FloatingActionButton fab, fab1, fab2, fab3;
 
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
@@ -162,6 +169,8 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
         earImage = (ImageView) findViewById(R.id.earImage);
+        errorView = (View) findViewById(R.id.errorView);
+        errorText = (TextView) findViewById(R.id.errorText);
 
         density = getResources().getDisplayMetrics().density;
         int miniFabWidth = (int) (36 * getResources().getSystem().getDisplayMetrics().density);
@@ -205,7 +214,11 @@ public class ConnectActivity extends AppCompatActivity {
                 switchGui(guiMode.CANT_LISTEN);
             }
         } else {
-            switchGui(guiMode.CONNECT);
+            if (BroadcastService.closeEnough()) {
+                switchGui(guiMode.CONNECT);
+            } else {
+                switchGui(guiMode.CANT_CONNECT);
+            }
         }
 
         actionButton.setOnClickListener(new View.OnClickListener() {
@@ -419,35 +432,46 @@ public class ConnectActivity extends AppCompatActivity {
 
             addAnimator(playerNameTextView, getUniformScaleAnimator(playerNameTextView, 500, 1.3f));
 
-            addFadeInAnimation(playerNameTextView, 500);
-            addFadeInAnimation(pianoStatusTextView, 550);
-            addFadeInAnimation(actionButton, 700);
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
         } else if (m == guiMode.CANT_CONNECT) {
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
             currentGuiMode = guiMode.CANT_CONNECT;
             setCircleColor(circleColor.GRAY);
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
-            actionButton.setText("Connect");
+            actionButton.setText("Connect to piano");
 
         } else if (m == guiMode.CONNECT) {
-            Toast.makeText(this, "SWITCHING TO CONNECT", Toast.LENGTH_SHORT).show();
             currentGuiMode = guiMode.CONNECT;
+
             changeBackgroundColor(getColor(R.color.backgroundGrayColor));
             setCircleColor(circleColor.GRAY);
-            playerNameTextView.setTextColor(getColor(R.color.actionRedColor));
-            playerNameTextView.setText(BroadcastService.getPlayerName());
-            pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
-            pianoStatusTextView.setText("is playing");
-            actionButton.setText("Connect to piano");
-            listenersTextView.setText("0");
-            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
-            actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
+
             durationText.setVisibility(View.INVISIBLE);
-            addFadeInAnimation(playerNameTextView, 500);
-            addFadeInAnimation(pianoStatusTextView, 550);
+
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionRedColor)));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
+
+            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
+            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
+
+            addInstantOperation(actionButton, () ->   actionButton.setText("Connect to piano"));
+            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_red)));
+
+            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+
+            addInstantOperation(earImage, () ->   earImage.setImageResource(R.drawable.ic_hearing_white_24dp));
+
+
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
             addFadeInAnimation(earImage, 550);
-            addFadeInAnimation(actionButton, 700);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
 
         }  else if (m == guiMode.PLAYING) {
@@ -462,6 +486,12 @@ public class ConnectActivity extends AppCompatActivity {
             listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
             actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
+
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            addFadeInAnimation(earImage, 550);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+            addFadeInAnimation(durationText, DURATION_TEXT_FADE_DURATION);
 
         }
         startAllAnimation();
@@ -488,6 +518,7 @@ public class ConnectActivity extends AppCompatActivity {
             addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, -130));
         }
         else if(currentGuiMode == guiMode.CANT_CONNECT){
+
 
 
         }
