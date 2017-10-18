@@ -7,6 +7,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import java.util.Random;
+
 /**
  * Created by Andreas Pegelow on 2017-10-09.
  */
@@ -20,11 +22,14 @@ public class OnlineBroadcastService {
     private volatile boolean isLive;
     private volatile long broadcastStartTime;
     private volatile int numberOfListeners;
+    private volatile int volume;
+    private ReactionListener reactionListener;
 
     private OnlineBroadcastService() {
         if (singletonInstantiated) throw new UnsupportedOperationException("Use singleton");
         singletonInstantiated = true;
     }
+
 
     public static OnlineBroadcastService getInstance() {
         return instance;
@@ -47,6 +52,8 @@ public class OnlineBroadcastService {
         return numberOfListeners;
     }
 
+    public int getVolume(){ return volume;}
+
     public void setBroadcasterName(String broadcasterName) {
         this.broadcasterName = broadcasterName;
     }
@@ -63,6 +70,14 @@ public class OnlineBroadcastService {
         this.numberOfListeners = numberOfListeners;
     }
 
+    public void setVolume(int volume){
+        this.volume = volume;
+    }
+
+    public void incomingReaction(Reaction reaction){
+        reactionListener.onReactionReceived(reaction);
+    }
+
     public void sendReaction(Reaction reaction){
         //// TODO: 2017-10-18
 
@@ -76,6 +91,10 @@ public class OnlineBroadcastService {
 
         }
         throw new NotLiveException();
+    }
+
+    public void setReactionListener(ReactionListener l){
+        reactionListener = l;
     }
 
 }

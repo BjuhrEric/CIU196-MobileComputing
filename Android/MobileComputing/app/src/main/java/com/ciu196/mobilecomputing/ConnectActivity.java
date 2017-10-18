@@ -53,7 +53,12 @@ import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAni
 import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
 
 
-public class ConnectActivity extends AppCompatActivity {
+public class ConnectActivity extends AppCompatActivity implements ReactionListener {
+
+    @Override
+    public void onReactionReceived(Reaction reaction) {
+        animateReaction(reaction);
+    }
 
     public enum guiMode {CONNECT, START_TO_LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING}
 
@@ -87,6 +92,7 @@ public class ConnectActivity extends AppCompatActivity {
     View errorView;
     TextView errorText;
     FloatingActionButton fab, fab1, fab2, fab3;
+    OnlineBroadcastService obs;
 
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
@@ -100,7 +106,7 @@ public class ConnectActivity extends AppCompatActivity {
     float density;
     LinearLayout.LayoutParams miniFabLp, normalFabLp;
 
-    View.OnClickListener reactionListener = new View.OnClickListener() {
+    View.OnClickListener fabReactionListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             int id = view.getId();
@@ -109,7 +115,7 @@ public class ConnectActivity extends AppCompatActivity {
                 case R.id.fab1: case R.id.fab2: case R.id.fab3:
                     Reaction reaction = getReactionFromId(id);
                     animateReaction(reaction);
-
+                    obs.sendReaction(reaction);
                     break;
                 default:
                     break;
@@ -178,8 +184,10 @@ public class ConnectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connect_activity);
-        //TESTING todo REMOVE
-        BroadcastService.getInstance(this);
+
+        //Online Broadcast Service
+        obs = OnlineBroadcastService.getInstance();
+
 
         //Connect UI Elements
         rel = (RelativeLayout) (RelativeLayout) findViewById(R.id.backgroundLayout);
@@ -211,9 +219,9 @@ public class ConnectActivity extends AppCompatActivity {
         fab2 = (FloatingActionButton) findViewById(R.id.fab2);
         fab3 = (FloatingActionButton) findViewById(R.id.fab3);
 
-        fab1.setOnClickListener(reactionListener);
-        fab2.setOnClickListener(reactionListener);
-        fab3.setOnClickListener(reactionListener);
+        fab1.setOnClickListener(fabReactionListener);
+        fab2.setOnClickListener(fabReactionListener);
+        fab3.setOnClickListener(fabReactionListener);
 
 
         circle1 = (Circle) findViewById(R.id.circle1);
@@ -342,6 +350,7 @@ public class ConnectActivity extends AppCompatActivity {
                 }
             }
         });
+        obs.setReactionListener(this);
 
     }
 
