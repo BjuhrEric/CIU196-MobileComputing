@@ -403,7 +403,7 @@ public class ConnectActivity extends AppCompatActivity {
             setCircleColor(circleColor.BLUE);
             pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
             playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
-            //addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setText("Stop listening");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
