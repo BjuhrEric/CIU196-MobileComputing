@@ -1,14 +1,19 @@
 package com.ciu196.mobilecomputing;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -26,6 +31,13 @@ import org.joda.time.Duration;
 
 import java.util.Random;
 
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
+import be.tarsos.dsp.pitch.PitchProcessor;
+
 import static android.support.design.widget.FloatingActionButton.*;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeInAnimation;
@@ -41,9 +53,18 @@ import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
 
 public class ConnectActivity extends AppCompatActivity {
 
-    public enum guiMode {CONNECT, START_TO_LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING};
+    public enum guiMode {CONNECT, START_TO_LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING}
 
-    public enum circleColor {BLUE, GRAY, RED};
+    ;
+
+    public enum circleColor {BLUE, GRAY, RED}
+
+    ;
+
+    final int STATUS_FADE_DURATION = 475;
+    final int NAME_FADE_DURATION = 400;
+    final int ACTION_BUTTON_FADE_DURATION = 550;
+    final int DURATION_TEXT_FADE_DURATION = 600;
 
     RelativeLayout rel;
     TextView pianoStatusTextView;
@@ -58,6 +79,8 @@ public class ConnectActivity extends AppCompatActivity {
     Circle circle4;
     View backgroundView;
     View listenerLayout;
+    View errorView;
+    TextView errorText;
     FloatingActionButton fab, fab1, fab2, fab3;
 
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
@@ -76,14 +99,17 @@ public class ConnectActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             int id = view.getId();
+
             switch (id){
                 case R.id.fab1: case R.id.fab2: case R.id.fab3:
                     Reaction reaction = getReactionFromId(id);
                     animateReaction(reaction);
+
                     break;
                 default:
                     break;
             }
+
         }
     };
 
@@ -107,7 +133,7 @@ public class ConnectActivity extends AppCompatActivity {
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         Random random = new Random();
-        int x = 150 + random.nextInt(width-300);
+        int x = 150 + random.nextInt(width - 300);
         int y = height - random.nextInt(height / 4) - 100;
         view.setX(x);
         view.setY(y);
@@ -123,7 +149,7 @@ public class ConnectActivity extends AppCompatActivity {
                 .with(ViewAnimationService.getWiggleAnimator(view, 1000, -15f, 15f))
                 .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 4f));
 
-        
+
         //ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha",  1f, 0f);
         //fadeOut.setDuration(2000);
 
@@ -159,6 +185,8 @@ public class ConnectActivity extends AppCompatActivity {
         actionButton = (Button) findViewById(R.id.actionButtion);
         listenerLayout = (View) findViewById(R.id.listenersLayout);
         earImage = (ImageView) findViewById(R.id.earImage);
+        errorView = (View) findViewById(R.id.errorView);
+        errorText = (TextView) findViewById(R.id.errorText);
 
         density = getResources().getDisplayMetrics().density;
         int miniFabWidth = (int) (36 * getResources().getSystem().getDisplayMetrics().density);
@@ -168,7 +196,7 @@ public class ConnectActivity extends AppCompatActivity {
         int layout_padding8 = (int) (8 * getResources().getSystem().getDisplayMetrics().density);
         miniFabLp = new LinearLayout.LayoutParams(miniFabWidth, miniFabWidth, Gravity.CENTER_HORIZONTAL);
         miniFabLp.gravity = Gravity.CENTER_HORIZONTAL;
-        miniFabLp.setMargins(layout_padding16,layout_padding16,layout_padding16,layout_padding8); //todo
+        miniFabLp.setMargins(layout_padding16, layout_padding16, layout_padding16, layout_padding8); //todo
         normalFabLp = new LinearLayout.LayoutParams(normalFabWidth, normalFabWidth, Gravity.CENTER_HORIZONTAL);
         normalFabLp.gravity = Gravity.CENTER_HORIZONTAL;
 
@@ -202,17 +230,21 @@ public class ConnectActivity extends AppCompatActivity {
                 switchGui(guiMode.CANT_LISTEN);
             }
         } else {
-            switchGui(guiMode.CONNECT);
+            if (BroadcastService.closeEnough()) {
+                switchGui(guiMode.CONNECT);
+            } else {
+                switchGui(guiMode.CANT_CONNECT);
+            }
         }
 
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentGuiMode == guiMode.START_TO_LISTEN){
+                if (currentGuiMode == guiMode.START_TO_LISTEN) {
                     switchGui(guiMode.LISTENING);
-                } else if (currentGuiMode == guiMode.LISTENING){
+                } else if (currentGuiMode == guiMode.LISTENING) {
                     switchGui(guiMode.START_TO_LISTEN);
-                }else if (currentGuiMode == guiMode.CONNECT){
+                } else if (currentGuiMode == guiMode.CONNECT) {
 
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -226,11 +258,11 @@ public class ConnectActivity extends AppCompatActivity {
                     builder.setPositiveButton("CONNECT", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            resultName = ((EditText)dialogView.findViewById(R.id.name)).getText().toString();
-                            if(BroadcastService.startNewBroadcast(resultName))
+                            resultName = ((EditText) dialogView.findViewById(R.id.name)).getText().toString();
+                            if (BroadcastService.startNewBroadcast(resultName))
                                 switchGui(guiMode.PLAYING);
                             else
-                                Toast.makeText(v.getContext(),"Cannot connect", Toast.LENGTH_LONG).show();
+                                Toast.makeText(v.getContext(), "Cannot connect", Toast.LENGTH_LONG).show();
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -243,9 +275,8 @@ public class ConnectActivity extends AppCompatActivity {
                     builder.show();
 
 
-
-                }else if (currentGuiMode == guiMode.PLAYING){
-                        switchGui(guiMode.CONNECT);
+                } else if (currentGuiMode == guiMode.PLAYING) {
+                    switchGui(guiMode.CONNECT);
                 }
 
 
@@ -254,13 +285,13 @@ public class ConnectActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentGuiMode == guiMode.START_TO_LISTEN){
+                if (currentGuiMode == guiMode.START_TO_LISTEN) {
 
                     Intent i = new Intent(ConnectActivity.this, VolumeRangeActivity.class);
                     startActivity(i);
-                }else if (currentGuiMode == guiMode.LISTENING){
+                } else if (currentGuiMode == guiMode.LISTENING) {
 
-                    if(isShowingReactions){
+                    if (isShowingReactions) {
                         //hide reaction alternatives
                         fab.hide();
                         fab.setSize(SIZE_NORMAL);
@@ -299,7 +330,6 @@ public class ConnectActivity extends AppCompatActivity {
                         fab3.setSize(SIZE_NORMAL);
 
 
-
                         isShowingReactions = true;
                     }
 
@@ -325,6 +355,9 @@ public class ConnectActivity extends AppCompatActivity {
         teardownCurrentGui();
 
         if (m == guiMode.START_TO_LISTEN) {
+            System.out.println("entered Start listening mode");
+            terminateAudioDispatcher();
+
             currentGuiMode = guiMode.START_TO_LISTEN;
 
             addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
@@ -333,7 +366,7 @@ public class ConnectActivity extends AppCompatActivity {
             playerNameTextView.setText(BroadcastService.getPlayerName());
             addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             actionButton.setText("Start Listening");
-            listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
+            listenersTextView.setText(BroadcastService.getNumberOfListeners() + "");
             earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
             setCircleColor(circleColor.GRAY);
             changeBackgroundColor(getResources().getColor(R.color.backgroundCreamColor));
@@ -361,8 +394,8 @@ public class ConnectActivity extends AppCompatActivity {
 
             final Handler handler = new Handler();
 
-            handler.postDelayed(new Runnable(){
-                public void run(){
+            handler.postDelayed(new Runnable() {
+                public void run() {
                     try {
 
                         durationText.setText(formatDuration(BroadcastService.getCurrentSessionDuration()));
@@ -382,7 +415,7 @@ public class ConnectActivity extends AppCompatActivity {
             setCircleColor(circleColor.BLUE);
             pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
             playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
-            //addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setText("Stop listening");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
@@ -397,8 +430,6 @@ public class ConnectActivity extends AppCompatActivity {
             );
             addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
 
-
-
             addFadeInAnimation(earImage, 400);
             //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
             addAnimator(pianoStatusTextView, getTranslateToCenterInParentViewAnimator(pianoStatusTextView, 500, ViewAnimationService.Axis.X));
@@ -409,38 +440,55 @@ public class ConnectActivity extends AppCompatActivity {
 
             addAnimator(playerNameTextView, getUniformScaleAnimator(playerNameTextView, 500, 1.3f));
 
-            addFadeInAnimation(playerNameTextView, 500);
-            addFadeInAnimation(pianoStatusTextView, 550);
-            addFadeInAnimation(actionButton, 700);
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+
+            audioDispatcher();
 
         } else if (m == guiMode.CANT_CONNECT) {
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
             currentGuiMode = guiMode.CANT_CONNECT;
             setCircleColor(circleColor.GRAY);
             playerNameTextView.setText(BroadcastService.getPlayerName());
             actionButton.setEnabled(false);
-            actionButton.setText("Connect");
+            actionButton.setText("Connect to piano");
+            terminateAudioDispatcher();
 
         } else if (m == guiMode.CONNECT) {
-            Toast.makeText(this, "SWITCHING TO CONNECT", Toast.LENGTH_SHORT).show();
             currentGuiMode = guiMode.CONNECT;
+
             changeBackgroundColor(getColor(R.color.backgroundGrayColor));
             setCircleColor(circleColor.GRAY);
-            playerNameTextView.setTextColor(getColor(R.color.actionRedColor));
-            playerNameTextView.setText(BroadcastService.getPlayerName());
-            pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
-            pianoStatusTextView.setText("is playing");
-            actionButton.setText("Connect to piano");
-            listenersTextView.setText("0");
-            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
-            actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
+
             durationText.setVisibility(View.INVISIBLE);
-            addFadeInAnimation(playerNameTextView, 500);
-            addFadeInAnimation(pianoStatusTextView, 550);
+
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionRedColor)));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
+
+            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
+            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
+
+            addInstantOperation(actionButton, () ->   actionButton.setText("Connect to piano"));
+            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_red)));
+
+            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+
+            addInstantOperation(earImage, () ->   earImage.setImageResource(R.drawable.ic_hearing_white_24dp));
+
+
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
             addFadeInAnimation(earImage, 550);
-            addFadeInAnimation(actionButton, 700);
+
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+
+            terminateAudioDispatcher();
 
 
-        }  else if (m == guiMode.PLAYING) {
+        } else if (m == guiMode.PLAYING) {
             currentGuiMode = guiMode.PLAYING;
             changeBackgroundColor(getColor(R.color.backgroundRedColor));
             setCircleColor(circleColor.RED);
@@ -449,25 +497,244 @@ public class ConnectActivity extends AppCompatActivity {
             pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
             pianoStatusTextView.setText("are playing");
             actionButton.setText("Stop playing");
-            listenersTextView.setText(BroadcastService.getNumberOfListeners()+"");
+            listenersTextView.setText(BroadcastService.getNumberOfListeners() + "");
             earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
             actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
+            audioDispatcher();
+
+            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            addFadeInAnimation(earImage, 550);
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+            addFadeInAnimation(durationText, DURATION_TEXT_FADE_DURATION);
 
         }
         startAllAnimation();
     }
 
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case RECORD_AUDIO_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Granted", Toast.LENGTH_LONG).show();
+                    audioDispatcher();
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    Toast.makeText(this, "Denied", Toast.LENGTH_LONG).show();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+        }
+    }
+
+    Thread audioThread = null;
+    private int deltaTime;
+    private int oldTime;
+    private double ampInDbOld;
+    private int circle1Radius;
+    private int circle2Radius;
+    private int circle3Radius;
+    private int circle4Radius;
+    private be.tarsos.dsp.AudioDispatcher dispatcher;
+    private final int RECORD_AUDIO_REQUEST_CODE = 1337;
+
+    private void audioDispatcher() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
+                    RECORD_AUDIO_REQUEST_CODE);
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(this, "returning...", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
+        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(PitchDetectionResult res, AudioEvent e) {
+                final float pitchInHz = res.getPitch();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+//                        processPitch(pitchInHz);
+                    }
+                });
+            }
+        };
+        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        dispatcher.addAudioProcessor(pitchProcessor);
+
+
+        AMPDetectionHandler adh = new AMPDetectionHandler() {
+            @Override
+            public void handleBuffer(double currentSPL, AudioEvent audioEvent) {
+                final double dbFloat = currentSPL;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                            processAMP(dbFloat);
+                    }
+                });
+            }
+
+        };
+        ConnectActivity.AMP ampDetector = new ConnectActivity.AMP(adh);
+        dispatcher.addAudioProcessor(ampDetector);
+
+        audioThread = new Thread(dispatcher, "Audio Thread");
+        audioThread.start();
+    }
+
+
+    public interface AMPDetectionHandler {
+        void handleBuffer(double currentSPL, AudioEvent audioEvent);
+    }
+
+    public class AMP implements AudioProcessor {
+        private final AMPDetectionHandler handler;
+
+        public AMP(AMPDetectionHandler handler) {
+            this.handler = handler;
+        }
+
+        double currentSPL = 0;
+
+        public boolean process(AudioEvent audioEvent) {
+            currentSPL = soundPressureLevel(audioEvent.getFloatBuffer());
+            this.handler.handleBuffer(currentSPL, audioEvent);
+            return true;
+        }
+
+        /**
+         * Returns the dBSPL for a buffer.
+         *
+         * @param buffer The buffer with audio information.
+         * @return The dBSPL level for the buffer.
+         */
+        private double soundPressureLevel(final float[] buffer) {
+            double value = Math.pow(localEnergy(buffer), 0.5);
+            value = value / buffer.length;
+            return linearToDecibel(value);
+        }
+
+        /**
+         * Calculates the local (linear) energy of an audio buffer.
+         *
+         * @param buffer The audio buffer.
+         * @return The local (linear) energy of an audio buffer.
+         */
+        private double localEnergy(final float[] buffer) {
+            double power = 0.0D;
+            for (float element : buffer) {
+                power += element * element;
+            }
+            return power;
+        }
+
+        /**
+         * Converts a linear to a dB value.
+         *
+         * @param value The value to convert.
+         * @return The converted value.
+         */
+        private double linearToDecibel(final double value) {
+            return 20.0 * Math.log10(value);
+        }
+
+        public void processingFinished() {
+        }
+    }
+
+    private void processAMP(double ampInDb) {
+        if (circle2Radius == 0) {
+            circle1Radius = ((Circle) findViewById(R.id.circle1)).getRadius();
+            circle2Radius = ((Circle) findViewById(R.id.circle2)).getRadius();
+            circle3Radius = ((Circle) findViewById(R.id.circle3)).getRadius();
+            circle4Radius = ((Circle) findViewById(R.id.circle4)).getRadius();
+        }
+
+        deltaTime = (int) System.currentTimeMillis() - oldTime;
+        double deltaAmp = ampInDb - ampInDbOld;
+
+        if (deltaTime > 500 && (deltaAmp > 3 || deltaAmp < -3)) {
+            oldTime = (int) System.currentTimeMillis();
+            ampInDbOld = ampInDb;
+
+            if (ampInDb > -190) {
+
+                final int delta = 150;
+                final int dur = 4 * delta + delta;
+                new CountDownTimer(dur, delta) {
+                    int tick = 0;
+                    int msLeft = dur - delta;
+
+                    public void onTick(long millisUntilFinished) {
+                        if (Math.round(millisUntilFinished / delta) <= msLeft) {
+                            switch (tick) {
+                                case 1:
+                                    circle1.setRadius2(circle1Radius + 20);
+                                    break;
+                                case 2:
+                                    circle1.setRadius(circle1Radius);
+                                    circle2.setRadius2(circle2Radius + 20);
+                                    break;
+                                case 3:
+                                    circle2.setRadius(circle2Radius);
+                                    circle3.setRadius2(circle3Radius + 20);
+                                    break;
+                                case 4:
+                                    circle3.setRadius(circle3Radius);
+                                    circle4.setRadius2(circle4Radius + 20);
+                                    break;
+                            }
+                            tick++;
+                            msLeft = msLeft - delta;
+                        }
+                    }
+
+                    public void onFinish() {
+                        circle4.setRadius2(circle4Radius);
+                    }
+
+                }.start();
+            }
+        }
+    }
+
+    private void terminateAudioDispatcher() {
+        if (audioThread != null) {
+            dispatcher.stop();
+            audioThread.interrupt();
+            audioThread = null;
+        }
+    }
+
     private void teardownCurrentGui() {
 
-        if(currentGuiMode == guiMode.START_TO_LISTEN){
+        if (currentGuiMode == guiMode.START_TO_LISTEN) {
 
             addFadeOutAnimation(playerNameTextView, 200);
             addFadeOutAnimation(pianoStatusTextView, 350);
             addFadeOutAnimation(actionButton, 700);
             addFadeOutAnimation(earImage, 400);
             addFadeWithScaleAnimation(fab, 400, 0, 1, 0);
-        } else if(currentGuiMode == guiMode.LISTENING){
+        } else if (currentGuiMode == guiMode.LISTENING) {
             addFadeOutAnimation(playerNameTextView, 200);
             addFadeOutAnimation(pianoStatusTextView, 350);
             addFadeOutAnimation(actionButton, 700);
@@ -476,22 +743,20 @@ public class ConnectActivity extends AppCompatActivity {
             isShowingReactions = false;
             addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, -120));
             addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, -130));
-        }
-        else if(currentGuiMode == guiMode.CANT_CONNECT){
+        } else if (currentGuiMode == guiMode.CANT_CONNECT) {
 
 
         }
         else if(currentGuiMode == guiMode.CONNECT){
 
 
-        }
-        else if(currentGuiMode == guiMode.PLAYING){
+
+        } else if (currentGuiMode == guiMode.PLAYING) {
 
 
         }
 
     }
-
 
     private void changeBackgroundColor(int newColor) {
         addAnimator(backgroundView, getColorTransitionAnimator(backgroundView, 750, currentBackgroundColor, newColor));
@@ -520,7 +785,7 @@ public class ConnectActivity extends AppCompatActivity {
             colorTo3 = getResources().getColor(R.color.circle3RedColor);
             colorTo4 = getResources().getColor(R.color.circle4RedColor);
 
-        }else if (c == circleColor.GRAY) {
+        } else if (c == circleColor.GRAY) {
             colorTo1 = getResources().getColor(R.color.circle1GrayColor);
             colorTo2 = getResources().getColor(R.color.circle2GrayColor);
             colorTo3 = getResources().getColor(R.color.circle3GrayColor);
