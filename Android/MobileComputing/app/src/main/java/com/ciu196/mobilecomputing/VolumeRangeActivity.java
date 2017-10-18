@@ -39,6 +39,8 @@ public class VolumeRangeActivity extends AbstractMapActivity implements View.OnC
     FloatingActionButton fab;
     FloatingActionButton fabLib;
     protected LatLng userLatLng;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
