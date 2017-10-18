@@ -54,7 +54,7 @@ import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAni
 import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
 
 
-public class ConnectActivity extends AppCompatActivity implements ReactionListener {
+public class ConnectActivity extends AppCompatActivity implements ReactionListener, StatusUpdateListener {
 
     @Override
     public void onReactionReceived(Reaction reaction) {
@@ -889,6 +889,11 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         currentCircleColors[3] = colorTo4;
 
 
+    }
+
+    @Override
+    public void onStatusUpdate() {
+        //TODO Uppdatera innehåll i vyer
     }
 
 

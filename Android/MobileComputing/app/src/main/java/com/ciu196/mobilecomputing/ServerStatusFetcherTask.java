@@ -11,6 +11,8 @@ import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Eric on 2017-10-16.
@@ -19,10 +21,12 @@ import java.io.IOException;
 public class ServerStatusFetcherTask extends LoopableTask implements RequestDoneListener {
 
     private final Context context;
+    private final List<StatusUpdateListener> updateListeners;
 
     public ServerStatusFetcherTask(Context context) {
         super(1000);
         this.context = context;
+        this.updateListeners = new LinkedList<>();
     }
 
     @Override
@@ -42,6 +46,10 @@ public class ServerStatusFetcherTask extends LoopableTask implements RequestDone
         return true;
     }
 
+    public void addStatusUpdateListener(final StatusUpdateListener listener) {
+        updateListeners.add(listener);
+    }
+
     @Override
     public void serverResponseReceived(ServerResponse response) {
         try {
@@ -51,6 +59,7 @@ public class ServerStatusFetcherTask extends LoopableTask implements RequestDone
             service.setBroadcasterName(status.getStatus("broadcaster"));
             service.setBroadcastStartTime(Long.parseLong(status.getStatus("broadcastStartTime")));
             service.setNumberOfListeners(Integer.parseInt(status.getStatus("nListeners")));
+            for (StatusUpdateListener listener : updateListeners) listener.onStatusUpdate();
         } catch (Exception e) {
             e.printStackTrace();
             stop();
