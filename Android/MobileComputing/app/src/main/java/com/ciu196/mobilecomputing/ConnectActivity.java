@@ -471,14 +471,14 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addFadeInAnimation(errorView, ERROR_FADE_DURATION);
 
             addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionBlueColor)));
-            addInstantOperation(playerNameTextView, () ->   playerNameTextView.setText(BroadcastService.getPlayerName()));
+            addInstantOperation(playerNameTextView, () ->   playerNameTextView.setText(OnlineBroadcastService.getInstance().getBroadcasterName()));
             addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
 
             addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor)));
             addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
             addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
 
-            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(OnlineBroadcastService.getInstance().getNumberOfListeners()+""));
             addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
 
             addInstantOperation(earImage, () ->   earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
