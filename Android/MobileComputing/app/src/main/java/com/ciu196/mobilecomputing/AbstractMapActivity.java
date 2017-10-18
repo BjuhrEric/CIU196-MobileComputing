@@ -50,25 +50,40 @@ public class AbstractMapActivity extends AppCompatActivity implements OnMapReady
     protected LatLng libLatLng;
 
     LocationManager locationManager;
-    protected int[] circleColors = {
-            Color.argb(255, 0,0,255),
-            Color.argb(255, 0,255,0),
-            Color.argb(255, 255,0,0),
-            Color.argb(255,255,255,0)
-    };
 
     GoogleMap.CancelableCallback mapCallback;
+    int[] blueCircleColors, redCircleColors;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Library
+        //Library latlng
         libLatLng = new LatLng(LIB_LAT, LIB_LNG);
+
+        //circle colors
+        blueCircleColors = new int[]{
+                getColor(R.color.circle1BlueColor),
+                getColor(R.color.circle2BlueColor),
+                getColor(R.color.circle3BlueColor),
+                getColor(R.color.circle4BlueColor)
+        };
+
+        redCircleColors = new int[]{
+                getColor(R.color.circle1RedColor),
+                getColor(R.color.circle2RedColor),
+                getColor(R.color.circle3RedColor),
+                getColor(R.color.circle4RedColor)
+        };
     }
 
 
-
     public void redrawMap(){
+
+
+
+        //todo perform isPLaying/isListening check to determine blue or red circles
+        int[] circleColors = blueCircleColors;
+
         if(mMap != null){
             //clear map
             mMap.clear();
@@ -90,8 +105,7 @@ public class AbstractMapActivity extends AppCompatActivity implements OnMapReady
             mMap.addMarker(new MarkerOptions()
                     .position(libLatLng)
                     .title("Stadsbiblioteket, Göteborg")
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_library_white_24dp)));
-
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_note_pin_white)));
 
             //center map
             /*

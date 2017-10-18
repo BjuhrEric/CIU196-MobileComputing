@@ -23,7 +23,7 @@ public class BroadcastService {
     //Returns if there is currently a session live. Is there somebody currently playing?
     public static boolean isLive(){
         //Todo: not implemented yet, just dummy implementation so far
-        return true;
+        return false;
 
 
     }
@@ -46,7 +46,7 @@ public class BroadcastService {
 
     }
 
-    public void setPlayername(String name){
+    public static void setPlayername(String name){
         playername = name;
 
     }
@@ -73,5 +73,20 @@ public class BroadcastService {
 //        double distance = SphericalUtil.computeDistanceBetween(null, null);
         double distance = -1;
         return distance < playZone*circleRadius;
+
+    }
+    //Start new brodcast
+    public static boolean startNewBroadcast(String nameOfBroadcaster) {
+        //Todo: not implemented yet
+
+        if(nameOfBroadcaster.length()>0)
+            setPlayername(nameOfBroadcaster);
+        else
+            setPlayername("Anonymous");
+
+        if(!isLive())
+            return true;
+        else
+            return false;
     }
 }

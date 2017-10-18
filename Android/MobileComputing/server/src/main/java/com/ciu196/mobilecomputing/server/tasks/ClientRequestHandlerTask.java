@@ -30,7 +30,6 @@ public class ClientRequestHandlerTask extends ServerTask {
 
     @Override
     protected boolean loop() {
-        System.out.println("Handling requests");
         final ClientRequest first = client.getFirstRequest();
         if (first == null)
             return true;
@@ -38,6 +37,15 @@ public class ClientRequestHandlerTask extends ServerTask {
             switch (first.getType()) {
                 case BROADCAST:
                     server.setBroadcaster(client, first.getValue());
+                    break;
+                case STOP_BROADCAST:
+                    server.stopBroadcast(client);
+                    break;
+                case LISTEN:
+                    server.addListener(client);
+                    break;
+                case STOP_LISTEN:
+                    server.removeListener(client);
                     break;
                 case DETACH_CLIENT:
                     server.detachClient(client);
