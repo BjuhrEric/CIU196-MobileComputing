@@ -40,10 +40,10 @@ public class ServerStatusFetcherTask extends LoopableTask {
             Log.d("ServerStatusFetcher", "Fetching server status");
             ServerResponse.Status status = ServerConnection.getInstance().getStatus();
             OnlineBroadcastService service = OnlineBroadcastService.getInstance();
-            service.setLive(Boolean.parseBoolean(status.getStatus("broadcasting")));
-            service.setBroadcasterName(status.getStatus("broadcaster"));
-            service.setBroadcastStartTime(Long.parseLong(status.getStatus("broadcastStartTime")));
-            service.setNumberOfListeners(Integer.parseInt(status.getStatus("nListeners")));
+//            service.setLive(Boolean.parseBoolean(status.getStatus("broadcasting")));
+//            service.setBroadcasterName(status.getStatus("broadcaster"));
+//            service.setBroadcastStartTime(Long.parseLong(status.getStatus("broadcastStartTime")));
+//            service.setNumberOfListeners(Integer.parseInt(status.getStatus("nListeners")));
         } catch (IOException | InterruptedException | ClassCastException | ClassNotFoundException e) {
             Toast.makeText(context, "Error occurred while fetching server status", Toast.LENGTH_LONG).show();
             e.printStackTrace();

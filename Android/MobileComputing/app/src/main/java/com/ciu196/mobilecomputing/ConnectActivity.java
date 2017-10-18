@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -16,10 +17,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,8 +49,9 @@ import static com.ciu196.mobilecomputing.ViewAnimationService.addInstantOperatio
 import static com.ciu196.mobilecomputing.ViewAnimationService.getColorTransitionAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getFadeAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslateToCenterInParentViewAnimator;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslationAnimator;
+import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslationAnimatorReset;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimator;
+import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimatorReset;
 import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
 
 
@@ -93,6 +95,9 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
     TextView errorText;
     FloatingActionButton fab, fab1, fab2, fab3;
     OnlineBroadcastService obs;
+    public static int SCREEN_WIDTH;
+    public static int SCREEN_HEIGHT;
+    private boolean isReturningFromListening;
 
     guiMode currentGuiMode = guiMode.START_TO_LISTEN;
     int currentBackgroundColor = 0;
@@ -111,8 +116,10 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         public void onClick(View view) {
             int id = view.getId();
 
-            switch (id){
-                case R.id.fab1: case R.id.fab2: case R.id.fab3:
+            switch (id) {
+                case R.id.fab1:
+                case R.id.fab2:
+                case R.id.fab3:
                     Reaction reaction = getReactionFromId(id);
                     animateReaction(reaction);
                     obs.sendReaction(reaction);
@@ -124,9 +131,9 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         }
     };
 
-    public Reaction getReactionFromId(int fabId){
+    public Reaction getReactionFromId(int fabId) {
         ImageView imageView = new ImageView(ConnectActivity.this);
-        switch (fabId){
+        switch (fabId) {
             case R.id.fab1:
                 return Reaction.THUMBS_UP;
             case R.id.fab2:
@@ -155,7 +162,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         AnimatorSet animation = new AnimatorSet();
         animation
                 .play(ViewAnimationService.getFadeAnimator(view, duration, 1, 0))
-                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -1*height))
+                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -1 * height))
                 .with(ViewAnimationService.getElevationTransitionAnimator(view, duration, 32f))
                 .with(ViewAnimationService.getWiggleAnimator(view, 1000, -15f, 15f))
                 .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 4f));
@@ -212,6 +219,12 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         miniFabLp.setMargins(layout_padding16, layout_padding16, layout_padding16, layout_padding8); //todo
         normalFabLp = new LinearLayout.LayoutParams(normalFabWidth, normalFabWidth, Gravity.CENTER_HORIZONTAL);
         normalFabLp.gravity = Gravity.CENTER_HORIZONTAL;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        SCREEN_WIDTH = size.x;
+        SCREEN_HEIGHT = size.y;
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -291,8 +304,6 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                 } else if (currentGuiMode == guiMode.PLAYING) {
                     switchGui(guiMode.CONNECT);
                 }
-
-
             }
         });
         fab.setOnClickListener(new View.OnClickListener() {
@@ -371,21 +382,41 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         if (m == guiMode.START_TO_LISTEN) {
             currentGuiMode = guiMode.START_TO_LISTEN;
 
-            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
-            pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor));
-            playerNameTextView.setTextColor(getColor(R.color.actionBlueColor));
-            playerNameTextView.setText(BroadcastService.getPlayerName());
-            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
-            actionButton.setText("Start Listening");
-            listenersTextView.setText(BroadcastService.getNumberOfListeners() + "");
-            earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
+            changeBackgroundColor(getColor(R.color.backgroundCreamColor));
             setCircleColor(circleColor.GRAY);
-            changeBackgroundColor(getResources().getColor(R.color.backgroundCreamColor));
-            addFadeInAnimation(playerNameTextView, 500);
-            addFadeInAnimation(pianoStatusTextView, 550);
-            addFadeInAnimation(earImage, 400);
-            addFadeInAnimation(listenerLayout, 600);
-            addFadeInAnimation(actionButton, 1000);
+
+            addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
+            addInstantOperation(listenersTextView, () -> listenersTextView.setText(BroadcastService.getNumberOfListeners() + ""));
+
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionBlueColor)));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
+
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor)));
+
+            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+            addInstantOperation(actionButton, () -> actionButton.setText("Start Listening"));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
+
+            addFadeInAnimation(earImage, EAR_FADE_DURATION);
+            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
+            addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+
+            if(!isReturningFromListening) {
+                addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
+                addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
+            }else{
+                AnimatorSet animset = new AnimatorSet();
+                animset
+                        .play(getTranslationAnimatorReset(pianoStatusTextView, 1500, ViewAnimationService.Axis.X, "pianoStatusTextView"))
+                        .with(getTranslationAnimatorReset(playerNameTextView, 1500, ViewAnimationService.Axis.X, "playerNameTextView"))
+                        .with(getTranslationAnimatorReset(playerNameTextView, 1500, ViewAnimationService.Axis.Y, "playerNameTextView"))
+                        .with(getUniformScaleAnimatorReset(playerNameTextView, 1500, 1.3f))
+                        .with(getTranslationAnimatorReset(listenerLayout, 1100, ViewAnimationService.Axis.Y, "listenerLayout"))
+                        .with(getFadeAnimator(pianoStatusTextView, STATUS_FADE_DURATION, 0, 1))
+                        .with(getFadeAnimator(playerNameTextView, NAME_FADE_DURATION, 0, 1));
+                addAnimator(pianoStatusTextView,animset);
+            }
 
 
             fab.setSize(SIZE_NORMAL);
@@ -421,16 +452,32 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         } else if (m == guiMode.LISTENING) {
             currentGuiMode = guiMode.LISTENING;
 
-            changeBackgroundColor(getResources().getColor(R.color.backgroundBlueColor));
-            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_blue));
+            changeBackgroundColor(getColor(R.color.backgroundBlueColor));
             setCircleColor(circleColor.BLUE);
-            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
-            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
-            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
-            playerNameTextView.setText(BroadcastService.getPlayerName());
-            actionButton.setText("Stop listening");
-            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
 
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionBlueColor)));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
+
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor)));
+
+            addInstantOperation(actionButton, () -> actionButton.setText("Stop listening"));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
+
+            addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
+            addInstantOperation(listenersTextView, () -> listenersTextView.setText(BroadcastService.getNumberOfListeners() + ""));
+
+            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
+            addFadeInAnimation(earImage, EAR_FADE_DURATION);
+            addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+
+//            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
+//            playerNameTextView.setText(BroadcastService.getPlayerName());
+//            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
+//            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("Currently listening to"));
+//            actionButton.setBackground(getResources().getDrawable(R.drawable.rounded_button_blue));
+//            actionButton.setText("Stop listening");
+//            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
 
             fab.setSize(SIZE_NORMAL);
             fab.setLayoutParams(normalFabLp);
@@ -441,23 +488,22 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             );
             addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
 
-            addFadeInAnimation(earImage, 400);
-            //TODO: The previous setText call doesn't update the internal position of the textView, which translateToCenterInParentView uses. E.I it dosn't work. Will have to be fixed.
-            addAnimator(pianoStatusTextView, getTranslateToCenterInParentViewAnimator(pianoStatusTextView, 500, ViewAnimationService.Axis.X));
-            addAnimator(playerNameTextView, getTranslateToCenterInParentViewAnimator(playerNameTextView, 500, ViewAnimationService.Axis.X));
-
-            addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, 120));
-            addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, 130));
-
-            addAnimator(playerNameTextView, getUniformScaleAnimator(playerNameTextView, 500, 1.3f));
-
-            addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
-            addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
-            addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
+            AnimatorSet animset = new AnimatorSet();
+            animset
+                    .play(getTranslateToCenterInParentViewAnimator(pianoStatusTextView, 1500, ViewAnimationService.Axis.X, "pianoStatusTextView"))
+                    .with(getTranslateToCenterInParentViewAnimator(playerNameTextView, 1500, ViewAnimationService.Axis.X, "playerNameTextView"))
+                    .with(getTranslateToCenterInParentViewAnimator(playerNameTextView, 1500, ViewAnimationService.Axis.Y, "playerNameTextView"))
+                    .with(getUniformScaleAnimator(playerNameTextView, 1500, 1.3f))
+                    .with(getTranslateToCenterInParentViewAnimator(listenerLayout, 1500, ViewAnimationService.Axis.Y, "listenerLayout"))
+                    .with(getFadeAnimator(playerNameTextView, NAME_FADE_DURATION, 0, 1))
+                    .with(getFadeAnimator(pianoStatusTextView, STATUS_FADE_DURATION*3, 0, 1))
+                    .with(getFadeAnimator(actionButton, ACTION_BUTTON_FADE_DURATION,0, 1));
+            addAnimator(pianoStatusTextView, animset);
+//            addAnimator(playerNameTextView,getUniformScaleAnimator(playerNameTextView, 500, 1.3f));
 
             audioDispatcher();
 
-        } else if(m == guiMode.CANT_LISTEN){
+        } else if (m == guiMode.CANT_LISTEN) {
             currentGuiMode = guiMode.CANT_LISTEN;
 
             setCircleColor(circleColor.GRAY);
@@ -470,26 +516,26 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addFadeInAnimation(errorView, ERROR_FADE_DURATION);
 
             addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionBlueColor)));
-            addInstantOperation(playerNameTextView, () ->   playerNameTextView.setText(BroadcastService.getPlayerName()));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
             addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
 
-            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor)));
-            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor)));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
 
-            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+            addInstantOperation(listenersTextView, () -> listenersTextView.setText(BroadcastService.getNumberOfListeners() + ""));
             addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
 
-            addInstantOperation(earImage, () ->   earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+            addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
             addFadeInAnimation(earImage, EAR_FADE_DURATION);
 
-            addInstantOperation(actionButton, () ->   actionButton.setEnabled(false));
-            addInstantOperation(actionButton, () ->   actionButton.setText("Start to listen"));
-            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
+            addInstantOperation(actionButton, () -> actionButton.setEnabled(false));
+            addInstantOperation(actionButton, () -> actionButton.setText("Start to listen"));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
 
-        }else if (m == guiMode.CANT_CONNECT) {
+        } else if (m == guiMode.CANT_CONNECT) {
             currentGuiMode = guiMode.CANT_CONNECT;
             setCircleColor(circleColor.GRAY);
             changeBackgroundColor(getColor(R.color.backgroundGrayColor));
@@ -502,22 +548,22 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
 
             addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionRedColor)));
-            addInstantOperation(playerNameTextView, () ->   playerNameTextView.setText(BroadcastService.getPlayerName()));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
             addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
 
-            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
-            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
 
-            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+            addInstantOperation(listenersTextView, () -> listenersTextView.setText(BroadcastService.getNumberOfListeners() + ""));
             addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
 
-            addInstantOperation(earImage, () ->   earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+            addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
             addFadeInAnimation(earImage, EAR_FADE_DURATION);
 
-            addInstantOperation(actionButton, () ->   actionButton.setEnabled(false));
-            addInstantOperation(actionButton, () ->   actionButton.setText("Connect to piano"));
-            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
+            addInstantOperation(actionButton, () -> actionButton.setEnabled(false));
+            addInstantOperation(actionButton, () -> actionButton.setText("Connect to piano"));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
 
@@ -533,18 +579,18 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addInstantOperation(playerNameTextView, () -> playerNameTextView.setText(BroadcastService.getPlayerName()));
             addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
 
-            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
-            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("is playing"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
 
-            addInstantOperation(actionButton, () ->   actionButton.setText("Connect to piano"));
-            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_red)));
+            addInstantOperation(actionButton, () -> actionButton.setText("Connect to piano"));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_red)));
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
-            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+            addInstantOperation(listenersTextView, () -> listenersTextView.setText(BroadcastService.getNumberOfListeners() + ""));
             addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
 
-            addInstantOperation(earImage, () ->   earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+            addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
             addFadeInAnimation(earImage, EAR_FADE_DURATION);
 
 
@@ -573,23 +619,22 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addFadeInAnimation(durationText, DURATION_TEXT_FADE_DURATION);
 
             addInstantOperation(playerNameTextView, () -> playerNameTextView.setTextColor(getColor(R.color.actionRedColor)));
-            addInstantOperation(playerNameTextView, () ->  playerNameTextView.setText("You"));
+            addInstantOperation(playerNameTextView, () -> playerNameTextView.setText("You"));
             addFadeInAnimation(playerNameTextView, NAME_FADE_DURATION);
 
-            addInstantOperation(pianoStatusTextView, () ->  pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
-            addInstantOperation(pianoStatusTextView, () ->   pianoStatusTextView.setText("are playing"));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setTextColor(getColor(R.color.whiteColor)));
+            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("are playing"));
             addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
 
-            addInstantOperation(actionButton, () ->   actionButton.setText("Stop playing"));
-            addInstantOperation(actionButton, () ->   actionButton.setBackground(getDrawable(R.drawable.rounded_button_red)));
+            addInstantOperation(actionButton, () -> actionButton.setText("Stop playing"));
+            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_red)));
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
-            addInstantOperation(listenersTextView, () ->   listenersTextView.setText(BroadcastService.getNumberOfListeners()+""));
+            addInstantOperation(listenersTextView, () -> listenersTextView.setText(BroadcastService.getNumberOfListeners() + ""));
             addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
 
-            addInstantOperation(earImage, () ->   earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
+            addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
             addFadeInAnimation(earImage, EAR_FADE_DURATION);
-
         }
         startAllAnimation();
     }
@@ -603,6 +648,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         addFadeOutAnimation(earImage, EAR_FADE_DURATION / 2);
         addFadeOutAnimation(listenersTextView, LISTENER_FADE_DURATION / 2);
         addInstantOperation(errorView, () -> errorView.setVisibility(INVISIBLE));
+        isReturningFromListening =false;
 
         if (currentGuiMode == guiMode.START_TO_LISTEN) {
             addFadeWithScaleAnimation(fab, 400, 0, 1, 0);
@@ -612,8 +658,8 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             terminateAudioDispatcher();
             isShowingReactions = false;
             addFadeWithScaleAnimation(fab, 400, 0, 1, 0);
-            addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, -120));
-            addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, -130));
+            isReturningFromListening = true;
+
         } else if (currentGuiMode == guiMode.CONNECT) {
             durationText.setVisibility(View.VISIBLE);
 
@@ -707,7 +753,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                            processAMP(dbFloat);
+                        processAMP(dbFloat);
                     }
                 });
             }

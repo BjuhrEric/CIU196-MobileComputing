@@ -6,37 +6,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundCreamColor"
-    tools:context="com.ciu196.mobilecomputing.ConnectActivity"
     android:clipChildren="false"
-    android:clipToPadding="false">
+    android:clipToPadding="false"
+    tools:context="com.ciu196.mobilecomputing.ConnectActivity">
 
 
     <RelativeLayout
         android:id="@+id/nameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="40dp"
         android:layout_centerHorizontal="true"
         android:clipChildren="false"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:paddingTop="40dp">
 
-    <TextView
+        <TextView
             android:id="@+id/playerNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="\'Name'"
             android:textColor="@color/actionBlueColor"
             android:textSize="26sp" />
+
         <TextView
             android:id="@+id/pianoStatusTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/playerNameTextView"
+            android:paddingLeft="8dp"
             android:text="\'Piano Status'"
             android:textColor="@color/grayTextColor"
-            android:textSize="26sp"
-            android:layout_toRightOf="@+id/playerNameTextView"
-            android:paddingLeft="8dp"/>
+            android:textSize="26sp" />
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/listenersLayout"
         android:layout_width="wrap_content"
@@ -44,47 +46,48 @@
         android:layout_below="@+id/nameLayout"
         android:layout_centerHorizontal="true"
         android:paddingTop="20dp">
+
         <TextView
             android:id="@+id/listenersTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="'#listeners'"
             android:textColor="@color/grayTextColor"
-            android:textSize="40sp"
-            />
+            android:textSize="40sp" />
+
         <ImageView
-            android:paddingLeft="6dp"
             android:id="@+id/earImage"
             android:layout_width="42dp"
             android:layout_height="42dp"
-            android:layout_toRightOf="@+id/listenersTextView"
-            android:src="@drawable/ic_hearing_black_24dp"
-            android:alpha="0.5"
             android:layout_marginTop="5dp"
-
-            />
+            android:layout_toRightOf="@+id/listenersTextView"
+            android:alpha="0.5"
+            android:paddingLeft="6dp"
+            android:src="@drawable/ic_hearing_black_24dp" />
 
     </RelativeLayout>
 
     <Button
-        android:layout_marginTop="80dp"
         android:id="@+id/actionButtion"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_below="@+id/listenersLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:background="@drawable/rounded_button_blue"
         android:text="'Action'"
         android:textColor="@color/whiteColor"
-        android:background="@drawable/rounded_button_blue"
 
         />
+
     <RelativeLayout
         android:id="@+id/errorView"
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/actionButtion"
         android:layout_width="230dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true">
+        android:layout_below="@+id/actionButtion"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp">
+
         <ImageView
             android:id="@+id/errorIcon"
             android:layout_width="40dp"
@@ -93,15 +96,16 @@
 
 
             />
+
         <TextView
             android:id="@+id/errorText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="'Distance"
-            android:textSize="15sp"
-            android:textColor="@color/fabColor"
             android:layout_toRightOf="@id/errorIcon"
             android:paddingLeft="10dp"
+            android:text="'Distance"
+            android:textColor="@color/fabColor"
+            android:textSize="15sp"
 
             />
 
@@ -117,63 +121,56 @@
 
 
         <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/circle4"
-                android:layout_width="400dp"
-                android:layout_height="400dp"
-                android:layout_gravity="center"
-                app:circleColor="#424242"
-               />
+            android:id="@+id/circle4"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:layout_gravity="center"
+            app:circleColor="#424242" />
 
-            <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/circle3"
-                android:layout_width="340dp"
-                android:layout_height="340dp"
-                android:layout_gravity="center"
-                app:circleColor="#3b3b3b"
-                 />
+        <com.ciu196.mobilecomputing.Circle
+            android:id="@+id/circle3"
+            android:layout_width="340dp"
+            android:layout_height="340dp"
+            android:layout_gravity="center"
+            app:circleColor="#3b3b3b" />
 
-            <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/circle2"
-                android:layout_width="280dp"
-                android:layout_height="280dp"
-                android:layout_gravity="center"
-                app:circleColor="#343434"
-                 />
+        <com.ciu196.mobilecomputing.Circle
+            android:id="@+id/circle2"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_gravity="center"
+            app:circleColor="#343434" />
 
-            <com.ciu196.mobilecomputing.Circle
-                android:id="@+id/circle1"
-                android:layout_width="210dp"
-                android:layout_height="210dp"
-                android:layout_gravity="center"
-                app:circleColor="#f46173"
-                 />
+        <com.ciu196.mobilecomputing.Circle
+            android:id="@+id/circle1"
+            android:layout_width="210dp"
+            android:layout_height="210dp"
+            android:layout_gravity="center"
+            app:circleColor="#f46173" />
     </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/pianoImage"
             android:layout_width="70dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_music_note_white_24dp"
-            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
-            />
+            android:src="@drawable/ic_music_note_white_24dp" />
 
         <TextView
+            android:id="@+id/durationText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/durationText"
-            android:text="'Duration'"
-            android:textColor="@color/whiteColor"
-            android:textSize="18sp"
-            android:textAlignment="center"
             android:layout_alignParentBottom="true"
-            />
+            android:text="'Duration'"
+            android:textAlignment="center"
+            android:textColor="@color/whiteColor"
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -187,39 +184,39 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab3"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-            app:fabSize="normal"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_gravity="center"
             android:layout_margin="8dp"
             android:src="@drawable/ic_favorite_white_24dp"
+            android:visibility="invisible"
             app:backgroundTint="@color/myLocationRed"
-            android:visibility="invisible"/>
+            app:fabSize="normal" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab2"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            app:fabSize="normal"
             android:layout_gravity="center"
             android:layout_margin="8dp"
             android:clickable="true"
             android:src="@drawable/ic_tag_faces_white_24dp"
+            android:visibility="invisible"
             app:backgroundTint="@color/fabColor"
-            android:visibility="invisible"/>
+            app:fabSize="normal" />
 
-            />
+        />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab1"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            app:fabSize="normal"
             android:layout_gravity="center"
             android:layout_margin="8dp"
             android:src="@drawable/ic_thumb_up_white_24dp"
+            android:visibility="invisible"
             app:backgroundTint="@color/actionBlueColor"
-            android:visibility="invisible"/>/>
+            app:fabSize="normal" />/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

@@ -6,12 +6,10 @@ import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,13 +19,15 @@ import java.util.Map;
  */
 
 public class ViewAnimationService {
-    public enum Axis {X, Y};
-    static Map<View,AnimationView> map = new HashMap<>();
+    public enum Axis {X, Y}
+
+    ;
+    static Map<View, AnimationView> map = new HashMap<>();
     public static final String TAG = "ViewAnimationService";
 
-    public static void startAllAnimation(){
+    public static void startAllAnimation() {
 
-        for(AnimationView a : map.values()){
+        for (AnimationView a : map.values()) {
             a.startAnimation();
         }
     }
@@ -113,22 +113,22 @@ public class ViewAnimationService {
         getTranslationAnimator(v, duration, axis, distance).start();
     }
 
-    public static Animator getTranslateToCenterInParentViewAnimator(final View v, int duration, final Axis axis) {
+    public static Animator getTranslateToCenterInParentViewAnimator2(final View v, int duration, final Axis axis) {
 
-       View parentView = v.getRootView();
+        View parentView = v.getRootView();
 
-        int vPosition[] = {0,0};
+        int vPosition[] = {0, 0};
         v.getLocationOnScreen(vPosition);
 
-        int parentPosition[] = {0,0};
+        int parentPosition[] = {0, 0};
         parentView.getLocationOnScreen(parentPosition);
-        int goalPosition = 0 ;
+        int goalPosition = 0;
         int distance = 0;
 
-        if(axis == Axis.X) {
+        if (axis == Axis.X) {
             goalPosition = (parentView.getWidth() / 2) + parentPosition[0] - (v.getWidth() / 2);
             distance = goalPosition - vPosition[0];
-        }else{
+        } else {
             goalPosition = (parentView.getHeight() / 2) + parentPosition[1] - (v.getHeight() / 2);
             distance = goalPosition - vPosition[1];
 
@@ -136,7 +136,6 @@ public class ViewAnimationService {
 
 
         ValueAnimator animator = ValueAnimator.ofFloat(0, distance);
-
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -157,20 +156,89 @@ public class ViewAnimationService {
         return animator;
     }
 
-    public static void startTranslateToCenterInParentViewAnimator(final View v, int duration, final Axis axis) {
-        getTranslateToCenterInParentViewAnimator(v, duration, axis).start();
+    public static Animator getTranslationAnimatorReset(final View v, int duration, final Axis axis, final String specialCase) {
+        ObjectAnimator animator = null;
+        String propertyName;
+
+        if (axis == Axis.X) {
+            propertyName="translationX";
+            if (specialCase.equals("pianoStatusTextView")) {
+                animator = ObjectAnimator.ofFloat(v, propertyName, -10);
+            }
+            else if (specialCase.equals("playerNameTextView")) {
+                animator = ObjectAnimator.ofFloat(v, propertyName, v.getRight(), -10);
+            }
+        } else {
+            propertyName="translationY";
+            if (specialCase.equals("playerNameTextView")) {
+                animator = ObjectAnimator.ofFloat(v, propertyName, v.getTop(), 0);
+            }
+            else if (specialCase.equals("listenerLayout")) {
+                animator = ObjectAnimator.ofFloat(v, propertyName, -10);
+            }
+        }
+
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.setDuration(duration);
+
+        return animator;
     }
 
+    public static Animator getTranslateToCenterInParentViewAnimator(final View v, int duration, final Axis axis, final String specialCase) {
+        int target;
+         if (axis == Axis.X) {
+            int screenWidth = ConnectActivity.SCREEN_WIDTH;
+            target = screenWidth / 2 - 2 * v.getWidth();
+        } else {
+            target = 90;
+        }
 
-    public static Animator getUniformScaleAnimator(final View v, int duration, float scaleFactor) {
 
-        ValueAnimator animator = ValueAnimator.ofFloat(1, scaleFactor);
-
+        ValueAnimator animator = ValueAnimator.ofFloat(0, target);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
 
+                if (axis == Axis.X)
+                    v.setTranslationX(value);
+                else if (axis == Axis.Y)
+                    v.setTranslationY(value);
+            }
+        });
+
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.setDuration(duration);
+
+        return animator;
+    }
+
+    public static Animator getUniformScaleAnimator(final View v, int duration, float scaleFactor) {
+
+        ValueAnimator animator = ValueAnimator.ofFloat(1, scaleFactor);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+
+                v.setScaleX(value);
+                v.setScaleY(value);
+
+            }
+        });
+
+        animator.setInterpolator(new DecelerateInterpolator());
+        animator.setDuration(duration);
+        return animator;
+    }
+
+    public static Animator getUniformScaleAnimatorReset(final View v, int duration, float scaleFactor) {
+
+        ValueAnimator animator = ValueAnimator.ofFloat(scaleFactor,1);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
 
                 v.setScaleX(value);
                 v.setScaleY(value);
@@ -223,10 +291,9 @@ public class ViewAnimationService {
             }
 
         });
-        animation.addListener(new AnimatorListenerAdapter(){
+        animation.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(Animator animation)
-            {
+            public void onAnimationEnd(Animator animation) {
                 startColorTransitionAnimator(v, duration, colorTo, colorFrom);
             }
 
@@ -239,19 +306,19 @@ public class ViewAnimationService {
         getColorTransitionAndBackAnimator(v, duration, colorFrom, colorTo).start();
     }
 
-    public static Animator getElevationTransitionAnimator(final View view, int duration, float elevation){
+    public static Animator getElevationTransitionAnimator(final View view, int duration, float elevation) {
         ValueAnimator animation = ValueAnimator.ofFloat(0, elevation);
         animation.setDuration(duration);
         animation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                float value = (float ) valueAnimator.getAnimatedValue();
+                float value = (float) valueAnimator.getAnimatedValue();
             }
         });
         return animation;
     }
 
-    public static Animator getFadeWithScaleAnimator(View view, int duration, float scale, int fadeFrom, int fadeTo){
+    public static Animator getFadeWithScaleAnimator(View view, int duration, float scale, int fadeFrom, int fadeTo) {
         AnimatorSet animation = new AnimatorSet();
         animation
                 .play(ViewAnimationService.getFadeAnimator(view, duration, fadeFrom, fadeTo))
@@ -264,7 +331,7 @@ public class ViewAnimationService {
         addAnimator(view, getFadeWithScaleAnimator(view, duration, scale, fadeFrom, fadeTo));
     }
 
-    public static Animator getWiggleAnimator(View v, int duration, float fromDeg, float toDeg){
+    public static Animator getWiggleAnimator(View v, int duration, float fromDeg, float toDeg) {
         ObjectAnimator imageViewObjectAnimator = ObjectAnimator.ofFloat(v,
                 "rotation", fromDeg, toDeg);
         imageViewObjectAnimator.setRepeatMode(ValueAnimator.REVERSE);
@@ -274,6 +341,4 @@ public class ViewAnimationService {
         return imageViewObjectAnimator;
 
     }
-
-
 }
