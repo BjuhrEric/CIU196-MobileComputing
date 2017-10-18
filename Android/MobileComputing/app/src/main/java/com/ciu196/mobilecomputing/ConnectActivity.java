@@ -1,15 +1,19 @@
 package com.ciu196.mobilecomputing;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -99,35 +103,38 @@ public class ConnectActivity extends AppCompatActivity {
     View.OnClickListener reactionListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Toast toast = new Toast(ConnectActivity.this);
-            ImageView imageView = new ImageView(ConnectActivity.this);
-
             int id = view.getId();
-            switch (id) {
-                case R.id.fab1:
-                    imageView.setImageResource(R.drawable.ic_thumb_up_white_24dp);
-                    imageView.setBackgroundColor(getColor(R.color.actionBlueColor));
-                    break;
-                case R.id.fab2:
-                    imageView.setImageResource(R.drawable.ic_tag_faces_white_24dp);
-                    imageView.setBackgroundColor(getColor(R.color.fabColor));
-                    break;
-                case R.id.fab3:
-                    imageView.setImageResource(R.drawable.ic_favorite_white_24dp);
-                    imageView.setBackgroundColor(getColor(R.color.myLocationRed));
+
+            switch (id){
+                case R.id.fab1: case R.id.fab2: case R.id.fab3:
+                    Reaction reaction = getReactionFromId(id);
+                    animateReaction(reaction);
+
                     break;
                 default:
                     break;
             }
-            imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT));
-            imageView.setPadding(10, 10, 10, 10);
-            rel.addView(imageView);
-            animateReaction(imageView);
+
         }
     };
 
-    public void animateReaction(final ImageView view) {
+    public Reaction getReactionFromId(int fabId){
+        ImageView imageView = new ImageView(ConnectActivity.this);
+        switch (fabId){
+            case R.id.fab1:
+                return Reaction.THUMBS_UP;
+            case R.id.fab2:
+                return Reaction.HAPPY;
+            case R.id.fab3:
+                return Reaction.HEART;
+            default:
+                return null;
+        }
+    }
+
+    public void animateReaction(Reaction reaction) {
+        ImageView view = ReactionService.getReactionImageView(this, reaction);
+        rel.addView(view);
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         Random random = new Random();
@@ -142,10 +149,10 @@ public class ConnectActivity extends AppCompatActivity {
         AnimatorSet animation = new AnimatorSet();
         animation
                 .play(ViewAnimationService.getFadeAnimator(view, duration, 1, 0))
-                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -200))
+                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -1*height))
                 .with(ViewAnimationService.getElevationTransitionAnimator(view, duration, 32f))
                 .with(ViewAnimationService.getWiggleAnimator(view, 1000, -15f, 15f))
-                .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 2.5f));
+                .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 4f));
 
 
         //ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha",  1f, 0f);
@@ -439,7 +446,7 @@ public class ConnectActivity extends AppCompatActivity {
             addFadeInAnimation(pianoStatusTextView, STATUS_FADE_DURATION);
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
-            AudioDispatcher();
+            audioDispatcher();
 
         } else if (m == guiMode.CANT_CONNECT) {
             currentGuiMode = guiMode.CANT_CONNECT;
@@ -503,9 +510,20 @@ public class ConnectActivity extends AppCompatActivity {
         } else if (m == guiMode.PLAYING) {
             currentGuiMode = guiMode.PLAYING;
 
-            AudioDispatcher();
+            audioDispatcher();
             changeBackgroundColor(getColor(R.color.backgroundRedColor));
             setCircleColor(circleColor.RED);
+
+            playerNameTextView.setTextColor(getColor(R.color.actionRedColor));
+            playerNameTextView.setText("You");
+            pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
+            pianoStatusTextView.setText("are playing");
+            actionButton.setText("Stop playing");
+            listenersTextView.setText(BroadcastService.getNumberOfListeners() + "");
+            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
+            actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
+            audioDispatcher();
+
 
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -548,11 +566,11 @@ public class ConnectActivity extends AppCompatActivity {
     private void teardownCurrentGui() {
 
         //Common teardowns
-        addFadeOutAnimation(playerNameTextView, NAME_FADE_DURATION/2);
-        addFadeOutAnimation(pianoStatusTextView, STATUS_FADE_DURATION/2);
-        addFadeOutAnimation(actionButton, ACTION_BUTTON_FADE_DURATION/2);
-        addFadeOutAnimation(earImage, EAR_FADE_DURATION/2);
-        addFadeOutAnimation(listenersTextView, LISTENER_FADE_DURATION/2);
+        addFadeOutAnimation(playerNameTextView, NAME_FADE_DURATION / 2);
+        addFadeOutAnimation(pianoStatusTextView, STATUS_FADE_DURATION / 2);
+        addFadeOutAnimation(actionButton, ACTION_BUTTON_FADE_DURATION / 2);
+        addFadeOutAnimation(earImage, EAR_FADE_DURATION / 2);
+        addFadeOutAnimation(listenersTextView, LISTENER_FADE_DURATION / 2);
         addInstantOperation(errorView, () -> errorView.setVisibility(INVISIBLE));
 
         if (currentGuiMode == guiMode.START_TO_LISTEN) {
@@ -565,21 +583,44 @@ public class ConnectActivity extends AppCompatActivity {
             addFadeWithScaleAnimation(fab, 400, 0, 1, 0);
             addAnimator(playerNameTextView, getTranslationAnimator(playerNameTextView, 500, ViewAnimationService.Axis.Y, -120));
             addAnimator(listenerLayout, getTranslationAnimator(listenerLayout, 500, ViewAnimationService.Axis.Y, -130));
-        } else if(currentGuiMode == guiMode.CONNECT){
+        } else if (currentGuiMode == guiMode.CONNECT) {
 
 
         } else if (currentGuiMode == guiMode.PLAYING) {
-            addFadeOutAnimation(durationText, DURATION_TEXT_FADE_DURATION/2);
+            addFadeOutAnimation(durationText, DURATION_TEXT_FADE_DURATION / 2);
             terminateAudioDispatcher();
 
         } else if (currentGuiMode == guiMode.CANT_CONNECT) {
-            addInstantOperation(actionButton, () ->   actionButton.setEnabled(true));
-            addFadeOutAnimation(errorView, ERROR_FADE_DURATION/2);
+            addInstantOperation(actionButton, () -> actionButton.setEnabled(true));
+            addFadeOutAnimation(errorView, ERROR_FADE_DURATION / 2);
 
+        } else if (currentGuiMode == guiMode.CANT_LISTEN) {
+            addInstantOperation(actionButton, () -> actionButton.setEnabled(true));
+            addFadeOutAnimation(errorView, ERROR_FADE_DURATION / 2);
         }
-        else if (currentGuiMode == guiMode.CANT_LISTEN) {
-            addInstantOperation(actionButton, () ->   actionButton.setEnabled(true));
-            addFadeOutAnimation(errorView, ERROR_FADE_DURATION/2);
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case RECORD_AUDIO_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Granted", Toast.LENGTH_LONG).show();
+                    audioDispatcher();
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    Toast.makeText(this, "Denied", Toast.LENGTH_LONG).show();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
         }
 
     }
@@ -593,8 +634,23 @@ public class ConnectActivity extends AppCompatActivity {
     private int circle3Radius;
     private int circle4Radius;
     private be.tarsos.dsp.AudioDispatcher dispatcher;
+    private final int RECORD_AUDIO_REQUEST_CODE = 1337;
 
-    private void AudioDispatcher() {
+    private void audioDispatcher() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
+                    RECORD_AUDIO_REQUEST_CODE);
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(this, "returning...", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
         PitchDetectionHandler pdh = new PitchDetectionHandler() {

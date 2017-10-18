@@ -1,5 +1,8 @@
 package com.ciu196.mobilecomputing;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -60,6 +63,10 @@ public class OnlineBroadcastService {
         this.numberOfListeners = numberOfListeners;
     }
 
+    public void sendReaction(Reaction reaction){
+        //// TODO: 2017-10-18
+
+    }
 
     // Returns the start Instat of the current session. If there isn't one it throws a "NotLiveException"
     public Duration getCurrentSessionDuration() throws NotLiveException {
