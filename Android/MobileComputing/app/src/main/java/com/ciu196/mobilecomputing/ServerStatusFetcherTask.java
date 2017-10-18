@@ -1,6 +1,8 @@
 package com.ciu196.mobilecomputing;
 
 import android.content.Context;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
@@ -23,6 +25,7 @@ public class ServerStatusFetcherTask extends LoopableTask {
 
     @Override
     protected boolean init() {
+        Looper.prepare();
         return true;
     }
 
@@ -34,6 +37,7 @@ public class ServerStatusFetcherTask extends LoopableTask {
     @Override
     protected boolean loop() {
         try {
+            Log.d("ServerStatusFetcher", "Fetching server status");
             ServerResponse.Status status = ServerConnection.getInstance().getStatus();
             OnlineBroadcastService service = OnlineBroadcastService.getInstance();
             service.setLive(Boolean.parseBoolean(status.getStatus("broadcasting")));
