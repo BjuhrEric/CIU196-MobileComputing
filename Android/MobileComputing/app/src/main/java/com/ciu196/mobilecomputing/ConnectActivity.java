@@ -523,17 +523,6 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             changeBackgroundColor(getColor(R.color.backgroundRedColor));
             setCircleColor(circleColor.RED);
 
-            playerNameTextView.setTextColor(getColor(R.color.actionRedColor));
-            playerNameTextView.setText("You");
-            pianoStatusTextView.setTextColor(getColor(R.color.whiteColor));
-            pianoStatusTextView.setText("are playing");
-            actionButton.setText("Stop playing");
-            listenersTextView.setText(BroadcastService.getNumberOfListeners() + "");
-            earImage.setImageResource(R.drawable.ic_hearing_white_24dp);
-            actionButton.setBackground(getDrawable(R.drawable.rounded_button_red));
-            audioDispatcher();
-
-
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
