@@ -5,6 +5,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.ciu196.mobilecomputing.common.requests.ClientRequest;
+import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
 
@@ -14,7 +16,7 @@ import java.io.IOException;
  * Created by Eric on 2017-10-16.
  */
 
-public class ServerStatusFetcherTask extends LoopableTask {
+public class ServerStatusFetcherTask extends LoopableTask implements RequestDoneListener {
 
     private final Context context;
 
@@ -36,19 +38,22 @@ public class ServerStatusFetcherTask extends LoopableTask {
 
     @Override
     protected boolean loop() {
+        ServerConnection.getInstance().fetchStatus(this);
+        return true;
+    }
+
+    @Override
+    public void serverResponseReceived(ServerResponse response) {
         try {
-            Log.d("ServerStatusFetcher", "Fetching server status");
-            ServerResponse.Status status = ServerConnection.getInstance().getStatus();
+            ServerResponse.Status status = (ServerResponse.Status) response.getValue();
             OnlineBroadcastService service = OnlineBroadcastService.getInstance();
             service.setLive(Boolean.parseBoolean(status.getStatus("broadcasting")));
             service.setBroadcasterName(status.getStatus("broadcaster"));
             service.setBroadcastStartTime(Long.parseLong(status.getStatus("broadcastStartTime")));
             service.setNumberOfListeners(Integer.parseInt(status.getStatus("nListeners")));
-        } catch (IOException | InterruptedException | ClassCastException | ClassNotFoundException e) {
-            Toast.makeText(context, "Error occurred while fetching server status", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            stop();
         }
-        return true;
     }
 }

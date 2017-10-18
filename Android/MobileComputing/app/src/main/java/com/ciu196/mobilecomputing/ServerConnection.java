@@ -6,6 +6,7 @@ import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -65,87 +66,88 @@ public class ServerConnection {
         return instance;
     }
 
-    public boolean startBroadcast() {
-        ServerResponse serverMessage = null;
+    public void startBroadcast(final String name) {
+        addTaskRequest(ClientRequestType.BROADCAST, name);
+    }
+
+    public void stopBroadcast() {
+        addTaskRequest(ClientRequestType.STOP_BROADCAST);
+    }
+
+    public void startListen() {
+        addTaskRequest(ClientRequestType.LISTEN);
+    }
+
+    public void stopListen() {
+        addTaskRequest(ClientRequestType.STOP_LISTEN);
+    }
+
+    public void startBroadcast(final String name, RequestDoneListener... listeners) {
+        addTaskRequest(ClientRequestType.BROADCAST, name, listeners);
+    }
+
+    public void stopBroadcast(RequestDoneListener... listeners) {
+        addTaskRequest(ClientRequestType.STOP_BROADCAST, listeners);
+    }
+
+    public void startListen(RequestDoneListener... listeners) {
+        addTaskRequest(ClientRequestType.LISTEN, listeners);
+    }
+
+    public void stopListen(RequestDoneListener... listeners) {
+        addTaskRequest(ClientRequestType.STOP_LISTEN, listeners);
+    }
+
+    public void fetchStatus(RequestDoneListener... listeners) {
+        addTaskRequest(ClientRequestType.REQUEST_STATUS, listeners);
+    }
+
+    public void detach() throws IOException, InterruptedException, ClassNotFoundException {
+        addTaskRequest(ClientRequestType.DETACH_CLIENT);
+    }
+
+    private void addTaskRequest(final ClientRequestType requestType) {
+        addTaskRequest(new ClientRequest(requestType));
+    }
+
+    private void addTaskRequest(final ClientRequestType requestType, final String value) {
+        addTaskRequest(new ClientRequest(requestType, value));
+    }
+
+    private void addTaskRequest(final ClientRequest request) {
+        ClientRequestTask.getInstance().addRequest(request);
+    }
+
+    private void addTaskRequest(final ClientRequestType requestType, RequestDoneListener... listeners) {
+        addTaskRequest(new ClientRequest(requestType), listeners);
+    }
+
+    private void addTaskRequest(final ClientRequestType requestType, final String value, RequestDoneListener... listeners) {
+        addTaskRequest(new ClientRequest(requestType, value), listeners);
+    }
+
+    private void addTaskRequest(final ClientRequest request, RequestDoneListener... listeners) {
+        ClientRequestTask.getInstance().addRequest(request, listeners);
+    }
+
+    public ServerResponse sendRequest(final ClientRequest request) {
+        Object tmp = null;
+
         try {
-            serverMessage = sendRequest(ClientRequestType.BROADCAST, "Ray Charles");
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            objectOutputStream.writeObject(request);
+            objectOutputStream.flush();
+            while (bufferedInputStream.available() <= 0 && request_socket.isConnected())
+                Thread.sleep(10);
+
+
+            if (request_socket.isConnected())
+                tmp = objectInputStream.readObject();
+        } catch (IOException | InterruptedException | ClassNotFoundException
+                | ClassCastException e) {
             e.printStackTrace();
-            return false;
         }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
-    }
 
-    public boolean stopBroadcast() {
-        ServerResponse serverMessage = null;
-        try {
-            serverMessage = sendRequest(ClientRequestType.STOP_BROADCAST);
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
-    }
-
-    public boolean startListen() {
-        ServerResponse serverMessage = null;
-        try {
-            serverMessage = sendRequest(ClientRequestType.LISTEN, "Ray Charles");
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
-    }
-
-    public boolean stopListen() {
-        ServerResponse serverMessage = null;
-        try {
-            serverMessage = sendRequest(ClientRequestType.STOP_LISTEN, "Ray Charles");
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
-    }
-
-    public boolean detach() throws IOException, InterruptedException, ClassNotFoundException {
-        ServerResponse serverMessage = sendRequest(ClientRequestType.DETACH_CLIENT);
-        return serverMessage.getType().equals(ServerResponse.ResponseType.DETACHED);
-    }
-
-    public ServerResponse.Status getStatus()  throws IOException, InterruptedException, ClassNotFoundException {
-        ServerResponse serverResponse = sendRequest(ClientRequestType.REQUEST_STATUS);
-        return (ServerResponse.Status) serverResponse.getValue();
-    }
-
-    private ServerResponse sendRequest(final ClientRequestType request) throws IOException,
-            InterruptedException, ClassNotFoundException, ClassCastException {
-        return sendRequest(new ClientRequest(request));
-    }
-
-    private ServerResponse sendRequest(final ClientRequestType request, final String val) throws IOException,
-            InterruptedException, ClassNotFoundException, ClassCastException {
-        return sendRequest(new ClientRequest(request, val));
-    }
-
-    private ServerResponse sendRequest(final ClientRequest request) throws IOException,
-            InterruptedException, ClassNotFoundException, ClassCastException {
-        Object o = null;
-
-        objectOutputStream.writeObject(request);
-        objectOutputStream.flush();
-
-
-        while (bufferedInputStream.available() <= 0 && request_socket.isConnected())
-            Thread.sleep(10);
-
-
-        if (request_socket.isConnected())
-            o = objectInputStream.readObject();
-
-
-        return (ServerResponse) o;
+        return (ServerResponse) tmp;
     }
 
 }
