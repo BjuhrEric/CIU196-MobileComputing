@@ -327,9 +327,8 @@ public class ConnectActivity extends AppCompatActivity {
             currentGuiMode = guiMode.START_TO_LISTEN;
 
             addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
-            setCircleColor(circleColor.GRAY);
-            pianoStatusTextView.setTextColor(getResources().getColor(R.color.grayTextColor));
-            playerNameTextView.setTextColor(getResources().getColor(R.color.actionBlueColor));
+            pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor));
+            playerNameTextView.setTextColor(getColor(R.color.actionBlueColor));
             playerNameTextView.setText(BroadcastService.getPlayerName());
             addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
             actionButton.setText("Start Listening");
