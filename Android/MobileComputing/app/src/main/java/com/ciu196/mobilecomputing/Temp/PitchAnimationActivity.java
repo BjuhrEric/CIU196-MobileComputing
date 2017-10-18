@@ -1,20 +1,11 @@
-package com.ciu196.mobilecomputing.sounddetection;
+package com.ciu196.mobilecomputing.Temp;
 
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.ciu196.mobilecomputing.Circle;
-import com.ciu196.mobilecomputing.R;
 
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
-import be.tarsos.dsp.io.android.AudioDispatcherFactory;
-import be.tarsos.dsp.pitch.PitchDetectionHandler;
-import be.tarsos.dsp.pitch.PitchDetectionResult;
-import be.tarsos.dsp.pitch.PitchProcessor;
 
 public class PitchAnimationActivity {
 

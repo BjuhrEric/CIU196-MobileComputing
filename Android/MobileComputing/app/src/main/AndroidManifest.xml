@@ -55,7 +55,7 @@
         </activity>
 
         <activity
-            android:name=".PitchAnimationActivity"
+            android:name=".Temp.PitchAnimationActivity"
             android:label="@string/title_activity_change_volume">
 
 
