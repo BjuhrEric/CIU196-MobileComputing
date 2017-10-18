@@ -3,21 +3,17 @@ package com.ciu196.mobilecomputing;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -79,35 +75,35 @@ public class ConnectActivity extends AppCompatActivity {
     View.OnClickListener reactionListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //Toast toast = new Toast(ConnectActivity.this);
-            ImageView imageView = new ImageView(ConnectActivity.this);
-
             int id = view.getId();
             switch (id){
-                case R.id.fab1:
-                    imageView.setImageResource(R.drawable.ic_thumb_up_white_24dp);
-                    imageView.setBackgroundColor(getColor(R.color.actionBlueColor));
-                    break;
-                case R.id.fab2:
-                    imageView.setImageResource(R.drawable.ic_tag_faces_white_24dp);
-                    imageView.setBackgroundColor(getColor(R.color.fabColor));
-                    break;
-                case R.id.fab3:
-                    imageView.setImageResource(R.drawable.ic_favorite_white_24dp);
-                    imageView.setBackgroundColor(getColor(R.color.myLocationRed));
+                case R.id.fab1: case R.id.fab2: case R.id.fab3:
+                    Reaction reaction = getReactionFromId(id);
+                    animateReaction(reaction);
                     break;
                 default:
                     break;
             }
-            imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT));
-            imageView.setPadding(10,10,10,10);
-            rel.addView(imageView);
-            animateReaction(imageView);
         }
     };
 
-    public void animateReaction(final ImageView view){
+    public Reaction getReactionFromId(int fabId){
+        ImageView imageView = new ImageView(ConnectActivity.this);
+        switch (fabId){
+            case R.id.fab1:
+                return Reaction.THUMBS_UP;
+            case R.id.fab2:
+                return Reaction.HAPPY;
+            case R.id.fab3:
+                return Reaction.HEART;
+            default:
+                return null;
+        }
+    }
+
+    public void animateReaction(Reaction reaction) {
+        ImageView view = ReactionService.getReactionImageView(this, reaction);
+        rel.addView(view);
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         Random random = new Random();
@@ -122,10 +118,10 @@ public class ConnectActivity extends AppCompatActivity {
         AnimatorSet animation = new AnimatorSet();
         animation
                 .play(ViewAnimationService.getFadeAnimator(view, duration, 1, 0))
-                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -200))
+                .with(ViewAnimationService.getTranslationAnimator(view, duration, ViewAnimationService.Axis.Y, -1*height))
                 .with(ViewAnimationService.getElevationTransitionAnimator(view, duration, 32f))
                 .with(ViewAnimationService.getWiggleAnimator(view, 1000, -15f, 15f))
-                .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 2.5f));
+                .with(ViewAnimationService.getUniformScaleAnimator(view, duration, 4f));
 
         
         //ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha",  1f, 0f);
