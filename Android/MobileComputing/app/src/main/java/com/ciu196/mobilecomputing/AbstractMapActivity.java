@@ -33,7 +33,7 @@ import com.google.maps.android.geometry.Bounds;
  * Created by alexanderalvmo on 2017-10-16.
  */
 
-public class AbstractMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnCameraMoveListener {
+public abstract class AbstractMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnCameraMoveListener {
     //CONSTANTS
     protected static final int FINE_LOCATION_REQUEST_CODE = 99;
     public static final double LIB_LNG = 11.979743;
@@ -164,10 +164,10 @@ public class AbstractMapActivity extends AppCompatActivity implements OnMapReady
                     MapStyleOptions.loadRawResourceStyle(
                             this, R.raw.map_style));
             if (success) {
-                Toast.makeText(this, "Map styling successful", Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Map styling successful");
             }
         } catch (Resources.NotFoundException e) {
-            Toast.makeText(this, "Map styling failed", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "Map styling failed");
         }
 
         // draw map with all the markers etc...
