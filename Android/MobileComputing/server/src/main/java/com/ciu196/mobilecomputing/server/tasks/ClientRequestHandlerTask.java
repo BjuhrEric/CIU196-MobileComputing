@@ -38,6 +38,15 @@ public class ClientRequestHandlerTask extends ServerTask {
                 case BROADCAST:
                     server.setBroadcaster(client, first.getValue());
                     break;
+                case STOP_BROADCAST:
+                    server.stopBroadcast(client);
+                    break;
+                case LISTEN:
+                    server.addListener(client);
+                    break;
+                case STOP_LISTEN:
+                    server.removeListener(client);
+                    break;
                 case DETACH_CLIENT:
                     server.detachClient(client);
                     return false;

@@ -62,7 +62,6 @@ public class SocketServer implements Server {
         client.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
 
         clientMap.put(clientSocket.getInetAddress(), client);
-        listeners.add(client);
 
         ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
         ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
@@ -127,20 +126,32 @@ public class SocketServer implements Server {
         c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
     }
 
-    public void detachClient(final Client c) throws IOException {
-        if (c == null)
-            throw new IllegalArgumentException("Client may not be null");
+    public void stopBroadcast(final Client c) {
         if (c.equals(broadcaster)) {
             broadcaster = null;
             broadcasterName = NOONE;
             broadcastStartTime = -1;
         }
+    }
+
+    public void detachClient(final Client c) throws IOException {
+        if (c == null)
+            throw new IllegalArgumentException("Client may not be null");
+        stopBroadcast(c);
+        removeListener(c);
+        //c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
+        clientMap.remove(c.getInetAddress());
+        c.close();
 
         System.out.println("Client detached");
-        c.sendMessage(new ServerResponse(ServerResponse.ResponseType.REQUEST_ACCEPTED, new ServerResponse.NoValue()));
-        clientMap.remove(c.getInetAddress());
+    }
+
+    public void addListener(Client c) {
+        listeners.add(c);
+    }
+
+    public void removeListener(Client c) {
         listeners.remove(c);
-        c.close();
     }
 
     public void quit() {

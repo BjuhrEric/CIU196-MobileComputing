@@ -8,6 +8,7 @@ import java.io.IOException;
 public class ClientConnectionCheckerTask extends ServerTask {
 
     private final Client client;
+    private boolean forcedStop = false;
 
     public ClientConnectionCheckerTask(final Client client, final Server server) {
         super(server, 10000);
@@ -22,7 +23,8 @@ public class ClientConnectionCheckerTask extends ServerTask {
     @Override
     protected boolean finish() {
         try {
-            server.detachClient(client);
+            if (!forcedStop)
+                server.detachClient(client);
         } catch (IOException e) {
             return false;
         }
@@ -33,5 +35,11 @@ public class ClientConnectionCheckerTask extends ServerTask {
     protected boolean loop() {
         System.out.println("Checking connection for client: "+client.getInetAddress().getHostAddress());
         return client.isConnected();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        forcedStop = true;
     }
 }
