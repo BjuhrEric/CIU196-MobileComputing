@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
+import com.ciu196.mobilecomputing.common.requests.ResponseValue;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
 
@@ -53,7 +54,7 @@ public class ServerStatusFetcherTask extends LoopableTask implements RequestDone
     @Override
     public void serverResponseReceived(ServerResponse response) {
         try {
-            ServerResponse.Status status = (ServerResponse.Status) response.getValue();
+            ResponseValue.Status status = (ResponseValue.Status) response.getValue();
             OnlineBroadcastService service = OnlineBroadcastService.getInstance();
             service.setLive(Boolean.parseBoolean(status.getStatus("broadcasting")));
             service.setBroadcasterName(status.getStatus("broadcaster"));

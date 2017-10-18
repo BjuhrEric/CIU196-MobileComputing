@@ -1,5 +1,7 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
+import com.ciu196.mobilecomputing.common.requests.ServerRequest;
+import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
@@ -11,7 +13,7 @@ public class ClientConnectionCheckerTask extends ServerTask {
     private boolean forcedStop = false;
 
     public ClientConnectionCheckerTask(final Client client, final Server server) {
-        super(server, 10000);
+        super(server, 1000);
         this.client = client;
     }
 
@@ -24,7 +26,7 @@ public class ClientConnectionCheckerTask extends ServerTask {
     protected boolean finish() {
         try {
             if (!forcedStop)
-                server.detachClient(client);
+                server.detachClient(client, false);
         } catch (IOException e) {
             return false;
         }
@@ -33,8 +35,11 @@ public class ClientConnectionCheckerTask extends ServerTask {
 
     @Override
     protected boolean loop() {
-        System.out.println("Checking connection for client: "+client.getInetAddress().getHostAddress());
-        return client.isConnected();
+        //System.out.println("Checking connection for client: "+client.getInetAddress().getHostAddress());
+        if (!client.isConnected())
+            return false;
+        client.addRequest(new ServerRequest(ServerRequestType.CONFIRM_CONNECTIVITY));
+        return true;
     }
 
     @Override

@@ -22,12 +22,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class ClientRequestTask extends LoopableTask {
 
     private final static ClientRequestTask instance = new ClientRequestTask();
-    private Queue<Map.Entry<ClientRequest, List<RequestDoneListener>>> requests;
-    private RequestHandler handler;
 
     private ClientRequestTask() {
         super(50);
-        requests = new LinkedList<>();
     }
 
     public static ClientRequestTask getInstance() {
@@ -46,31 +43,7 @@ public final class ClientRequestTask extends LoopableTask {
 
     @Override
     protected boolean loop() {
-        if (!requests.isEmpty()) {
-            Map.Entry<ClientRequest, List<RequestDoneListener>> entry = requests.poll();
-            ServerResponse response = handler.handleRequest(entry.getKey());
-            for (RequestDoneListener listener : entry.getValue())
-                listener.serverResponseReceived(response);
-        }
+        ServerConnection.getInstance().sendRequest();
         return true;
-    }
-
-
-    public void addRequest(ClientRequest request) {
-        addRequest(request, new LinkedList<>());
-    }
-
-    public void addRequest(ClientRequest request, @NonNull RequestDoneListener... listeners) {
-        List<RequestDoneListener> l = new LinkedList<>();
-        l.addAll(Arrays.asList(listeners));
-        addRequest(request, l);
-    }
-
-    public void addRequest(ClientRequest request, @NonNull List<RequestDoneListener> listeners) {
-        requests.offer(new AbstractMap.SimpleEntry<>(request, listeners));
-    }
-
-    public void setRequestHandler(RequestHandler handler) {
-        this.handler = handler;
     }
 }

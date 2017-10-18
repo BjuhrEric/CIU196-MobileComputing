@@ -59,6 +59,9 @@ public class ClientRequestHandlerTask extends ServerTask {
                 case REQUEST_STATUS:
                     server.sendStatus(client);
                     break;
+                case SEND_REACTION:
+                    //TODO
+                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();

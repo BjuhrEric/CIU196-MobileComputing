@@ -4,6 +4,8 @@ import com.ciu196.mobilecomputing.server.io.SocketServer;
 import com.ciu196.mobilecomputing.server.tasks.ConnectClientDataSocketTask;
 import com.ciu196.mobilecomputing.server.tasks.ConnectClientRequestSocketTask;
 import com.ciu196.mobilecomputing.common.tasks.TaskManager;
+import com.ciu196.mobilecomputing.server.tasks.ConnectClientServerRequestSocketTask;
+import com.ciu196.mobilecomputing.server.tasks.SendServerRequestsTask;
 import com.ciu196.mobilecomputing.server.util.Server;
 
 import java.io.IOException;
@@ -36,6 +38,8 @@ public final class ServerApplication {
     private void start() {
         new Thread(new ConnectClientDataSocketTask(server)).start();
         new Thread(new ConnectClientRequestSocketTask(server)).start();
+        new Thread(new ConnectClientServerRequestSocketTask(server)).start();
+        new Thread(new SendServerRequestsTask(server)).start();
     }
 
 }

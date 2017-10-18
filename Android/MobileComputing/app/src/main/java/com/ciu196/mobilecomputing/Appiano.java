@@ -19,9 +19,8 @@ public class Appiano extends Application {
         super.onCreate();
         new Thread(
                 ()-> {
-                    ClientRequestTask.getInstance().setRequestHandler(ServerConnection.getInstance()::sendRequest);
-
                     new Thread(task).start();
+                    new Thread(FetchRequestTask.getInstance()).start();
                     new Thread(ClientRequestTask.getInstance()).start();
                 }).start();
     }
