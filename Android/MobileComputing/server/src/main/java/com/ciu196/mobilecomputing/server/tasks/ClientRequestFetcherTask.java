@@ -31,6 +31,7 @@ public class ClientRequestFetcherTask extends ServerTask {
         try {
             client.fetchRequests();
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             return false;
         }
         return true;

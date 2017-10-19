@@ -2,7 +2,6 @@ package com.ciu196.mobilecomputing.servertestclient;
 
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
-import com.ciu196.mobilecomputing.common.requests.ServerMessage;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 
 import java.io.BufferedInputStream;

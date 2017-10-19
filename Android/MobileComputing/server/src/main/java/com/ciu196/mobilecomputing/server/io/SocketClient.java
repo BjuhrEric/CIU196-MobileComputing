@@ -1,7 +1,10 @@
 package com.ciu196.mobilecomputing.server.io;
 
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
-import com.ciu196.mobilecomputing.common.requests.ServerMessage;
+import com.ciu196.mobilecomputing.common.requests.ClientResponse;
+import com.ciu196.mobilecomputing.common.requests.ServerRequest;
+import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
+import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
 import com.ciu196.mobilecomputing.server.util.Client;
 
@@ -21,21 +24,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 class SocketClient implements Client {
 
     private final Queue<byte[]> dataOutput;
-    private final Queue<ClientRequest> requests;
+    private final Queue<ClientRequest> clientRequests;
+    private final Queue<ServerRequest> serverRequests;
     private final Collection<LoopableTask> tasks;
-    private InetAddress inetAddress = null;
-    private Socket requestSocket, dataSocket;
+    private final InetAddress inetAddress;
+    private Socket requestSocket, serverRequestSocket, dataSocket;
     private InputStream dataInputStream;
-    private ObjectInputStream requestInputStream;
-    private BufferedInputStream bufferedInputStream;
     private OutputStream dataOutputStream;
-    private ObjectOutputStream requestOutputStream;
-    private long lastRequestTimestamp = -1;
+    private BufferedInputStream bufferedInputStream1, bufferedInputStream2;
+    private ObjectInputStream requestInputStream, responseInputStream;
+    private ObjectOutputStream responseOutputStream, requestOutputStream;
+    private boolean connected;
+    private boolean sendingRequest = false;
 
-    SocketClient(){
-        this.requests = new ConcurrentLinkedQueue<>();
+    SocketClient(InetAddress inetAddress){
+        this.clientRequests = new ConcurrentLinkedQueue<>();
+        this.serverRequests = new ConcurrentLinkedQueue<>();
         this.tasks = new LinkedList<>();
         this.dataOutput = new ConcurrentLinkedQueue<>();
+        this.inetAddress = inetAddress;
+        this.connected = true;
     }
 
     void addTask(final LoopableTask task) {
@@ -44,40 +52,96 @@ class SocketClient implements Client {
 
     void bindRequestSocket(Socket socket) throws IOException {
         requestSocket = socket;
-        bufferedInputStream = new BufferedInputStream(socket.getInputStream());
-        requestInputStream = new ObjectInputStream(bufferedInputStream);
-        requestOutputStream = new ObjectOutputStream(socket.getOutputStream());
-        inetAddress = socket.getInetAddress();
+        bufferedInputStream1 = new BufferedInputStream(socket.getInputStream());
+        requestInputStream = new ObjectInputStream(bufferedInputStream1);
+        responseOutputStream = new ObjectOutputStream(socket.getOutputStream());
     }
 
     void bindDataSocket(Socket socket) throws IOException {
         dataSocket = socket;
         dataInputStream = socket.getInputStream();
         dataOutputStream = socket.getOutputStream();
-        inetAddress = socket.getInetAddress();
+    }
+
+    void bindServerRequestSocket(Socket socket) throws IOException {
+        serverRequestSocket = socket;
+        bufferedInputStream2 = new BufferedInputStream(socket.getInputStream());
+        responseInputStream = new ObjectInputStream(bufferedInputStream2);
+        requestOutputStream = new ObjectOutputStream(socket.getOutputStream());
     }
 
     public ClientRequest getFirstRequest() {
-        if (requests.isEmpty())
+        if (clientRequests.isEmpty())
             return null;
-        return requests.poll();
+        return clientRequests.poll();
     }
 
     public void fetchRequests() throws IOException, ClassNotFoundException {
-        if (bufferedInputStream.available() > 0) {
+        if (!requestSocket.isClosed() && bufferedInputStream1.available() > 0) {
             final Object o = requestInputStream.readObject();
             final ClientRequest request;
             if (o != null) {
                 request = (ClientRequest) o;
-                requests.offer(request);
-                lastRequestTimestamp = System.currentTimeMillis();
+                clientRequests.offer(request);
             }
         }
     }
 
-    public void sendMessage(ServerMessage response) throws IOException {
-        requestOutputStream.writeObject(response);
-        requestOutputStream.flush();
+    public void sendResponse(ServerResponse response) throws IOException {
+        responseOutputStream.writeObject(response);
+        responseOutputStream.flush();
+    }
+
+    @Override
+    public void addRequest(ServerRequest request) {
+        if (!request.getType().equals(ServerRequestType.CONFIRM_CONNECTIVITY)
+                || !hasRequestOfType(ServerRequestType.CONFIRM_CONNECTIVITY)) {
+            serverRequests.offer(request);
+        }
+    }
+
+    private boolean hasRequestOfType(ServerRequestType type) {
+        for (ServerRequest request : serverRequests) {
+            if (request.getType().equals(type))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public ClientResponse sendRequest() {
+        ClientResponse response = null;
+        if (serverRequests.isEmpty() || requestOutputStream == null || responseInputStream == null)
+            return null;
+
+        ServerRequest request = serverRequests.poll();
+        try {
+            sendingRequest = true;
+            long sendingRequestStartTime = System.currentTimeMillis();
+            new Thread(() -> {
+                try {
+                    requestOutputStream.writeObject(request);
+                    requestOutputStream.flush();
+                    sendingRequest = false;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            while (sendingRequest)
+                if (sendingRequestStartTime + 15000 < System.currentTimeMillis())
+                    throw new IOException("Request timed out, assuming connection lost\n"
+                    + "Start time: " + sendingRequestStartTime + "\t current time:" + System.currentTimeMillis());
+            while (bufferedInputStream2.available() <= 0)
+                    Thread.sleep(10);
+
+            response = (ClientResponse) responseInputStream.readObject();
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+            if (e instanceof IOException || request.getType().equals(ServerRequestType.CONFIRM_CONNECTIVITY))
+                setConnected(false);
+            else
+                e.printStackTrace();
+        }
+        return response;
     }
 
     @Override
@@ -85,10 +149,13 @@ class SocketClient implements Client {
         return inetAddress;
     }
 
+    private void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
     @Override
     public boolean isConnected() {
-        return true;
-        //Expecting status request ~1 second. If we have not gotten one for an entire minute, we have lost connection.
+        return connected;
     }
 
     public synchronized byte[] readData() throws IOException {
@@ -110,6 +177,7 @@ class SocketClient implements Client {
     public void close() throws IOException {
         dataSocket.close();
         requestSocket.close();
+        serverRequestSocket.close();
         tasks.forEach(LoopableTask::stop);
     }
 
