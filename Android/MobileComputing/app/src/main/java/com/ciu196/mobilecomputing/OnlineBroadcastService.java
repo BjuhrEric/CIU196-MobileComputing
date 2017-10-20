@@ -7,6 +7,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,14 +27,22 @@ public class OnlineBroadcastService {
     private volatile int volume;
     private ReactionListener reactionListener;
 
+
+    private final List<StatusUpdateListener> updateListeners;
+
     private OnlineBroadcastService() {
         if (singletonInstantiated) throw new UnsupportedOperationException("Use singleton");
         singletonInstantiated = true;
+        this.updateListeners = new LinkedList<>();
     }
 
 
     public static OnlineBroadcastService getInstance() {
         return instance;
+    }
+
+    public void addStatusUpdateListener(final StatusUpdateListener listener) {
+        updateListeners.add(listener);
     }
 
     //Returns if there is currently a session live. Is there somebody currently playing?
@@ -59,6 +69,11 @@ public class OnlineBroadcastService {
     }
 
     public void setLive(boolean live) {
+        if (isLive != live)
+            if (live)
+                for (StatusUpdateListener listener : updateListeners) listener.onBroadcastStarted();
+        if (!live)
+            for (StatusUpdateListener listener : updateListeners) listener.onBroadcastEnded();
         isLive = live;
     }
 
@@ -67,6 +82,8 @@ public class OnlineBroadcastService {
     }
 
     public void setNumberOfListeners(int numberOfListeners) {
+        if (numberOfListeners != this.numberOfListeners)
+            for (StatusUpdateListener listener : updateListeners) listener.onNumberOfListenersChanged();
         this.numberOfListeners = numberOfListeners;
     }
 

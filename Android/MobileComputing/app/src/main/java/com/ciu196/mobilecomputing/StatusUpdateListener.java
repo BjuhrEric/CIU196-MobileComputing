@@ -6,6 +6,8 @@ package com.ciu196.mobilecomputing;
 
 public interface StatusUpdateListener {
 
-    void onStatusUpdate();
+    void onBroadcastStarted();
+    void onBroadcastEnded();
+    void onNumberOfListenersChanged();
 
 }

@@ -5,11 +5,16 @@ import android.content.res.ColorStateList;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by alexanderalvmo on 2017-10-18.
  */
 
 public class ReactionService {
+
+    private final static List<ReactionListener> reactionListeners = new LinkedList<>();
 
 
     public static ImageView getReactionImageView(Context context, Reaction reaction){
@@ -26,6 +31,14 @@ public class ReactionService {
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
         return reactionImageView;
     };
+
+    public static void addReactionListener(final ReactionListener listener) {
+        reactionListeners.add(listener);
+    }
+
+    public static void onReactionReceived(final Reaction reaction) {
+
+    }
 
 
 }

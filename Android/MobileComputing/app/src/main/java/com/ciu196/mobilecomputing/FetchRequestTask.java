@@ -17,12 +17,10 @@ import java.util.List;
 
 public class FetchRequestTask extends LoopableTask {
 
-    private final List<ReactionListener> reactionListeners;
     private final static FetchRequestTask instance = new FetchRequestTask();
 
     private FetchRequestTask() {
         super(100);
-        reactionListeners = new LinkedList<>();
     }
 
     public static FetchRequestTask getInstance() {
@@ -56,8 +54,7 @@ public class FetchRequestTask extends LoopableTask {
                         .CONNECTIVITY_CONFIRMED, new ResponseValue.NoValue()));
                 break;
             case RECEIVE_REACTION:
-                reactionListeners.forEach((listener) -> listener.onReactionReceived(Reaction
-                        .valueOf(request.getValue())));
+                ReactionService.onReactionReceived(Reaction.valueOf(request.getValue()));
                 ServerConnection.getInstance().sendResponse(new ClientResponse(ClientResponseType
                         .REQUEST_ACCEPTED, new ResponseValue.NoValue()));
                 break;
@@ -65,9 +62,5 @@ public class FetchRequestTask extends LoopableTask {
             case SEND_BROADCAST:
                 break;
         }
-    }
-
-    public void addReactionListener(final ReactionListener listener) {
-        reactionListeners.add(listener);
     }
 }
