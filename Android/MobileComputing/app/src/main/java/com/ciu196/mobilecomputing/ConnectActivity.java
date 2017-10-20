@@ -384,14 +384,6 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             currentGuiMode = guiMode.START_TO_LISTEN;
 
             changeBackgroundColor(getColor(R.color.backgroundCreamColor));
-            addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_blue)));
-            pianoStatusTextView.setTextColor(getColor(R.color.grayTextColor));
-            playerNameTextView.setTextColor(getColor(R.color.actionBlueColor));
-            playerNameTextView.setText(OnlineBroadcastService.getInstance().getBroadcasterName());
-            addInstantOperation(pianoStatusTextView, () -> pianoStatusTextView.setText("is playing"));
-            actionButton.setText("Start Listening");
-            listenersTextView.setText(OnlineBroadcastService.getInstance().getNumberOfListeners()+"");
-            earImage.setImageResource(R.drawable.ic_hearing_black_24dp);
             setCircleColor(circleColor.GRAY);
 
             addFadeInAnimation(listenersTextView, LISTENER_FADE_DURATION);
