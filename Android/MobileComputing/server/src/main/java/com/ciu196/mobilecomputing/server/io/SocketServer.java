@@ -1,6 +1,8 @@
 package com.ciu196.mobilecomputing.server.io;
 
 import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.requests.ClientRequest;
+import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.common.requests.ResponseValue;
 import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
@@ -15,14 +17,17 @@ import com.ciu196.mobilecomputing.server.util.Server;
 
 import static com.ciu196.mobilecomputing.common.Constants.*;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -36,7 +41,7 @@ public class SocketServer implements Server {
     private volatile Client broadcaster = null;
     private volatile String broadcasterName = NOONE;
     private ServerSocket requestSocket, serverRequestSocket, dataSocket;
-    private final Map<InetAddress, Client> clientMap;
+    private final Map<Long, Client> clientMap;
     private final Set<Client> listeners;
 
     public SocketServer() {
@@ -69,51 +74,88 @@ public class SocketServer implements Server {
 
     public void connectRequestSocket() throws IOException {
         Socket clientSocket = requestSocket.accept();
-        SocketClient client = null;
+        SocketClient client;
+        BufferedInputStream bis = new BufferedInputStream(clientSocket.getInputStream());
+        ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+        ObjectInputStream ois = new ObjectInputStream(bis);
 
-        if (clientMap.containsKey(clientSocket.getInetAddress())) {
-            client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
-            detachClient(client);
-        }
+        Random r = new Random();
+        Long rand;
+        do { rand = r.nextLong(); } while(clientMap.containsKey(rand) || rand == -1);
 
-        if (client == null) {
-            client = new SocketClient(clientSocket.getInetAddress());
-            clientMap.put(clientSocket.getInetAddress(), client);
-        }
+        client = new SocketClient(rand, clientSocket.getInetAddress());
+        clientMap.put(rand, client);
+        client.bindRequestSocket(clientSocket, bis, ois, oos);
 
-        client.bindRequestSocket(clientSocket);
+        System.out.println("Client "+rand+" connected with IP: "+clientSocket.getInetAddress().getHostAddress());
+        client.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.SingleObjectValue<>(rand)));
 
-        System.out.println("Client connected: "+clientSocket.getInetAddress().getHostAddress());
-        client.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.NoValue()));
-
-        ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
-        ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
-        ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
-
-        client.addTask(fetcherTask);
-        client.addTask(handlerTask);
-        client.addTask(connectionTask);
-
-        new Thread(fetcherTask, "ClientRequestFetcherThread").start();
-        new Thread(handlerTask, "ClientRequestHandlerThread").start();
-        new Thread(connectionTask, "ClientConnectionThread").start();
     }
 
     public void connectServerRequestSocket() throws IOException {
-        Socket clientSocket = serverRequestSocket.accept();
-        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
-        if (client != null) {
-            System.out.println("Server request socket opened for client: "+clientSocket.getInetAddress().getHostAddress());
-            client.bindServerRequestSocket(clientSocket);
+        final Socket clientSocket = serverRequestSocket.accept();
+        final BufferedInputStream bis = new BufferedInputStream(clientSocket.getInputStream());
+        final ObjectInputStream in = new ObjectInputStream(bis);
+        final ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+        long id;
+
+        try {
+            ClientRequest request = (ClientRequest) in.readObject();
+            if (request.getType().equals(ClientRequestType.IDENTIFY)) {
+                id = Long.parseLong(request.getValue());
+                SocketClient client = (SocketClient) clientMap.get(id);
+                if (client != null) {
+                    System.out.println("Server request socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
+                    client.bindServerRequestSocket(clientSocket, bis, in, out);
+                    out.writeObject(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.SingleObjectValue<>(id)));
+                    out.flush();
+
+                    ClientRequestFetcherTask fetcherTask = new ClientRequestFetcherTask(client, this);
+                    ClientRequestHandlerTask handlerTask = new ClientRequestHandlerTask(client, this);
+                    ClientConnectionCheckerTask connectionTask = new ClientConnectionCheckerTask(client, this);
+
+                    client.addTask(fetcherTask);
+                    client.addTask(handlerTask);
+                    client.addTask(connectionTask);
+
+                    new Thread(fetcherTask, "ClientRequestFetcherThread").start();
+                    new Thread(handlerTask, "ClientRequestHandlerThread").start();
+                    new Thread(connectionTask, "ClientConnectionThread").start();
+                    return;
+                }
+            }
+            out.writeObject(new ServerResponse(ServerResponseType.REQUEST_DECLINED, new ResponseValue.NoValue()));
+            out.flush();
+
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     public void connectDataSocket() throws IOException {
         Socket clientSocket = dataSocket.accept();
-        SocketClient client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
-        if (client != null) {
-            System.out.println("Data socket opened for client: "+clientSocket.getInetAddress().getHostAddress());
-            client.bindDataSocket(clientSocket);
+        final ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+        final ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+        long id;
+
+        try {
+            ClientRequest request = (ClientRequest) in.readObject();
+            if (request.getType().equals(ClientRequestType.IDENTIFY)) {
+                id = Long.parseLong(request.getValue());
+                SocketClient client = (SocketClient) clientMap.get(id);
+                if (client != null) {
+                    System.out.println("Data socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
+                    client.bindDataSocket(clientSocket);
+                    out.writeObject(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.SingleObjectValue<>(id)));
+                    out.flush();
+                    return;
+                }
+            }
+            out.writeObject(new ServerResponse(ServerResponseType.REQUEST_DECLINED, new ResponseValue.NoValue()));
+            out.flush();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -187,7 +229,7 @@ public class SocketServer implements Server {
                     System.out.println("The socket was already closed");
                 }
             }
-            clientMap.remove(c.getInetAddress());
+            clientMap.remove(c.getID());
             listeners.remove(c);
             c.close();
 
@@ -214,7 +256,7 @@ public class SocketServer implements Server {
         return clientMap.values();
     }
 
-    public void removeListener(Client c, boolean respond) throws IOException {
+    private void removeListener(Client c, boolean respond) throws IOException {
         listeners.remove(c);
         if (respond)
             c.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.NoValue()));

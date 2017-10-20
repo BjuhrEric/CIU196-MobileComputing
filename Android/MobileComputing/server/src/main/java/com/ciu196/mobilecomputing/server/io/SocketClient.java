@@ -28,6 +28,7 @@ class SocketClient implements Client {
     private final Queue<ServerRequest> serverRequests;
     private final Collection<LoopableTask> tasks;
     private final InetAddress inetAddress;
+    private final long id;
     private Socket requestSocket, serverRequestSocket, dataSocket;
     private InputStream dataInputStream;
     private OutputStream dataOutputStream;
@@ -38,7 +39,8 @@ class SocketClient implements Client {
     private boolean sendingRequest = false;
     private long sendingRequestStartTime = -1;
 
-    SocketClient(InetAddress inetAddress){
+    SocketClient(long id, InetAddress inetAddress){
+        this.id = id;
         this.clientRequests = new ConcurrentLinkedQueue<>();
         this.serverRequests = new ConcurrentLinkedQueue<>();
         this.tasks = new LinkedList<>();
@@ -51,11 +53,11 @@ class SocketClient implements Client {
         tasks.add(task);
     }
 
-    void bindRequestSocket(Socket socket) throws IOException {
+    void bindRequestSocket(Socket socket, BufferedInputStream bis, ObjectInputStream ois, ObjectOutputStream oos) throws IOException {
         requestSocket = socket;
-        bufferedInputStream1 = new BufferedInputStream(socket.getInputStream());
-        requestInputStream = new ObjectInputStream(bufferedInputStream1);
-        responseOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        bufferedInputStream1 = bis;
+        requestInputStream = ois;
+        responseOutputStream = oos;
     }
 
     void bindDataSocket(Socket socket) throws IOException {
@@ -64,11 +66,11 @@ class SocketClient implements Client {
         dataOutputStream = socket.getOutputStream();
     }
 
-    void bindServerRequestSocket(Socket socket) throws IOException {
+    void bindServerRequestSocket(Socket socket, BufferedInputStream bis, ObjectInputStream ois, ObjectOutputStream oos) throws IOException {
         serverRequestSocket = socket;
-        bufferedInputStream2 = new BufferedInputStream(socket.getInputStream());
-        responseInputStream = new ObjectInputStream(bufferedInputStream2);
-        requestOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        bufferedInputStream2 = bis;
+        responseInputStream = ois;
+        requestOutputStream = oos;
     }
 
     public ClientRequest getFirstRequest() {
@@ -162,6 +164,11 @@ class SocketClient implements Client {
         return connected;
     }
 
+    @Override
+    public long getID() {
+        return id;
+    }
+
     public synchronized byte[] readData() throws IOException {
         byte[] buffer = new byte[dataInputStream.available()];
         dataInputStream.read(buffer);
@@ -187,7 +194,6 @@ class SocketClient implements Client {
             serverRequestSocket.close();
 
         tasks.forEach(LoopableTask::stop);
-
         tasks.clear();
         serverRequests.clear();
         clientRequests.clear();

@@ -10,6 +10,7 @@ import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,10 +32,11 @@ public class ServerConnection {
     private final static ServerConnection instance = new ServerConnection();
     private static boolean singletonInstantiated = false;
 
-    private Socket data_socket, request_socket, server_request_socket;
-    private BufferedInputStream bufferedInputStream, bufferedInputStream2;
+    private Socket request_socket, server_request_socket;
+    private BufferedInputStream bufferedInputStream, bufferedInputStream2, bufferedInputStream3;
     private ObjectOutputStream requestOutputStream, responseOutputStream;
     private ObjectInputStream responseInputStream, requestInputStream;
+    private boolean request_socket_init = false, server_request_socket_init = false;
 
     private Queue<Map.Entry<ClientRequest, List<RequestDoneListener>>> requests;
 
@@ -46,10 +48,29 @@ public class ServerConnection {
         requests = new LinkedList<>();
 
         try {
+            long id = initRequestSocket();
+            if (id == -1)
+                throw new IOException("Could not establish connection on port: "+REQUEST_PORT);
+            request_socket_init = true;
+
+
+            id = initServerRequestSocket(id);
+            if (id == -1)
+                throw new IOException("Could not establish connection on port: "+SERVER_REQUEST_PORT);
+            server_request_socket_init = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private long initRequestSocket() throws IOException {
+        try {
             request_socket = new Socket(InetAddress.getByName("46.239.104.32"), REQUEST_PORT);
             bufferedInputStream = new BufferedInputStream(request_socket.getInputStream());
             requestOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
             responseInputStream = new ObjectInputStream(bufferedInputStream);
+            ServerResponse response;
+
             while (bufferedInputStream.available() <= 0) {
                 try {
                     Thread.sleep(10);
@@ -58,31 +79,31 @@ public class ServerConnection {
                 }
             }
 
-            ServerResponse response = (ServerResponse) responseInputStream.readObject(); //Confirmation of connection.
-            if (response.getType() == ServerResponseType.DETACHED) {
-                // Detached from previous session, wait for confirmation for the new session.
-                while (bufferedInputStream.available() <= 0) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-                responseInputStream.readObject();
-            }
+            response = (ServerResponse) responseInputStream.readObject(); //Confirmation of connection.
 
-            data_socket = new Socket(InetAddress.getByName("46.239.104.32"), DATA_PORT);
-            server_request_socket = new Socket(InetAddress.getByName("46.239.104.32"), SERVER_REQUEST_PORT);
-            bufferedInputStream2 = new BufferedInputStream(server_request_socket.getInputStream());
-            responseOutputStream = new ObjectOutputStream(server_request_socket.getOutputStream());
-            requestInputStream = new ObjectInputStream(bufferedInputStream2);
+            if (response.getType().equals(ServerResponseType.REQUEST_ACCEPTED))
+                return (Long) response.getValue().getValue();
 
-            request_socket.setKeepAlive(true);
-            data_socket.setKeepAlive(true);
-            server_request_socket.setKeepAlive(true);
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        return -1;
+    }
+
+    private long initServerRequestSocket(long id) throws IOException {
+        server_request_socket = new Socket(InetAddress.getByName("46.239.104.32"), SERVER_REQUEST_PORT);
+        bufferedInputStream2 = new BufferedInputStream(server_request_socket.getInputStream());
+        responseOutputStream = new ObjectOutputStream(server_request_socket.getOutputStream());
+        requestInputStream = new ObjectInputStream(bufferedInputStream2);
+        ServerResponse response;
+
+        addRequest(ClientRequestType.IDENTIFY, Long.toString(id));
+        response = sendRequest(bufferedInputStream2, responseOutputStream, requestInputStream);
+
+        if (response.getType().equals(ServerResponseType.REQUEST_ACCEPTED))
+            return (Long) response.getValue().getValue();
+
+        return -1;
     }
 
     public static ServerConnection getInstance() {
@@ -164,16 +185,23 @@ public class ServerConnection {
     }
 
     public ServerResponse sendRequest() {
+        if (request_socket_init)
+            return sendRequest(bufferedInputStream, requestOutputStream, responseInputStream);
+        return null;
+    }
+
+    private ServerResponse sendRequest(final BufferedInputStream bis, final ObjectOutputStream oos,
+                                       final ObjectInputStream ois) {
         Object tmp = null;
         if (!requests.isEmpty()) {
             Map.Entry<ClientRequest, List<RequestDoneListener>> request = requests.poll();
             try {
-                requestOutputStream.writeObject(request.getKey());
-                requestOutputStream.flush();
-                while (bufferedInputStream.available() <= 0)
+                oos.writeObject(request.getKey());
+                oos.flush();
+                while (bis.available() <= 0)
                     Thread.sleep(10);
 
-                tmp = responseInputStream.readObject();
+                tmp = ois.readObject();
 
                 for (RequestDoneListener listener : request.getValue())
                     listener.serverResponseReceived((ServerResponse) tmp);
@@ -186,26 +214,30 @@ public class ServerConnection {
     }
 
     public ServerRequest fetchRequest() {
-        try {
-            if (bufferedInputStream2.available() > 0) {
-                final Object o = requestInputStream.readObject();
-                final ClientRequest request;
-                if (o != null) {
-                    return (ServerRequest) o;
+        if (server_request_socket_init) {
+            try {
+                if (bufferedInputStream2.available() > 0) {
+                    final Object o = requestInputStream.readObject();
+                    final ClientRequest request;
+                    if (o != null) {
+                        return (ServerRequest) o;
+                    }
                 }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
     public void sendResponse(final ClientResponse response) {
-        try {
-            responseOutputStream.writeObject(response);
-            responseOutputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (server_request_socket_init) {
+            try {
+                responseOutputStream.writeObject(response);
+                responseOutputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

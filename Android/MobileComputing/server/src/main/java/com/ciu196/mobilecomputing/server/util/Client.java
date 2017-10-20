@@ -25,4 +25,5 @@ public interface Client extends Comparable<Client> {
     ClientResponse sendRequest();
     InetAddress getInetAddress();
     boolean isConnected();
+    long getID();
 }
