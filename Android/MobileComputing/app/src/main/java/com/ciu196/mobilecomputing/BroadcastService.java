@@ -95,13 +95,10 @@ public class BroadcastService {
         Log.i(TAG, "queueing request");
     }
 
-
-
     //Returns if there is currently a session live. Is there somebody currently playing?
     public static boolean isLive(){
         //Todo: not implemented yet, just dummy implementation so far
         return false;
-
 
     }
 

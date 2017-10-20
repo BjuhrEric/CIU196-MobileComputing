@@ -352,6 +352,9 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
                     Intent i = new Intent(ConnectActivity.this, VolumeRangeActivity.class);
                     startActivity(i);
+                } else if(currentGuiMode == guiMode.PLAYING){
+                    Intent i = new Intent(ConnectActivity.this, ChangeVolumeRangeActivity.class);
+                    startActivity(i);
                 } else if (currentGuiMode == guiMode.LISTENING) {
 
                     if (isShowingReactions) {
@@ -666,6 +669,15 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
             addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
             addFadeInAnimation(earImage, EAR_FADE_DURATION);
+
+            fab.setSize(SIZE_NORMAL);
+            fab.setLayoutParams(normalFabLp);
+
+            addInstantOperation(fab,
+                    () -> fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.fabColor))),
+                    () -> fab.setImageResource(R.drawable.ic_map_white_24dp)
+            );
+            addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
         }
         startAllAnimations();
     }
