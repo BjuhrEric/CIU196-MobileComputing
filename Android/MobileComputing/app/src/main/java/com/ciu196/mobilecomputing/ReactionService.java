@@ -2,6 +2,8 @@ package com.ciu196.mobilecomputing;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -15,6 +17,7 @@ import java.util.List;
 public class ReactionService {
 
     private final static List<ReactionListener> reactionListeners = new LinkedList<>();
+    private final static Handler handler = new Handler(Looper.getMainLooper());
 
 
     public static ImageView getReactionImageView(Context context, Reaction reaction){
@@ -37,7 +40,9 @@ public class ReactionService {
     }
 
     public static void onReactionReceived(final Reaction reaction) {
-
+        for (ReactionListener listener : reactionListeners) {
+            handler.post(()->listener.onReactionReceived(reaction));
+        }
     }
 
 

@@ -7,9 +7,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,33 +20,37 @@ public class ViewAnimationService {
     public enum Axis {X, Y}
 
     ;
-    static Map<View, AnimationView> map = new HashMap<>();
+    static Map<View, AnimationView> animationViewMap = new HashMap<>();
     public static final String TAG = "ViewAnimationService";
 
-    public static void startAllAnimation() {
+    public static void startAllAnimations() {
 
-        for (AnimationView a : map.values()) {
+        for (AnimationView a : animationViewMap.values()) {
             a.startAnimation();
         }
     }
 
+    public static void startAnimations(View view) {
+        animationViewMap.get(view).startAnimation();
+    }
+
     public static void addInstantOperation(final View v, ViewAction... actions) {
-        AnimationView animationView = map.get(v);
+        AnimationView animationView = animationViewMap.get(v);
 
         if (animationView == null) {
             animationView = new AnimationView(v);
-            map.put(v, animationView);
+            animationViewMap.put(v, animationView);
         }
 
         animationView.addAnimation(new InstantViewOperation(actions));
     }
 
     public static void addAnimator(final View v, final Animator a) {
-        AnimationView animationView = map.get(v);
+        AnimationView animationView = animationViewMap.get(v);
 
         if (animationView == null) {
             animationView = new AnimationView(v);
-            map.put(v, animationView);
+            animationViewMap.put(v, animationView);
         }
         animationView.addAnimation(new AnimatorOperation(a));
     }

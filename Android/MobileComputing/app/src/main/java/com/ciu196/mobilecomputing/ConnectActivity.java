@@ -53,7 +53,8 @@ import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslateToCent
 import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslationAnimatorReset;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimator;
 import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimatorReset;
-import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimation;
+import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimations;
+import static com.ciu196.mobilecomputing.ViewAnimationService.startAnimations;
 
 
 public class ConnectActivity extends AppCompatActivity implements ReactionListener, StatusUpdateListener {
@@ -74,27 +75,27 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             } else {
                 switchGui(guiMode.CANT_LISTEN);
             }
+        } else {
+            switchGui(guiMode.PLAYING);
         }
         System.out.println();
     }
 
     @Override
     public void onBroadcastEnded() {
-        if (!broadcasting) {
-            System.out.print("somebody else's ");
-            //Somebody else stopped broadcasting!
-            if (BroadcastService.closeEnough()) {
-                switchGui(guiMode.CONNECT);
-            } else {
-                switchGui(guiMode.CANT_CONNECT);
-            }
+        broadcasting = false; //If we were broadcasting, we no longer are...
+
+        if (BroadcastService.closeEnough()) {
+            switchGui(guiMode.CONNECT);
+        } else {
+            switchGui(guiMode.CANT_CONNECT);
         }
-        System.out.println("broadcast ended");
     }
 
     @Override
     public void onNumberOfListenersChanged() {
-
+        addInstantOperation(listenersTextView, () -> listenersTextView.setText(OnlineBroadcastService.getInstance().getNumberOfListeners() + ""));
+        startAnimations(listenersTextView);
     }
 
     public enum guiMode {CONNECT, START_TO_LISTEN, CANT_LISTEN, CANT_CONNECT, LISTENING, PLAYING}
@@ -326,7 +327,6 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                             ServerConnection.getInstance().startBroadcast(resultName);
                             broadcasting = true;
                             Log.d("Broadcast", "Starting broadcast");
-                            switchGui(guiMode.PLAYING);
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -340,9 +340,8 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
 
                 } else if (currentGuiMode == guiMode.PLAYING) {
-                    broadcasting = false;
                     ServerConnection.getInstance().stopBroadcast();
-                    switchGui(guiMode.CONNECT);
+                    //switchGui(guiMode.CONNECT);
                 }
             }
         });
@@ -668,7 +667,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addInstantOperation(earImage, () -> earImage.setImageTintList(ColorStateList.valueOf(getColor(R.color.grayTextColor))));
             addFadeInAnimation(earImage, EAR_FADE_DURATION);
         }
-        startAllAnimation();
+        startAllAnimations();
     }
 
     private void teardownCurrentGui() {

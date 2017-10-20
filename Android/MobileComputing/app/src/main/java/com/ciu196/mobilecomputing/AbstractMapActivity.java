@@ -85,7 +85,7 @@ public abstract class AbstractMapActivity extends AppCompatActivity implements O
         int[] circleColors = blueCircleColors;
 
         if(mMap != null){
-            //clear map
+            //clear animationViewMap
             mMap.clear();
 
             //draw circles
@@ -107,7 +107,7 @@ public abstract class AbstractMapActivity extends AppCompatActivity implements O
                     .title("Stadsbiblioteket, Göteborg")
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_note_pin_white)));
 
-            //center map
+            //center animationViewMap
             /*
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             builder.include(libLatLng);
@@ -135,7 +135,7 @@ public abstract class AbstractMapActivity extends AppCompatActivity implements O
             }
         });
         /*
-        int padding = CENTER_MAP_PADDING; // offset from edges of the map in pixels
+        int padding = CENTER_MAP_PADDING; // offset from edges of the animationViewMap in pixels
         int width = getResources().getDisplayMetrics().widthPixels;
         int height = getResources().getDisplayMetrics().heightPixels;
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(b, width, height, padding);
@@ -143,8 +143,8 @@ public abstract class AbstractMapActivity extends AppCompatActivity implements O
     }
 
     /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
+     * Manipulates the animationViewMap once available.
+     * This callback is triggered when the animationViewMap is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
      * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
@@ -156,9 +156,9 @@ public abstract class AbstractMapActivity extends AppCompatActivity implements O
         Log.i(TAG, "Map ready");
         mMap = googleMap;
         mMap.setOnCameraMoveListener(this);
-        //Change style of the map
+        //Change style of the animationViewMap
         try {
-            // Customise the styling of the base map using a JSON object defined
+            // Customise the styling of the base animationViewMap using a JSON object defined
             // in a raw resource file.
             boolean success = googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(
@@ -170,7 +170,7 @@ public abstract class AbstractMapActivity extends AppCompatActivity implements O
             Log.e(TAG, "Map styling failed");
         }
 
-        // draw map with all the markers etc...
+        // draw animationViewMap with all the markers etc...
         redrawMap();
         centerMap(libLatLng);
     }

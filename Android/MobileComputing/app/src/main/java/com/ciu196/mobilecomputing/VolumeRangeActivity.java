@@ -47,7 +47,7 @@ public class VolumeRangeActivity extends AbstractMapActivity implements View.OnC
         //Set layout of the activity
         setContentView(R.layout.activity_maps);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment and get notified when the animationViewMap is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -152,8 +152,8 @@ public class VolumeRangeActivity extends AbstractMapActivity implements View.OnC
 
 
     /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
+     * Manipulates the animationViewMap once available.
+     * This callback is triggered when the animationViewMap is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
      * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
