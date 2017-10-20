@@ -107,7 +107,9 @@ public class OnlineBroadcastService {
             return new Duration(new DateTime(broadcastStartTime).toInstant(), Instant.now());
 
         }
-        throw new NotLiveException();
+
+        //throw new NotLiveException();
+        return new Duration(0);
     }
 
     public void setReactionListener(ReactionListener l){

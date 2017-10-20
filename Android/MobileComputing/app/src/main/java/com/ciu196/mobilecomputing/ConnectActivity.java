@@ -65,9 +65,12 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
     @Override
     public void onBroadcastStarted() {
+        System.out.print("Broadcast started");
         if (!broadcasting) {
             //Somebody else started broadcasting!
+            System.out.print(" by somebody else");
         }
+        System.out.println();
     }
 
     @Override
@@ -309,6 +312,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                             //TODO create RequestDoneListener
                             resultName = ((EditText) dialogView.findViewById(R.id.name)).getText().toString();
                             ServerConnection.getInstance().startBroadcast(resultName);
+                            broadcasting = true;
                             Log.d("Broadcast", "Starting broadcast");
                             switchGui(guiMode.PLAYING);
                         }
@@ -324,6 +328,8 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
 
 
                 } else if (currentGuiMode == guiMode.PLAYING) {
+                    broadcasting = false;
+                    ServerConnection.getInstance().stopBroadcast();
                     switchGui(guiMode.CONNECT);
                 }
             }
