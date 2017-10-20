@@ -12,6 +12,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Point;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -29,6 +30,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ciu196.mobilecomputing.common.requests.ServerResponse;
+import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 
 import org.joda.time.Duration;
 
@@ -305,8 +309,12 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             @Override
             public void onClick(View v) {
                 if (currentGuiMode == guiMode.START_TO_LISTEN) {
-                    switchGui(guiMode.LISTENING);
+                    ServerConnection.getInstance().startListen((RequestDoneListener) response -> {
+                        if (response.getType().equals(ServerResponseType.REQUEST_ACCEPTED))
+                            new Handler(Looper.getMainLooper()).post(()->switchGui(guiMode.LISTENING));
+                    });
                 } else if (currentGuiMode == guiMode.LISTENING) {
+                    ServerConnection.getInstance().stopListen();
                     switchGui(guiMode.START_TO_LISTEN);
                 } else if (currentGuiMode == guiMode.CONNECT) {
 

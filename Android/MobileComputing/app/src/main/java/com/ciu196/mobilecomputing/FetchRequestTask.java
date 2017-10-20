@@ -49,11 +49,11 @@ public class FetchRequestTask extends LoopableTask {
     private void handleRequest(final ServerRequest request) {
         switch(request.getType()) {
             case CONFIRM_CONNECTIVITY:
-                Log.d("Connectivity", "Confirming connectivity");
                 ServerConnection.getInstance().sendResponse(new ClientResponse(ClientResponseType
                         .CONNECTIVITY_CONFIRMED, new ResponseValue.NoValue()));
                 break;
             case RECEIVE_REACTION:
+                Log.d("Reactions", "Reaction received");
                 ReactionService.onReactionReceived(Reaction.valueOf(request.getValue()));
                 ServerConnection.getInstance().sendResponse(new ClientResponse(ClientResponseType
                         .REQUEST_ACCEPTED, new ResponseValue.NoValue()));
