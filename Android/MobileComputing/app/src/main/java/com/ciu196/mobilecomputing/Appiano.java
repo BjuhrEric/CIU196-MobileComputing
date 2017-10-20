@@ -2,6 +2,8 @@ package com.ciu196.mobilecomputing;
 
 import android.app.Application;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 /**
  * Created by Eric on 2017-10-18.
  */
@@ -17,6 +19,7 @@ public class Appiano extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        JodaTimeAndroid.init(this);
         new Thread(
                 ()-> {
                     new Thread(task).start();

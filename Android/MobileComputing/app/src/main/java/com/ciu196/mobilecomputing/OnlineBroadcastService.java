@@ -1,5 +1,7 @@
 package com.ciu196.mobilecomputing;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ public class OnlineBroadcastService {
     private final static OnlineBroadcastService instance = new OnlineBroadcastService();
     private static boolean  singletonInstantiated = false;
 
+    private final Handler handler;
     private volatile String broadcasterName = NOONE;
     private volatile boolean isLive;
     private volatile long broadcastStartTime;
@@ -34,6 +37,7 @@ public class OnlineBroadcastService {
         if (singletonInstantiated) throw new UnsupportedOperationException("Use singleton");
         singletonInstantiated = true;
         this.updateListeners = new LinkedList<>();
+        handler = new Handler(Looper.getMainLooper());
     }
 
 
@@ -51,7 +55,7 @@ public class OnlineBroadcastService {
     }
 
     public String getBroadcasterName() {
-        return isLive ? getBroadcasterName() : NOONE;
+        return isLive ? broadcasterName : NOONE;
     }
 
     public long getBroadcastStartTime() {
@@ -69,11 +73,12 @@ public class OnlineBroadcastService {
     }
 
     public void setLive(boolean live) {
-        if (isLive != live)
+        if (isLive != live) {
             if (live)
-                for (StatusUpdateListener listener : updateListeners) listener.onBroadcastStarted();
-        if (!live)
-            for (StatusUpdateListener listener : updateListeners) listener.onBroadcastEnded();
+                for (StatusUpdateListener listener : updateListeners) handler.post(listener::onBroadcastStarted);
+            if (!live)
+                for (StatusUpdateListener listener : updateListeners) handler.post(listener::onBroadcastEnded);
+        }
         isLive = live;
     }
 
@@ -83,7 +88,7 @@ public class OnlineBroadcastService {
 
     public void setNumberOfListeners(int numberOfListeners) {
         if (numberOfListeners != this.numberOfListeners)
-            for (StatusUpdateListener listener : updateListeners) listener.onNumberOfListenersChanged();
+            for (StatusUpdateListener listener : updateListeners) handler.post(listener::onNumberOfListenersChanged);
         this.numberOfListeners = numberOfListeners;
     }
 

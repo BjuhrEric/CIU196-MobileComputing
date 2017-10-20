@@ -69,6 +69,11 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         if (!broadcasting) {
             //Somebody else started broadcasting!
             System.out.print(" by somebody else");
+            if (BroadcastService.closeEnough()) {
+                switchGui(guiMode.START_TO_LISTEN);
+            } else {
+                switchGui(guiMode.CANT_LISTEN);
+            }
         }
         System.out.println();
     }
@@ -76,8 +81,15 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
     @Override
     public void onBroadcastEnded() {
         if (!broadcasting) {
+            System.out.print("somebody else's ");
             //Somebody else stopped broadcasting!
+            if (BroadcastService.closeEnough()) {
+                switchGui(guiMode.CONNECT);
+            } else {
+                switchGui(guiMode.CANT_CONNECT);
+            }
         }
+        System.out.println("broadcast ended");
     }
 
     @Override

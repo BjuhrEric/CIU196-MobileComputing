@@ -60,12 +60,14 @@ public class SocketServer implements Server {
 
     public void connectRequestSocket() throws IOException {
         Socket clientSocket = requestSocket.accept();
-        SocketClient client;
+        SocketClient client = null;
 
         if (clientMap.containsKey(clientSocket.getInetAddress())) {
             client = (SocketClient) clientMap.get(clientSocket.getInetAddress());
             detachClient(client);
-        } else {
+        }
+
+        if (client == null) {
             client = new SocketClient(clientSocket.getInetAddress());
             clientMap.put(clientSocket.getInetAddress(), client);
         }
@@ -148,6 +150,7 @@ public class SocketServer implements Server {
 
     private void stopBroadcast(final Client c, boolean respond) throws IOException {
         if (c.equals(broadcaster)) {
+            System.out.println("Stopping broadcast");
             broadcaster = null;
             broadcasterName = NOONE;
             broadcastStartTime = -1;
@@ -163,22 +166,22 @@ public class SocketServer implements Server {
     }
 
     public void detachClient(final Client c, boolean sendResponse) throws IOException {
-        if (c == null)
-            throw new IllegalArgumentException("Client may not be null");
-        System.out.println("Detaching client: "+c.getInetAddress().getHostAddress());
-        stopBroadcast(c, false);
-        removeListener(c, false);
-        if (sendResponse) {
-            try {
-                c.sendResponse(new ServerResponse(ServerResponseType.DETACHED, new ResponseValue.NoValue()));
-            } catch (IOException e) {
-                System.out.println("The socket was already closed");
+        if (c != null) {
+            System.out.println("Detaching client: " + c.getInetAddress().getHostAddress());
+            stopBroadcast(c, false);
+            removeListener(c, false);
+            if (sendResponse) {
+                try {
+                    c.sendResponse(new ServerResponse(ServerResponseType.DETACHED, new ResponseValue.NoValue()));
+                } catch (IOException e) {
+                    System.out.println("The socket was already closed");
+                }
             }
-        }
-        clientMap.remove(c.getInetAddress());
-        c.close();
+            clientMap.remove(c.getInetAddress());
+            c.close();
 
-        System.out.println("Client detached");
+            System.out.println("Client detached");
+        }
     }
 
     public void addListener(Client c) throws IOException {
