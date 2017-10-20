@@ -57,7 +57,6 @@ public class SocketServer implements Server {
     public void shareReaction(final Client provider, final Reaction reaction) throws IOException {
         listeners.forEach((client) -> {
             if (client != provider) {
-                System.out.println("Sharing "+reaction.name()+" with "+client.getInetAddress().getHostAddress());
                 client.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name()));
             }
         });
