@@ -61,6 +61,7 @@ public class ClientRequestHandlerTask extends ServerTask {
                     server.sendStatus(client);
                     break;
                 case SEND_REACTION:
+                    System.out.println("Sharing reaction" + first.getValue() + "!" );
                     server.shareReaction(Reaction.valueOf(first.getValue()));
                     break;
             }

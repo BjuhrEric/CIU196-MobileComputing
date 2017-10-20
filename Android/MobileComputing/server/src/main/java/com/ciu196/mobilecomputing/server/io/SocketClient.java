@@ -175,9 +175,13 @@ class SocketClient implements Client {
     }
 
     public void close() throws IOException {
-        dataSocket.close();
-        requestSocket.close();
-        serverRequestSocket.close();
+        if (dataSocket != null)
+            dataSocket.close();
+        if (requestSocket != null)
+            requestSocket.close();
+        if (serverRequestSocket != null)
+            serverRequestSocket.close();
+
         tasks.forEach(LoopableTask::stop);
     }
 

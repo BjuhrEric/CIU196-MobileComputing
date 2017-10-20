@@ -115,7 +115,6 @@ public class SocketServer implements Server {
 
     @Override
     public void sendStatus(final Client client) throws IOException {
-        System.out.println("Sending status to client");
         ResponseValue.Status status = new ResponseValue.Status();
         ServerResponse response = new ServerResponse(ServerResponseType.STATUS, status);
         status.putStatus("broadcasting", Boolean.toString(broadcaster != null));
