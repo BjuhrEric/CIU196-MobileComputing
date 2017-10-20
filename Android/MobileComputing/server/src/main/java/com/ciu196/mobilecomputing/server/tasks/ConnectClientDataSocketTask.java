@@ -1,5 +1,6 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
+import com.ciu196.mobilecomputing.common.Constants;
 import com.ciu196.mobilecomputing.server.util.Server;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class ConnectClientDataSocketTask extends ServerTask {
     @Override
     protected boolean loop() {
         try {
-            System.out.println("Waiting for clients to connects to port 9001");
+            System.out.println("Waiting for clients to connect to port "+ Constants.DATA_PORT);
             server.connectDataSocket();
             return true;
         } catch (IOException e) {

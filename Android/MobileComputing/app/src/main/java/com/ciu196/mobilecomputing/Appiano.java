@@ -17,7 +17,12 @@ public class Appiano extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        new Thread(task).start();
+        new Thread(
+                ()-> {
+                    new Thread(task).start();
+                    new Thread(FetchRequestTask.getInstance()).start();
+                    new Thread(ClientRequestTask.getInstance()).start();
+                }).start();
     }
 
 }

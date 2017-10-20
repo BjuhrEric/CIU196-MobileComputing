@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public final class ClientRequest implements Serializable {
 
+    private static final long serialVersionUID = -6781481050664522565L;
     private final String val;
     private final ClientRequestType type;
 

@@ -1,8 +1,13 @@
 package com.ciu196.mobilecomputing;
 
+import android.support.annotation.NonNull;
+
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
+import com.ciu196.mobilecomputing.common.requests.ClientResponse;
+import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
+import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -10,30 +15,41 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import static com.ciu196.mobilecomputing.common.Constants.DATA_PORT;
 import static com.ciu196.mobilecomputing.common.Constants.REQUEST_PORT;
+import static com.ciu196.mobilecomputing.common.Constants.SERVER_REQUEST_PORT;
 
 public class ServerConnection {
 
     private final static ServerConnection instance = new ServerConnection();
     private static boolean singletonInstantiated = false;
 
-    private Socket data_socket;
-    private Socket request_socket;
-    private BufferedInputStream bufferedInputStream;
-    private ObjectOutputStream objectOutputStream;
-    private ObjectInputStream objectInputStream;
+    private Socket data_socket, request_socket, server_request_socket;
+    private BufferedInputStream bufferedInputStream, bufferedInputStream2;
+    private ObjectOutputStream requestOutputStream, responseOutputStream;
+    private ObjectInputStream responseInputStream, requestInputStream;
+
+    private Queue<Map.Entry<ClientRequest, List<RequestDoneListener>>> requests;
+
 
     private ServerConnection() {
         if (singletonInstantiated) throw new UnsupportedOperationException("Use singleton");
         singletonInstantiated = true;
 
+        requests = new LinkedList<>();
+
         try {
             request_socket = new Socket(InetAddress.getByName("46.239.104.32"), REQUEST_PORT);
             bufferedInputStream = new BufferedInputStream(request_socket.getInputStream());
-            objectOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
-            objectInputStream = new ObjectInputStream(bufferedInputStream);
+            requestOutputStream = new ObjectOutputStream(request_socket.getOutputStream());
+            responseInputStream = new ObjectInputStream(bufferedInputStream);
             while (bufferedInputStream.available() <= 0) {
                 try {
                     Thread.sleep(10);
@@ -42,8 +58,8 @@ public class ServerConnection {
                 }
             }
 
-            ServerResponse response = (ServerResponse) objectInputStream.readObject(); //Confirmation of connection.
-            if (response.getType() == ServerResponse.ResponseType.DETACHED) {
+            ServerResponse response = (ServerResponse) responseInputStream.readObject(); //Confirmation of connection.
+            if (response.getType() == ServerResponseType.DETACHED) {
                 // Detached from previous session, wait for confirmation for the new session.
                 while (bufferedInputStream.available() <= 0) {
                     try {
@@ -52,10 +68,14 @@ public class ServerConnection {
                         break;
                     }
                 }
-                objectInputStream.readObject();
+                responseInputStream.readObject();
             }
 
             data_socket = new Socket(InetAddress.getByName("46.239.104.32"), DATA_PORT);
+            server_request_socket = new Socket(InetAddress.getByName("46.239.104.32"), SERVER_REQUEST_PORT);
+            bufferedInputStream2 = new BufferedInputStream(server_request_socket.getInputStream());
+            responseOutputStream = new ObjectOutputStream(server_request_socket.getOutputStream());
+            requestInputStream = new ObjectInputStream(bufferedInputStream2);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -65,87 +85,124 @@ public class ServerConnection {
         return instance;
     }
 
-    public boolean startBroadcast() {
-        ServerResponse serverMessage = null;
-        try {
-            serverMessage = sendRequest(ClientRequestType.BROADCAST, "Ray Charles");
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
+    public void startBroadcast(final String name) {
+        addRequest(ClientRequestType.BROADCAST, name);
+    }
+
+    public void stopBroadcast() {
+        addRequest(ClientRequestType.STOP_BROADCAST);
+    }
+
+    public void startListen() {
+        addRequest(ClientRequestType.LISTEN);
+    }
+
+    public void stopListen() {
+        addRequest(ClientRequestType.STOP_LISTEN);
+    }
+
+    public void startBroadcast(final String name, RequestDoneListener... listeners) {
+        addRequest(ClientRequestType.BROADCAST, name, listeners);
+    }
+
+    public void stopBroadcast(RequestDoneListener... listeners) {
+        addRequest(ClientRequestType.STOP_BROADCAST, listeners);
+    }
+
+    public void startListen(RequestDoneListener... listeners) {
+        addRequest(ClientRequestType.LISTEN, listeners);
+    }
+
+    public void stopListen(RequestDoneListener... listeners) {
+        addRequest(ClientRequestType.STOP_LISTEN, listeners);
+    }
+
+    public void sendReaction(Reaction reaction){
+        addRequest(ClientRequestType.SEND_REACTION, reaction.toString());
+    }
+
+    public void fetchStatus(RequestDoneListener... listeners) {
+        addRequest(ClientRequestType.REQUEST_STATUS, listeners);
+    }
+
+    public void detach() throws IOException, InterruptedException, ClassNotFoundException {
+        addRequest(ClientRequestType.DETACH_CLIENT);
+    }
+
+    private void addRequest(final ClientRequestType requestType) {
+        addRequest(new ClientRequest(requestType));
+    }
+
+    private void addRequest(final ClientRequestType requestType, final String value) {
+        addRequest(new ClientRequest(requestType, value));
+    }
+
+    private void addRequest(final ClientRequestType requestType, RequestDoneListener... listeners) {
+        addRequest(new ClientRequest(requestType), listeners);
+    }
+
+    private void addRequest(final ClientRequestType requestType, final String value, RequestDoneListener... listeners) {
+        addRequest(new ClientRequest(requestType, value), listeners);
+    }
+
+    public void addRequest(ClientRequest request) {
+        addRequest(request, new LinkedList<>());
+    }
+
+    public void addRequest(ClientRequest request, @NonNull RequestDoneListener... listeners) {
+        List<RequestDoneListener> l = new LinkedList<>();
+        l.addAll(Arrays.asList(listeners));
+        addRequest(request, l);
+    }
+
+    public void addRequest(ClientRequest request, @NonNull List<RequestDoneListener> listeners) {
+        requests.offer(new AbstractMap.SimpleEntry<>(request, listeners));
+    }
+
+    public ServerResponse sendRequest() {
+        Object tmp = null;
+        if (!requests.isEmpty()) {
+            Map.Entry<ClientRequest, List<RequestDoneListener>> request = requests.poll();
+            try {
+                requestOutputStream.writeObject(request.getKey());
+                requestOutputStream.flush();
+                while (bufferedInputStream.available() <= 0)
+                    Thread.sleep(10);
+
+                tmp = responseInputStream.readObject();
+
+                for (RequestDoneListener listener : request.getValue())
+                    listener.serverResponseReceived((ServerResponse) tmp);
+            } catch (IOException | InterruptedException | ClassNotFoundException
+                    | ClassCastException e) {
+                e.printStackTrace();
+            }
         }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
+        return (ServerResponse) tmp;
     }
 
-    public boolean stopBroadcast() {
-        ServerResponse serverMessage = null;
+    public ServerRequest fetchRequest() {
         try {
-            serverMessage = sendRequest(ClientRequestType.STOP_BROADCAST);
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
+            if (bufferedInputStream2.available() > 0) {
+                final Object o = requestInputStream.readObject();
+                final ClientRequest request;
+                if (o != null) {
+                    return (ServerRequest) o;
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+
         }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
+        return null;
     }
 
-    public boolean startListen() {
-        ServerResponse serverMessage = null;
+    public void sendResponse(final ClientResponse response) {
         try {
-            serverMessage = sendRequest(ClientRequestType.LISTEN, "Ray Charles");
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            responseOutputStream.writeObject(response);
+            responseOutputStream.flush();
+        } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
-    }
-
-    public boolean stopListen() {
-        ServerResponse serverMessage = null;
-        try {
-            serverMessage = sendRequest(ClientRequestType.STOP_LISTEN, "Ray Charles");
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return serverMessage.getType().equals(ServerResponse.ResponseType.REQUEST_ACCEPTED);
-    }
-
-    public boolean detach() throws IOException, InterruptedException, ClassNotFoundException {
-        ServerResponse serverMessage = sendRequest(ClientRequestType.DETACH_CLIENT);
-        return serverMessage.getType().equals(ServerResponse.ResponseType.DETACHED);
-    }
-
-    public ServerResponse.Status getStatus()  throws IOException, InterruptedException, ClassNotFoundException {
-        ServerResponse serverResponse = sendRequest(ClientRequestType.REQUEST_STATUS);
-        return (ServerResponse.Status) serverResponse.getValue();
-    }
-
-    private ServerResponse sendRequest(final ClientRequestType request) throws IOException,
-            InterruptedException, ClassNotFoundException, ClassCastException {
-        return sendRequest(new ClientRequest(request));
-    }
-
-    private ServerResponse sendRequest(final ClientRequestType request, final String val) throws IOException,
-            InterruptedException, ClassNotFoundException, ClassCastException {
-        return sendRequest(new ClientRequest(request, val));
-    }
-
-    private ServerResponse sendRequest(final ClientRequest request) throws IOException,
-            InterruptedException, ClassNotFoundException, ClassCastException {
-        Object o = null;
-
-        objectOutputStream.writeObject(request);
-        objectOutputStream.flush();
-
-
-        while (bufferedInputStream.available() <= 0 && request_socket.isConnected())
-            Thread.sleep(10);
-
-
-        if (request_socket.isConnected())
-            o = objectInputStream.readObject();
-
-
-        return (ServerResponse) o;
     }
 
 }
