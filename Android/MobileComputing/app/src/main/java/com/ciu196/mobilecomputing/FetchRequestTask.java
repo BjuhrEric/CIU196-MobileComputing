@@ -58,6 +58,8 @@ public class FetchRequestTask extends LoopableTask {
             case RECEIVE_REACTION:
                 reactionListeners.forEach((listener) -> listener.onReactionReceived(Reaction
                         .valueOf(request.getValue())));
+                ServerConnection.getInstance().sendResponse(new ClientResponse(ClientResponseType
+                        .REQUEST_ACCEPTED, new ResponseValue.NoValue()));
                 break;
             case RECEIVE_BROADCAST: //TODO
             case SEND_BROADCAST:
