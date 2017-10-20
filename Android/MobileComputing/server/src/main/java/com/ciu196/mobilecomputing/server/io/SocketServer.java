@@ -56,9 +56,13 @@ public class SocketServer implements Server {
     @Override
     public void shareReaction(final Client provider, final Reaction reaction) throws IOException {
         listeners.forEach((client) -> {
-            if (client != provider)
+            if (client != provider) {
+                System.out.println("Sharing "+reaction.name()+" with "+client.getInetAddress().getHostAddress());
                 client.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name()));
+            }
         });
+        if (broadcaster != null)
+            broadcaster.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name()));
 
         provider.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED,
                 new ResponseValue.NoValue()));
