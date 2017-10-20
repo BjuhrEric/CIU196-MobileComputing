@@ -78,8 +78,6 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             } else {
                 switchGui(guiMode.CANT_LISTEN);
             }
-        } else {
-            switchGui(guiMode.PLAYING);
         }
         System.out.println();
     }
@@ -331,8 +329,12 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                         public void onClick(DialogInterface dialog, int which) {
                             //TODO create RequestDoneListener
                             resultName = ((EditText) dialogView.findViewById(R.id.name)).getText().toString();
-                            ServerConnection.getInstance().startBroadcast(resultName);
-                            broadcasting = true;
+                            ServerConnection.getInstance().startBroadcast(resultName, (RequestDoneListener) response -> {
+                                if (response.getType().equals(ServerResponseType.REQUEST_ACCEPTED)) {
+                                    broadcasting = true;
+                                    new Handler(Looper.getMainLooper()).post(() -> switchGui(guiMode.PLAYING));
+                                }
+                            });
                             Log.d("Broadcast", "Starting broadcast");
                         }
                     });
