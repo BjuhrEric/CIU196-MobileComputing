@@ -154,6 +154,7 @@ public class SocketServer implements Server {
             broadcaster = null;
             broadcasterName = NOONE;
             broadcastStartTime = -1;
+            listeners.clear();
             if (respond)
                 c.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.NoValue()));
         } else if (respond) {
@@ -178,6 +179,7 @@ public class SocketServer implements Server {
                 }
             }
             clientMap.remove(c.getInetAddress());
+            listeners.remove(c);
             c.close();
 
             System.out.println("Client detached");
