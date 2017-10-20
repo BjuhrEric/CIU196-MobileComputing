@@ -54,8 +54,14 @@ public class SocketServer implements Server {
     }
 
     @Override
-    public void shareReaction(final Reaction reaction) {
-        listeners.forEach((client) -> client.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name())));
+    public void shareReaction(final Client provider, final Reaction reaction) throws IOException {
+        listeners.forEach((client) -> {
+            if (client != provider)
+                client.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name()));
+        });
+
+        provider.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED,
+                new ResponseValue.NoValue()));
     }
 
     public void connectRequestSocket() throws IOException {

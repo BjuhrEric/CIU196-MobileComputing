@@ -31,7 +31,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 
 import org.joda.time.Duration;
@@ -163,7 +162,7 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                 case R.id.fab3:
                     Reaction reaction = getReactionFromId(id);
                     animateReaction(reaction);
-                    obs.sendReaction(reaction);
+                    ServerConnection.getInstance().sendReaction(reaction);
                     break;
                 default:
                     break;
@@ -411,7 +410,6 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
                 }
             }
         });
-        obs.setReactionListener(this);
 
     }
 

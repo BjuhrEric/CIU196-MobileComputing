@@ -28,7 +28,6 @@ public class OnlineBroadcastService {
     private volatile long broadcastStartTime;
     private volatile int numberOfListeners;
     private volatile int volume;
-    private ReactionListener reactionListener;
 
 
     private final List<StatusUpdateListener> updateListeners;
@@ -96,14 +95,7 @@ public class OnlineBroadcastService {
         this.volume = volume;
     }
 
-    public void incomingReaction(Reaction reaction){
-        reactionListener.onReactionReceived(reaction);
-    }
 
-    public void sendReaction(Reaction reaction){
-        //// TODO: 2017-10-18
-
-    }
 
     // Returns the start Instat of the current session. If there isn't one it throws a "NotLiveException"
     public Duration getCurrentSessionDuration() throws NotLiveException {
@@ -115,10 +107,6 @@ public class OnlineBroadcastService {
 
         //throw new NotLiveException();
         return new Duration(0);
-    }
-
-    public void setReactionListener(ReactionListener l){
-        reactionListener = l;
     }
 
 }

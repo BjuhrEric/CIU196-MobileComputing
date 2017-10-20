@@ -25,5 +25,5 @@ public interface Server {
     void receiveData(Client client) throws IllegalStateException, IOException;
     void sendStatus(Client client) throws IOException;
     void init() throws IOException;
-    void shareReaction(Reaction reaction);
+    void shareReaction(Client provider, Reaction reaction) throws IOException;
 }
