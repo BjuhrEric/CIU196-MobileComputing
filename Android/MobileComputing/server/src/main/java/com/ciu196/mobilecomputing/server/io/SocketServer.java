@@ -85,9 +85,9 @@ public class SocketServer implements Server {
         client.addTask(handlerTask);
         client.addTask(connectionTask);
 
-        new Thread(fetcherTask).start();
-        new Thread(handlerTask).start();
-        new Thread(connectionTask).start();
+        new Thread(fetcherTask, "ClientRequestFetcherThread").start();
+        new Thread(handlerTask, "ClientRequestHandlerThread").start();
+        new Thread(connectionTask, "ClientConnectionThread").start();
     }
 
     public void connectServerRequestSocket() throws IOException {
@@ -132,7 +132,7 @@ public class SocketServer implements Server {
     }
 
     public void setBroadcaster(final Client c, final String name) throws IOException {
-        System.out.println("Setting broadcaster");
+        System.out.println("Setting broadcaster to: "+name);
         if (broadcaster != null) {
             c.sendResponse(new ServerResponse(ServerResponseType.REQUEST_DECLINED, new ResponseValue.NoValue()));
             return;

@@ -36,10 +36,10 @@ public final class ServerApplication {
     }
 
     private void start() {
-        new Thread(new ConnectClientDataSocketTask(server)).start();
-        new Thread(new ConnectClientRequestSocketTask(server)).start();
-        new Thread(new ConnectClientServerRequestSocketTask(server)).start();
-        new Thread(new SendServerRequestsTask(server)).start();
+        new Thread(new ConnectClientDataSocketTask(server), "ConnectClientDataSocketThread").start();
+        new Thread(new ConnectClientRequestSocketTask(server), "ConnectClientRequestSocketThread").start();
+        new Thread(new ConnectClientServerRequestSocketTask(server), "ConnectClientServerRequestSocketThread").start();
+        new Thread(new SendServerRequestsTask(server), "SendServerRequestsThread").start();
     }
 
 }

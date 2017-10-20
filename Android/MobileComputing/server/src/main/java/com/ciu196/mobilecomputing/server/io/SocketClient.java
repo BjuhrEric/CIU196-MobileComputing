@@ -36,6 +36,7 @@ class SocketClient implements Client {
     private ObjectOutputStream responseOutputStream, requestOutputStream;
     private boolean connected;
     private boolean sendingRequest = false;
+    private long sendingRequestStartTime = -1;
 
     SocketClient(InetAddress inetAddress){
         this.clientRequests = new ConcurrentLinkedQueue<>();
@@ -117,21 +118,24 @@ class SocketClient implements Client {
         ServerRequest request = serverRequests.poll();
         try {
             sendingRequest = true;
-            long sendingRequestStartTime = System.currentTimeMillis();
+            sendingRequestStartTime = System.currentTimeMillis();
             new Thread(() -> {
                 try {
                     requestOutputStream.writeObject(request);
                     requestOutputStream.flush();
+                    sendingRequestStartTime = System.currentTimeMillis();
                     sendingRequest = false;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    sendingRequest = true;
+                    sendingRequestStartTime = Long.MIN_VALUE;
+                    // This will force an exception below, causing the server to detach the client
                 }
-            });
-            while (sendingRequest)
+            }, "RequestStreamWriteThread").start();
+
+            while (sendingRequest || bufferedInputStream2.available() <= 0)
                 if (sendingRequestStartTime + 15000 < System.currentTimeMillis())
-                    throw new IOException("Request timed out, assuming connection lost\n"
-                    + "Start time: " + sendingRequestStartTime + "\t current time:" + System.currentTimeMillis());
-            while (bufferedInputStream2.available() <= 0)
+                    throw new IOException("Request timed out, assuming connection lost");
+                else
                     Thread.sleep(10);
 
             response = (ClientResponse) responseInputStream.readObject();
@@ -183,6 +187,11 @@ class SocketClient implements Client {
             serverRequestSocket.close();
 
         tasks.forEach(LoopableTask::stop);
+
+        tasks.clear();
+        serverRequests.clear();
+        clientRequests.clear();
+        dataOutput.clear();
     }
 
     @Override

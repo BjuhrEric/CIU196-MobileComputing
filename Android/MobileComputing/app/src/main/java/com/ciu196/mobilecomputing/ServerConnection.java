@@ -76,6 +76,10 @@ public class ServerConnection {
             bufferedInputStream2 = new BufferedInputStream(server_request_socket.getInputStream());
             responseOutputStream = new ObjectOutputStream(server_request_socket.getOutputStream());
             requestInputStream = new ObjectInputStream(bufferedInputStream2);
+
+            request_socket.setKeepAlive(true);
+            data_socket.setKeepAlive(true);
+            server_request_socket.setKeepAlive(true);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -191,7 +195,7 @@ public class ServerConnection {
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
-
+            e.printStackTrace();
         }
         return null;
     }
