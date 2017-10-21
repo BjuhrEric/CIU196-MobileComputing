@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 
@@ -41,12 +42,14 @@ public class SocketServer implements Server {
     private volatile Client broadcaster = null;
     private volatile String broadcasterName = NOONE;
     private ServerSocket requestSocket, serverRequestSocket, dataSocket;
-    private final Map<Long, Client> clientMap;
+    private final Map<Long, Client> connectingClients;
+    private final Set<Client> connectedClients;
     private final Set<Client> listeners;
 
     public SocketServer() {
         System.out.println("Allocating server memory.");
-        clientMap = Collections.synchronizedMap(new HashMap<>());
+        connectingClients = Collections.synchronizedMap(new TreeMap<>());
+        connectedClients = Collections.synchronizedNavigableSet(new TreeSet<>());
         listeners = Collections.synchronizedNavigableSet(new TreeSet<>());
     }
 
@@ -81,10 +84,10 @@ public class SocketServer implements Server {
 
         Random r = new Random();
         Long rand;
-        do { rand = r.nextLong(); } while(clientMap.containsKey(rand) || rand == -1);
+        do { rand = r.nextLong(); } while(connectingClients.containsKey(rand) || rand == -1);
 
         client = new SocketClient(rand, clientSocket.getInetAddress());
-        clientMap.put(rand, client);
+        connectingClients.put(rand, client);
         client.bindRequestSocket(clientSocket, bis, ois, oos);
 
         System.out.println("Client "+rand+" connected with IP: "+clientSocket.getInetAddress().getHostAddress());
@@ -103,7 +106,7 @@ public class SocketServer implements Server {
             ClientRequest request = (ClientRequest) in.readObject();
             if (request.getType().equals(ClientRequestType.IDENTIFY)) {
                 id = Long.parseLong(request.getValue());
-                SocketClient client = (SocketClient) clientMap.get(id);
+                SocketClient client = (SocketClient) connectingClients.get(id);
                 if (client != null) {
                     System.out.println("Server request socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
                     client.bindServerRequestSocket(clientSocket, bis, in, out);
@@ -121,6 +124,8 @@ public class SocketServer implements Server {
                     new Thread(fetcherTask, "ClientRequestFetcherThread").start();
                     new Thread(handlerTask, "ClientRequestHandlerThread").start();
                     new Thread(connectionTask, "ClientConnectionThread").start();
+                    connectedClients.add(client);
+                    connectingClients.remove(client.getID());
                     return;
                 }
             }
@@ -143,7 +148,7 @@ public class SocketServer implements Server {
             ClientRequest request = (ClientRequest) in.readObject();
             if (request.getType().equals(ClientRequestType.IDENTIFY)) {
                 id = Long.parseLong(request.getValue());
-                SocketClient client = (SocketClient) clientMap.get(id);
+                SocketClient client = (SocketClient) connectingClients.get(id);
                 if (client != null) {
                     System.out.println("Data socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
                     client.bindDataSocket(clientSocket);
@@ -219,7 +224,7 @@ public class SocketServer implements Server {
 
     public void detachClient(final Client c, boolean sendResponse) throws IOException {
         if (c != null) {
-            System.out.println("Detaching client: " + c.getInetAddress().getHostAddress());
+            System.out.println("Detaching client " + c.getID() + " with IP: " + c.getInetAddress().getHostAddress());
             stopBroadcast(c, false);
             removeListener(c, false);
             if (sendResponse) {
@@ -229,7 +234,7 @@ public class SocketServer implements Server {
                     System.out.println("The socket was already closed");
                 }
             }
-            clientMap.remove(c.getID());
+            connectedClients.remove(c);
             listeners.remove(c);
             c.close();
 
@@ -253,7 +258,7 @@ public class SocketServer implements Server {
 
     @Override
     public Collection<Client> getClients() {
-        return clientMap.values();
+        return connectedClients;
     }
 
     private void removeListener(Client c, boolean respond) throws IOException {
@@ -267,7 +272,7 @@ public class SocketServer implements Server {
         try {
             if (running) {
                 listeners.clear();
-                clientMap.clear();
+                connectingClients.clear();
                 requestSocket.close();
                 dataSocket.close();
                 running = false;
