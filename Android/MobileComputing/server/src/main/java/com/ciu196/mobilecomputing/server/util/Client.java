@@ -3,7 +3,6 @@ package com.ciu196.mobilecomputing.server.util;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientResponse;
 import com.ciu196.mobilecomputing.common.requests.ServerRequest;
-import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 
 import java.io.IOException;

@@ -1,9 +1,7 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.io;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -11,7 +9,6 @@ import org.joda.time.Instant;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Andreas Pegelow on 2017-10-09.

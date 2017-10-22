@@ -1,4 +1,4 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.io;
 
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 

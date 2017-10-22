@@ -1,4 +1,4 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.animations;
 
 import android.animation.Animator;
 import android.view.View;

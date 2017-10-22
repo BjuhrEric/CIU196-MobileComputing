@@ -1,4 +1,4 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.reactions;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -6,6 +6,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import com.ciu196.mobilecomputing.R;
+import com.ciu196.mobilecomputing.Reaction;
 
 import java.util.LinkedList;
 import java.util.List;

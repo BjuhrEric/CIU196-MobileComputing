@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,7 +18,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -31,7 +31,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ciu196.mobilecomputing.animations.ViewAnimationService;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
+import com.ciu196.mobilecomputing.io.BroadcastService;
+import com.ciu196.mobilecomputing.io.NotLiveException;
+import com.ciu196.mobilecomputing.io.OnlineBroadcastService;
+import com.ciu196.mobilecomputing.io.RequestDoneListener;
+import com.ciu196.mobilecomputing.io.ServerConnection;
+import com.ciu196.mobilecomputing.io.StatusUpdateListener;
+import com.ciu196.mobilecomputing.reactions.ReactionListener;
+import com.ciu196.mobilecomputing.reactions.ReactionService;
 
 import org.joda.time.Duration;
 
@@ -44,20 +53,23 @@ import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 
-import static android.support.design.widget.FloatingActionButton.*;
-import static com.ciu196.mobilecomputing.ViewAnimationService.addAnimator;
-import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeInAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeOutAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.addFadeWithScaleAnimation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.addInstantOperation;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getColorTransitionAnimator;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getFadeAnimator;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslateToCenterInParentViewAnimator;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getTranslationAnimatorReset;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimator;
-import static com.ciu196.mobilecomputing.ViewAnimationService.getUniformScaleAnimatorReset;
-import static com.ciu196.mobilecomputing.ViewAnimationService.startAllAnimations;
-import static com.ciu196.mobilecomputing.ViewAnimationService.startAnimations;
+import static android.support.design.widget.FloatingActionButton.INVISIBLE;
+import static android.support.design.widget.FloatingActionButton.SIZE_MINI;
+import static android.support.design.widget.FloatingActionButton.SIZE_NORMAL;
+import static android.support.design.widget.FloatingActionButton.VISIBLE;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.addAnimator;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.addFadeInAnimation;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.addFadeOutAnimation;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.addFadeWithScaleAnimation;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.addInstantOperation;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.getColorTransitionAnimator;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.getFadeAnimator;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.getTranslateToCenterInParentViewAnimator;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.getTranslationAnimatorReset;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.getUniformScaleAnimator;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.getUniformScaleAnimatorReset;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.startAllAnimations;
+import static com.ciu196.mobilecomputing.animations.ViewAnimationService.startAnimations;
 
 
 public class ConnectActivity extends AppCompatActivity implements ReactionListener, StatusUpdateListener {

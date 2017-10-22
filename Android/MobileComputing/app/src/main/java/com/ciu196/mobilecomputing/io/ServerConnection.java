@@ -1,7 +1,8 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.io;
 
 import android.support.annotation.NonNull;
 
+import com.ciu196.mobilecomputing.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.common.requests.ClientResponse;
@@ -10,7 +11,6 @@ import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import static com.ciu196.mobilecomputing.common.Constants.DATA_PORT;
 import static com.ciu196.mobilecomputing.common.Constants.REQUEST_PORT;
 import static com.ciu196.mobilecomputing.common.Constants.SERVER_REQUEST_PORT;
 
@@ -110,16 +109,8 @@ public class ServerConnection {
         return instance;
     }
 
-    public void startBroadcast(final String name) {
-        addRequest(ClientRequestType.BROADCAST, name);
-    }
-
     public void stopBroadcast() {
         addRequest(ClientRequestType.STOP_BROADCAST);
-    }
-
-    public void startListen() {
-        addRequest(ClientRequestType.LISTEN);
     }
 
     public void stopListen() {
@@ -130,16 +121,8 @@ public class ServerConnection {
         addRequest(ClientRequestType.BROADCAST, name, listeners);
     }
 
-    public void stopBroadcast(RequestDoneListener... listeners) {
-        addRequest(ClientRequestType.STOP_BROADCAST, listeners);
-    }
-
     public void startListen(RequestDoneListener... listeners) {
         addRequest(ClientRequestType.LISTEN, listeners);
-    }
-
-    public void stopListen(RequestDoneListener... listeners) {
-        addRequest(ClientRequestType.STOP_LISTEN, listeners);
     }
 
     public void sendReaction(Reaction reaction){
@@ -218,7 +201,6 @@ public class ServerConnection {
             try {
                 if (bufferedInputStream2.available() > 0) {
                     final Object o = requestInputStream.readObject();
-                    final ClientRequest request;
                     if (o != null) {
                         return (ServerRequest) o;
                     }

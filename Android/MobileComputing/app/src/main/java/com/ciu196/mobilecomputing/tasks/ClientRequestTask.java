@@ -1,19 +1,7 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.tasks;
 
-import android.support.annotation.NonNull;
-
-import com.ciu196.mobilecomputing.common.requests.ClientRequest;
-import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
-
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.ciu196.mobilecomputing.io.ServerConnection;
 
 /**
  * Created by Eric on 2017-10-18.

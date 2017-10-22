@@ -1,15 +1,8 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.io;
 
 
 import android.content.Context;
 import android.util.Log;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.json.JSONObject;
-
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -18,15 +11,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.Gson;
-import com.google.maps.android.*;
 
-import java.util.SimpleTimeZone;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.json.JSONObject;
 
 /**
  * Created by Andreas Pegelow on 2017-10-09.
  */
-
+@Deprecated
 public class BroadcastService {
     public static final String TAG = "BroadcastService";
     private static String playername = "Ray";

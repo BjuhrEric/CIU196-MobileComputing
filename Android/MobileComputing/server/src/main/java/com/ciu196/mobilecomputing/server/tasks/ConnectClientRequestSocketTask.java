@@ -3,8 +3,6 @@ package com.ciu196.mobilecomputing.server.tasks;
 import com.ciu196.mobilecomputing.common.Constants;
 import com.ciu196.mobilecomputing.server.util.Server;
 
-import java.io.IOException;
-
 public class ConnectClientRequestSocketTask extends ServerTask {
 
     public ConnectClientRequestSocketTask(Server server) {

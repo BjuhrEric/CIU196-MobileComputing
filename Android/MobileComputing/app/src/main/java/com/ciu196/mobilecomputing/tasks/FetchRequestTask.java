@@ -1,15 +1,15 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.tasks;
 
 import android.util.Log;
 
+import com.ciu196.mobilecomputing.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientResponse;
 import com.ciu196.mobilecomputing.common.requests.ClientResponseType;
 import com.ciu196.mobilecomputing.common.requests.ResponseValue;
 import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
-
-import java.util.LinkedList;
-import java.util.List;
+import com.ciu196.mobilecomputing.io.ServerConnection;
+import com.ciu196.mobilecomputing.reactions.ReactionService;
 
 /**
  * Created by Eric on 2017-10-18.

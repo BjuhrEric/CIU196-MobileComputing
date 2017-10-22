@@ -1,10 +1,7 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.animations;
 
-import android.animation.Animator;
 import android.view.View;
-import android.view.animation.Animation;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.animations;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -8,6 +8,9 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+
+import com.ciu196.mobilecomputing.Circle;
+import com.ciu196.mobilecomputing.ConnectActivity;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,6 +2,10 @@ package com.ciu196.mobilecomputing;
 
 import android.app.Application;
 
+import com.ciu196.mobilecomputing.tasks.ClientRequestTask;
+import com.ciu196.mobilecomputing.tasks.FetchRequestTask;
+import com.ciu196.mobilecomputing.tasks.ServerStatusFetcherTask;
+
 import net.danlew.android.joda.JodaTimeAndroid;
 
 /**

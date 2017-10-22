@@ -15,8 +15,6 @@ import com.ciu196.mobilecomputing.server.tasks.ClientRequestHandlerTask;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
-import static com.ciu196.mobilecomputing.common.Constants.*;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,12 +23,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import static com.ciu196.mobilecomputing.common.Constants.DATA_PORT;
+import static com.ciu196.mobilecomputing.common.Constants.REQUEST_PORT;
+import static com.ciu196.mobilecomputing.common.Constants.SERVER_REQUEST_PORT;
 
 
 public class SocketServer implements Server {

@@ -28,6 +28,8 @@ public class ClientRequestFetcherTask extends ServerTask {
 
     @Override
     protected boolean loop() {
+        if (!client.isConnected())
+            return false;
         try {
             client.fetchRequests();
         } catch (IOException | ClassNotFoundException e) {

@@ -1,13 +1,7 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.animations;
 
-import android.content.Context;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 

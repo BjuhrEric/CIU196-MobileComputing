@@ -2,10 +2,6 @@ package com.ciu196.mobilecomputing.server.tasks;
 
 import com.ciu196.mobilecomputing.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
-import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
-import com.ciu196.mobilecomputing.common.requests.ResponseValue;
-import com.ciu196.mobilecomputing.common.requests.ServerResponse;
-import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
@@ -34,6 +30,8 @@ public class ClientRequestHandlerTask extends ServerTask {
 
     @Override
     protected boolean loop() {
+        if (!client.isConnected())
+            return false;
         final ClientRequest first = client.getFirstRequest();
         if (first == null)
             return true;
