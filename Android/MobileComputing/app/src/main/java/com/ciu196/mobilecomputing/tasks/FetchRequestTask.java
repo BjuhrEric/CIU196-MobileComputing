@@ -2,7 +2,7 @@ package com.ciu196.mobilecomputing.tasks;
 
 import android.util.Log;
 
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientResponse;
 import com.ciu196.mobilecomputing.common.requests.ClientResponseType;
 import com.ciu196.mobilecomputing.common.requests.ResponseValue;

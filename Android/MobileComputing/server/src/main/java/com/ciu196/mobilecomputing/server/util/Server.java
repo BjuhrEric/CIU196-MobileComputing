@@ -1,6 +1,6 @@
 package com.ciu196.mobilecomputing.server.util;
 
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -22,7 +22,7 @@ public interface Server {
     void detachClient(Client client) throws IOException;
     void detachClient(Client client, boolean response) throws IOException;
     void sendData(Client client) throws IOException;
-    void receiveData(Client client) throws IllegalStateException, IOException;
+    void receiveData(Client client) throws IOException;
     void sendStatus(Client client) throws IOException;
     void init() throws IOException;
     void shareReaction(Client provider, Reaction reaction) throws IOException;

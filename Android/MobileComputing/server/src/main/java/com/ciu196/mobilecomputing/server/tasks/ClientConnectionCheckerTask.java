@@ -2,6 +2,7 @@ package com.ciu196.mobilecomputing.server.tasks;
 
 import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
@@ -19,12 +20,14 @@ public class ClientConnectionCheckerTask extends ServerTask {
 
     @Override
     protected boolean init() {
-        return client.isConnected();
+        GlobalLog.log("Began checking connection for: "+client.getID());
+        return true;
     }
 
     @Override
     protected boolean finish() {
         try {
+            GlobalLog.log("Stopped checking connection for: "+client.getID());
             if (!forcedStop)
                 server.detachClient(client, false);
         } catch (IOException e) {
@@ -35,7 +38,6 @@ public class ClientConnectionCheckerTask extends ServerTask {
 
     @Override
     protected boolean loop() {
-        //System.out.println("Checking connection for client: "+client.getInetAddress().getHostAddress());
         if (!client.isConnected())
             return false;
         client.addRequest(new ServerRequest(ServerRequestType.CONFIRM_CONNECTIVITY));

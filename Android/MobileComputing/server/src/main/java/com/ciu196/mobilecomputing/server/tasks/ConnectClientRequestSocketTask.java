@@ -22,7 +22,7 @@ public class ConnectClientRequestSocketTask extends ServerTask {
     @Override
     protected boolean loop() {
         try {
-            System.out.println("Waiting for clients to connect to port "+ Constants.REQUEST_PORT);
+            //System.out.println("Waiting for clients to connect to port "+ Constants.REQUEST_PORT);
             server.connectRequestSocket();
             return true;
         } catch (Exception e) {

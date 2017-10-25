@@ -1,4 +1,4 @@
-package com.ciu196.mobilecomputing;
+package com.ciu196.mobilecomputing.common;
 
 import java.io.Serializable;
 

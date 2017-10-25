@@ -1,5 +1,6 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
@@ -22,7 +23,7 @@ public class ClientRequestFetcherTask extends ServerTask {
 
     @Override
     protected boolean finish() {
-        System.out.println("Finishing request fetcher task for client: "+client.getInetAddress().getHostAddress());
+        GlobalLog.log("Finishing request fetcher task for client: " + client.getInetAddress().getHostAddress());
         return true;
     }
 
@@ -33,7 +34,7 @@ public class ClientRequestFetcherTask extends ServerTask {
         try {
             client.fetchRequests();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
             return false;
         }
         return true;

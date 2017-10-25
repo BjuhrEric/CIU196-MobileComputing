@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ciu196.mobilecomputing.animations.ViewAnimationService;
+import com.ciu196.mobilecomputing.common.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 import com.ciu196.mobilecomputing.io.BroadcastService;
 import com.ciu196.mobilecomputing.io.NotLiveException;

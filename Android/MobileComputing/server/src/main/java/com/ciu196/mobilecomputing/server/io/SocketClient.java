@@ -6,6 +6,7 @@ import com.ciu196.mobilecomputing.common.requests.ServerRequest;
 import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.tasks.LoopableTask;
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.util.Client;
 
 import java.io.BufferedInputStream;
@@ -29,12 +30,17 @@ class SocketClient implements Client {
     private final Collection<LoopableTask> tasks;
     private final InetAddress inetAddress;
     private final long id;
-    private Socket requestSocket, serverRequestSocket, dataSocket;
+    private Socket requestSocket;
+    private Socket serverRequestSocket;
+    private Socket dataSocket;
     private InputStream dataInputStream;
     private OutputStream dataOutputStream;
-    private BufferedInputStream bufferedInputStream1, bufferedInputStream2;
-    private ObjectInputStream requestInputStream, responseInputStream;
-    private ObjectOutputStream responseOutputStream, requestOutputStream;
+    private BufferedInputStream bufferedInputStream1;
+    private BufferedInputStream bufferedInputStream2;
+    private ObjectInputStream requestInputStream;
+    private ObjectInputStream responseInputStream;
+    private ObjectOutputStream responseOutputStream;
+    private ObjectOutputStream requestOutputStream;
     private boolean connected;
     private boolean sendingRequest = false;
     private long sendingRequestStartTime = -1;
@@ -53,7 +59,7 @@ class SocketClient implements Client {
         tasks.add(task);
     }
 
-    void bindRequestSocket(Socket socket, BufferedInputStream bis, ObjectInputStream ois, ObjectOutputStream oos) throws IOException {
+    void bindRequestSocket(Socket socket, BufferedInputStream bis, ObjectInputStream ois, ObjectOutputStream oos) {
         requestSocket = socket;
         bufferedInputStream1 = bis;
         requestInputStream = ois;
@@ -66,7 +72,7 @@ class SocketClient implements Client {
         dataOutputStream = socket.getOutputStream();
     }
 
-    void bindServerRequestSocket(Socket socket, BufferedInputStream bis, ObjectInputStream ois, ObjectOutputStream oos) throws IOException {
+    void bindServerRequestSocket(Socket socket, BufferedInputStream bis, ObjectInputStream ois, ObjectOutputStream oos) {
         serverRequestSocket = socket;
         bufferedInputStream2 = bis;
         responseInputStream = ois;
@@ -117,22 +123,11 @@ class SocketClient implements Client {
         if (serverRequests.isEmpty() || requestOutputStream == null || responseInputStream == null)
             return null;
 
-        ServerRequest request = serverRequests.poll();
+        final ServerRequest request = serverRequests.poll();
         try {
             sendingRequest = true;
             sendingRequestStartTime = System.currentTimeMillis();
-            new Thread(() -> {
-                try {
-                    requestOutputStream.writeObject(request);
-                    requestOutputStream.flush();
-                    sendingRequestStartTime = System.currentTimeMillis();
-                    sendingRequest = false;
-                } catch (IOException e) {
-                    sendingRequest = true;
-                    sendingRequestStartTime = Long.MIN_VALUE;
-                    // This will force an exception below, causing the server to detach the client
-                }
-            }, "RequestStreamWriteThread").start();
+            new Thread(() -> sendRequest(request), "RequestStreamWriteThread").start();
 
             while (sendingRequest || bufferedInputStream2.available() <= 0)
                 if (sendingRequestStartTime + 15000 < System.currentTimeMillis())
@@ -141,13 +136,28 @@ class SocketClient implements Client {
                     Thread.sleep(10);
 
             response = (ClientResponse) responseInputStream.readObject();
-        } catch (IOException | ClassNotFoundException | InterruptedException e) {
-            if (e instanceof IOException || request.getType().equals(ServerRequestType.CONFIRM_CONNECTIVITY))
+        } catch (IOException e) {
+            setConnected(false);
+        } catch (ClassNotFoundException | InterruptedException e) {
+            if (request.getType().equals(ServerRequestType.CONFIRM_CONNECTIVITY))
                 setConnected(false);
             else
-                e.printStackTrace();
+                GlobalLog.log(e);
         }
         return response;
+    }
+
+    private void sendRequest(ServerRequest request) {
+        try {
+            requestOutputStream.writeObject(request);
+            requestOutputStream.flush();
+            sendingRequestStartTime = System.currentTimeMillis();
+            sendingRequest = false;
+        } catch (IOException e) {
+            sendingRequest = true;
+            sendingRequestStartTime = Long.MIN_VALUE;
+            // This will force an log below, causing the server to detach the client
+        }
     }
 
     @Override
@@ -202,6 +212,6 @@ class SocketClient implements Client {
 
     @Override
     public int compareTo(Client client) {
-        return inetAddress.getHostAddress().compareTo(client.getInetAddress().getHostAddress());
+        return Long.compare(id, client.getID());
     }
 }

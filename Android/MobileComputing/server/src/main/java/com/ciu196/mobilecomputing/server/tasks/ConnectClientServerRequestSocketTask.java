@@ -1,6 +1,6 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
-import com.ciu196.mobilecomputing.common.Constants;
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.util.Server;
 
 /**
@@ -26,11 +26,10 @@ public class ConnectClientServerRequestSocketTask extends ServerTask {
     @Override
     protected boolean loop() {
         try {
-            System.out.println("Waiting for clients to connect to port "+ Constants.SERVER_REQUEST_PORT);
             server.connectServerRequestSocket();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
             return false;
         }
     }

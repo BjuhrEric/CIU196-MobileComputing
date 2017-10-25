@@ -1,5 +1,7 @@
 package com.ciu196.mobilecomputing.common.tasks;
 
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
+
 /**
  * Created by Eric on 2017-10-12.
  */
@@ -39,7 +41,7 @@ public abstract class LoopableTask implements Runnable, Comparable<LoopableTask>
                     Thread.sleep(delay);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
         }
 
         if (listener != null)

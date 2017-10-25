@@ -1,6 +1,7 @@
 package com.ciu196.mobilecomputing.server;
 
 import com.ciu196.mobilecomputing.server.io.SocketServer;
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.tasks.ConnectClientRequestSocketTask;
 import com.ciu196.mobilecomputing.server.tasks.ConnectClientServerRequestSocketTask;
 import com.ciu196.mobilecomputing.server.tasks.SendServerRequestsTask;
@@ -13,11 +14,11 @@ public final class ServerApplication {
     private final Server server;
 
     public static void main(final String[] args) {
-        System.out.println("Starting server...");
+        GlobalLog.log("Starting server...");
         final ServerApplication application = new ServerApplication();
         application.init();
         application.start();
-        System.out.println("Server started!");
+        GlobalLog.log("Server started!");
         Runtime.getRuntime().addShutdownHook(new Thread(application.server::quit));
     }
 
@@ -29,7 +30,7 @@ public final class ServerApplication {
         try {
             server.init();
         } catch (IOException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
         }
     }
 

@@ -2,7 +2,7 @@ package com.ciu196.mobilecomputing.io;
 
 import android.support.annotation.NonNull;
 
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.common.requests.ClientResponse;

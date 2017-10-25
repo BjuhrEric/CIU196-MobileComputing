@@ -1,7 +1,8 @@
 package com.ciu196.mobilecomputing.server.tasks;
 
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.util.Client;
 import com.ciu196.mobilecomputing.server.util.Server;
 
@@ -24,7 +25,7 @@ public class ClientRequestHandlerTask extends ServerTask {
 
     @Override
     protected boolean finish() {
-        System.out.println("Finishing request handler task for client: "+client.getInetAddress().getHostAddress());
+        GlobalLog.log("Finishing request handler task for client: " + client.getInetAddress().getHostAddress());
         return true;
     }
 
@@ -64,9 +65,11 @@ public class ClientRequestHandlerTask extends ServerTask {
                 case SEND_REACTION:
                     server.shareReaction(client, Reaction.valueOf(first.getValue()));
                     break;
+                default:
+                    break;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
             return false;
         }
         return true;

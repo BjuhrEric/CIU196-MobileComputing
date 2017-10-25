@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.ciu196.mobilecomputing.R;
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 
 import java.util.LinkedList;
 import java.util.List;

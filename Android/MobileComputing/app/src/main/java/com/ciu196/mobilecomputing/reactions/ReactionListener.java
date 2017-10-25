@@ -1,6 +1,6 @@
 package com.ciu196.mobilecomputing.reactions;
 
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 
 /**
  * Created by alexanderalvmo on 2017-10-18.

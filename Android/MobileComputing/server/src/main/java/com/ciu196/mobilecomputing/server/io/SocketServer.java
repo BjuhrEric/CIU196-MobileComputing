@@ -1,6 +1,6 @@
 package com.ciu196.mobilecomputing.server.io;
 
-import com.ciu196.mobilecomputing.Reaction;
+import com.ciu196.mobilecomputing.common.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
 import com.ciu196.mobilecomputing.common.requests.ResponseValue;
@@ -9,6 +9,7 @@ import com.ciu196.mobilecomputing.common.requests.ServerRequestType;
 import com.ciu196.mobilecomputing.common.requests.ServerResponse;
 import com.ciu196.mobilecomputing.common.requests.ServerResponseType;
 import com.ciu196.mobilecomputing.common.tasks.TaskManager;
+import com.ciu196.mobilecomputing.common.logging.GlobalLog;
 import com.ciu196.mobilecomputing.server.tasks.ClientConnectionCheckerTask;
 import com.ciu196.mobilecomputing.server.tasks.ClientRequestFetcherTask;
 import com.ciu196.mobilecomputing.server.tasks.ClientRequestHandlerTask;
@@ -37,25 +38,27 @@ import static com.ciu196.mobilecomputing.common.Constants.SERVER_REQUEST_PORT;
 public class SocketServer implements Server {
 
 
-    private final static String NOONE = "No-one";
+    private static final String NOONE = "No-one";
     private volatile long broadcastStartTime = -1;
     private volatile boolean running = false;
     private volatile Client broadcaster = null;
     private volatile String broadcasterName = NOONE;
-    private ServerSocket requestSocket, serverRequestSocket, dataSocket;
+    private ServerSocket requestSocket;
+    private ServerSocket serverRequestSocket;
+    private ServerSocket dataSocket;
     private final Map<Long, Client> connectingClients;
     private final Set<Client> connectedClients;
     private final Set<Client> listeners;
 
     public SocketServer() {
-        System.out.println("Allocating server memory.");
+        GlobalLog.log("Allocating server memory.");
         connectingClients = Collections.synchronizedMap(new TreeMap<>());
         connectedClients = Collections.synchronizedNavigableSet(new TreeSet<>());
         listeners = Collections.synchronizedNavigableSet(new TreeSet<>());
     }
 
     public void init() throws IOException {
-        System.out.println("Opening server sockets");
+        GlobalLog.log("Opening server sockets");
         requestSocket = new ServerSocket(REQUEST_PORT);
         serverRequestSocket = new ServerSocket(SERVER_REQUEST_PORT);
         dataSocket = new ServerSocket(DATA_PORT);
@@ -64,7 +67,7 @@ public class SocketServer implements Server {
 
     @Override
     public void shareReaction(final Client provider, final Reaction reaction) throws IOException {
-        listeners.forEach((client) -> {
+        listeners.forEach(client -> {
             if (client != provider) {
                 client.addRequest(new ServerRequest(ServerRequestType.RECEIVE_REACTION, reaction.name()));
             }
@@ -91,7 +94,7 @@ public class SocketServer implements Server {
         connectingClients.put(rand, client);
         client.bindRequestSocket(clientSocket, bis, ois, oos);
 
-        System.out.println("Client "+rand+" connected with IP: "+clientSocket.getInetAddress().getHostAddress());
+        GlobalLog.log("Client "+rand+" connected with IP: "+clientSocket.getInetAddress().getHostAddress());
         client.sendResponse(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.SingleObjectValue<>(rand)));
 
     }
@@ -109,7 +112,7 @@ public class SocketServer implements Server {
                 id = Long.parseLong(request.getValue());
                 SocketClient client = (SocketClient) connectingClients.get(id);
                 if (client != null) {
-                    System.out.println("Server request socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
+                    GlobalLog.log("Server request socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
                     client.bindServerRequestSocket(clientSocket, bis, in, out);
                     out.writeObject(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.SingleObjectValue<>(id)));
                     out.flush();
@@ -135,7 +138,7 @@ public class SocketServer implements Server {
 
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
         }
     }
 
@@ -151,7 +154,7 @@ public class SocketServer implements Server {
                 id = Long.parseLong(request.getValue());
                 SocketClient client = (SocketClient) connectingClients.get(id);
                 if (client != null) {
-                    System.out.println("Data socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
+                    GlobalLog.log("Data socket opened for client: " + clientSocket.getInetAddress().getHostAddress());
                     client.bindDataSocket(clientSocket);
                     out.writeObject(new ServerResponse(ServerResponseType.REQUEST_ACCEPTED, new ResponseValue.SingleObjectValue<>(id)));
                     out.flush();
@@ -161,11 +164,11 @@ public class SocketServer implements Server {
             out.writeObject(new ServerResponse(ServerResponseType.REQUEST_DECLINED, new ResponseValue.NoValue()));
             out.flush();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
         }
     }
 
-    public void receiveData(final Client c) throws IllegalStateException, IOException {
+    public void receiveData(final Client c) throws IOException {
         if (c == null || !c.equals(broadcaster))
             throw new IllegalStateException("Only the broadcaster is supposed to broadcast");
 
@@ -189,7 +192,7 @@ public class SocketServer implements Server {
     }
 
     public void setBroadcaster(final Client c, final String name) throws IOException {
-        System.out.println("Setting broadcaster to: "+name);
+        GlobalLog.log("Setting broadcaster to: " + name + " (" + c.getID() + ")");
         if (broadcaster != null) {
             c.sendResponse(new ServerResponse(ServerResponseType.REQUEST_DECLINED, new ResponseValue.NoValue()));
             return;
@@ -207,7 +210,7 @@ public class SocketServer implements Server {
 
     private void stopBroadcast(final Client c, boolean respond) throws IOException {
         if (c.equals(broadcaster)) {
-            System.out.println("Stopping broadcast");
+            GlobalLog.log("Stopping broadcast");
             broadcaster = null;
             broadcasterName = NOONE;
             broadcastStartTime = -1;
@@ -225,21 +228,21 @@ public class SocketServer implements Server {
 
     public void detachClient(final Client c, boolean sendResponse) throws IOException {
         if (c != null) {
-            System.out.println("Detaching client " + c.getID() + " with IP: " + c.getInetAddress().getHostAddress());
+            GlobalLog.log("Detaching client " + c.getID() + " with IP: " + c.getInetAddress().getHostAddress());
             stopBroadcast(c, false);
             removeListener(c, false);
             if (sendResponse) {
                 try {
                     c.sendResponse(new ServerResponse(ServerResponseType.DETACHED, new ResponseValue.NoValue()));
                 } catch (IOException e) {
-                    System.out.println("The socket was already closed");
+                    GlobalLog.log("The socket was already closed");
                 }
             }
+
             connectedClients.remove(c);
-            listeners.remove(c);
             c.close();
 
-            System.out.println("Client detached");
+            GlobalLog.log("Client " + c.getID() + " detached, " + getClients().size() + " clients still connected.");
         }
     }
 
@@ -250,7 +253,6 @@ public class SocketServer implements Server {
         } else {
             c.sendResponse(new ServerResponse(ServerResponseType.REQUEST_DECLINED, new ResponseValue.NoValue()));
         }
-
     }
 
     public void removeListener(Client c) throws IOException {
@@ -259,7 +261,7 @@ public class SocketServer implements Server {
 
     @Override
     public Collection<Client> getClients() {
-        return connectedClients;
+        return new TreeSet<>(connectedClients);
     }
 
     private void removeListener(Client c, boolean respond) throws IOException {
@@ -279,9 +281,9 @@ public class SocketServer implements Server {
                 running = false;
             }
             TaskManager.getInstance().finishAllTasks();
-            System.out.println("Server has been shut down");
+            GlobalLog.log("Server has been shut down");
         } catch (IOException e) {
-            e.printStackTrace();
+            GlobalLog.log(e);
         }
     }
 }
