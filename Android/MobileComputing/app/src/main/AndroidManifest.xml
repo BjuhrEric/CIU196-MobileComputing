@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:name=".Appiano"
         android:theme="@style/AppTheme">
-        <activity android:name=".ConnectActivity">
+        <activity android:name=".ConnectActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,23 +46,13 @@
 
         <activity
             android:name=".VolumeRangeActivity"
-            android:label="@string/title_activity_maps">
-
-
-        </activity>
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ChangeVolumeRangeActivity"
-            android:label="@string/title_activity_change_volume">
+            android:label="@string/title_activity_change_volume"
+            android:screenOrientation="portrait" />
 
-
-        </activity>
-
-        <activity
-            android:name=".Temp.PitchAnimationActivity"
-            android:label="@string/title_activity_change_volume">
-
-
-        </activity>
     </application>
 
 </manifest>
