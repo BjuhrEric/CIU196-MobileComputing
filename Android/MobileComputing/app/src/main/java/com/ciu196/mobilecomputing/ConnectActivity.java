@@ -370,6 +370,9 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(currentGuiMode == guiMode.CANT_LISTEN || currentGuiMode == guiMode.CANT_CONNECT){
+                    startActivity(new Intent(ConnectActivity.this, VolumeRangeActivity.class));
+                }
                 if (currentGuiMode == guiMode.START_TO_LISTEN) {
 
                     Intent i = new Intent(ConnectActivity.this, VolumeRangeActivity.class);
@@ -590,7 +593,14 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
-
+            fab.setClickable(true);
+            fab.setSize(SIZE_NORMAL);
+            fab.setLayoutParams(normalFabLp);
+            addInstantOperation(fab,
+                    () -> fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.actionBlueColor))),
+                    () -> fab.setImageResource(R.drawable.ic_map_white_24dp)
+            );
+            addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
         } else if (m == guiMode.CANT_CONNECT) {
             currentGuiMode = guiMode.CANT_CONNECT;
             setCircleColor(circleColor.GRAY);
@@ -622,7 +632,14 @@ public class ConnectActivity extends AppCompatActivity implements ReactionListen
             addInstantOperation(actionButton, () -> actionButton.setBackground(getDrawable(R.drawable.rounded_button_gray)));
             addFadeInAnimation(actionButton, ACTION_BUTTON_FADE_DURATION);
 
-
+            fab.setClickable(true);
+            fab.setSize(SIZE_NORMAL);
+            fab.setLayoutParams(normalFabLp);
+            addInstantOperation(fab,
+                    () -> fab.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.actionBlueColor))),
+                    () -> fab.setImageResource(R.drawable.ic_map_white_24dp)
+            );
+            addFadeWithScaleAnimation(fab, 400, 1, 0, 1);
         } else if (m == guiMode.CONNECT) {
             currentGuiMode = guiMode.CONNECT;
 
