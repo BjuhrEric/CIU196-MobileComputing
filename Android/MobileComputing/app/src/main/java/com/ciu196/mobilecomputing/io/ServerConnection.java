@@ -1,7 +1,9 @@
 package com.ciu196.mobilecomputing.io;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.ciu196.mobilecomputing.common.Constants;
 import com.ciu196.mobilecomputing.common.Reaction;
 import com.ciu196.mobilecomputing.common.requests.ClientRequest;
 import com.ciu196.mobilecomputing.common.requests.ClientRequestType;
@@ -20,6 +22,7 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 
@@ -47,16 +50,21 @@ public class ServerConnection {
         requests = new LinkedList<>();
 
         try {
+            Log.d("Connection", "Trying to open a connection.");
             long id = initRequestSocket();
             if (id == -1)
                 throw new IOException("Could not establish connection on port: "+REQUEST_PORT);
             request_socket_init = true;
 
+            Log.d("Connection", String.format(Locale.ENGLISH, "Successfully opened a connection on port: %1$d", Constants.REQUEST_PORT));
 
             id = initServerRequestSocket(id);
             if (id == -1)
                 throw new IOException("Could not establish connection on port: "+SERVER_REQUEST_PORT);
             server_request_socket_init = true;
+
+            Log.d("Connection", String.format(Locale.ENGLISH, "Successfully opened a connection on port: %1$d", Constants.SERVER_REQUEST_PORT));
+            Log.d("Connection", "Connection successfully opened!");
         } catch (IOException e) {
             e.printStackTrace();
         }

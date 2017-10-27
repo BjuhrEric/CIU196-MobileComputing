@@ -49,6 +49,7 @@ public class FetchRequestTask extends LoopableTask {
     private void handleRequest(final ServerRequest request) {
         switch(request.getType()) {
             case CONFIRM_CONNECTIVITY:
+                Log.d("Connection", "Verifying connection");
                 ServerConnection.getInstance().sendResponse(new ClientResponse(ClientResponseType
                         .CONNECTIVITY_CONFIRMED, new ResponseValue.NoValue()));
                 break;
