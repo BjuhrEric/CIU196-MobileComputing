@@ -131,19 +131,28 @@ public class BroadcastService {
     /*
    * http://googlemaps.github.io/android-maps-utils/javadoc/
    * */
+    private static double distance;
+    private static boolean closeEnough = false;
 
     public static boolean closeEnough() {
-        //Todo: not implemented yet, just dummy implementation so far
-        int playZone = 0;
-        int circleRadius = 0;
-        LatLng libLatLng = null;
-        LatLng userLatLng = null;
-
-//        double distance = SphericalUtil.computeDistanceBetween(null, null);
-        double distance = -1;
-        return distance < playZone*circleRadius;
-
+//        //Todo: not implemented yet, just dummy implementation so far
+//        int playZone = 0;
+//        int circleRadius = 0;
+//        LatLng libLatLng = null;
+//        LatLng userLatLng = null;
+//
+////        double distance = SphericalUtil.computeDistanceBetween(null, null);
+//        distance = 999999; //-1;
+//        return distance < playZone*circleRadius;
+        return closeEnough;
     }
+
+    public static void flipCloseEnough(){
+        closeEnough = !closeEnough;
+    }
+
+
+
     //Start new brodcast
     public static boolean startNewBroadcast(String nameOfBroadcaster) {
         //Todo: not implemented yet

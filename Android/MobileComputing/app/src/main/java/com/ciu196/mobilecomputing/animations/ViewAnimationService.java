@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
@@ -166,19 +167,17 @@ public class ViewAnimationService {
         String propertyName;
 
         if (axis == Axis.X) {
-            propertyName="translationX";
+            propertyName = "translationX";
             if (specialCase.equals("pianoStatusTextView")) {
                 animator = ObjectAnimator.ofFloat(v, propertyName, -10);
-            }
-            else if (specialCase.equals("playerNameTextView")) {
+            } else if (specialCase.equals("playerNameTextView")) {
                 animator = ObjectAnimator.ofFloat(v, propertyName, v.getRight(), -10);
             }
         } else {
-            propertyName="translationY";
+            propertyName = "translationY";
             if (specialCase.equals("playerNameTextView")) {
                 animator = ObjectAnimator.ofFloat(v, propertyName, v.getTop(), 0);
-            }
-            else if (specialCase.equals("listenerLayout")) {
+            } else if (specialCase.equals("listenerLayout")) {
                 animator = ObjectAnimator.ofFloat(v, propertyName, -10);
             }
         }
@@ -191,9 +190,16 @@ public class ViewAnimationService {
 
     public static Animator getTranslateToCenterInParentViewAnimator(final View v, int duration, final Axis axis, final String specialCase) {
         int target;
-         if (axis == Axis.X) {
-            int screenWidth = ConnectActivity.SCREEN_WIDTH;
-            target = screenWidth / 2 - 2 * v.getWidth();
+        if (axis == Axis.X) {
+            if(specialCase.equals("pianoStatusTextView"))
+                target = -150;
+            else {
+                target = 350;
+                //int screenWidth = ConnectActivity.SCREEN_WIDTH;
+                //target = (screenWidth / 2) - (v.getLeft()) - v.getWidth();
+                //System.out.println(specialCase + ": screen witdh: " + screenWidth + "getwidth: " + v.getWidth() + " target: " + target);
+                //Snackbar.make(v, specialCase + ":screen witdh: " + screenWidth + " target: " + target, Snackbar.LENGTH_INDEFINITE);
+            }
         } else {
             target = 90;
         }
@@ -239,7 +245,7 @@ public class ViewAnimationService {
 
     public static Animator getUniformScaleAnimatorReset(final View v, int duration, float scaleFactor) {
 
-        ValueAnimator animator = ValueAnimator.ofFloat(scaleFactor,1);
+        ValueAnimator animator = ValueAnimator.ofFloat(scaleFactor, 1);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
